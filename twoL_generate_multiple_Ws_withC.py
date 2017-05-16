@@ -15,8 +15,8 @@ except:
 
 import sys
 
-N = 3000 #minimum of 1000
-p_AVG = 50/N
+N = 5000 #minimum of 1000
+p_AVG = 0.05 #50/N
 
 if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
@@ -40,12 +40,12 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
             # alpha_conv = np.random.uniform(0, 0.3)
             # alpha_div = np.random.uniform(0, 0.3)
             # alpha_chain = np.random.uniform(-0.4, 0.3)
-            L_left = 45
-            L_right = 45
-            alpha_recip = 0.3
-            alpha_conv = 0.3
-            alpha_div = 0.3
-            alpha_chain = 0.3
+            L_left = math.inf
+            L_right = math.inf
+            alpha_recip = 0.2
+            alpha_conv = 0.2
+            alpha_div = 0.2
+            alpha_chain = 0.2
 
             P = create_P(N, L_left, L_right, p_AVG)
             print("P has been created \n")
@@ -65,9 +65,11 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
             alpha_conv_hat = ((np.sum(np.matmul(np.transpose(W),W)) - np.sum(W)) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             alpha_div_hat = ((np.sum(np.matmul(W,np.transpose(W))) - np.sum(W)) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             alpha_chain_hat = ((np.sum(np.matmul(W,W)) - np.trace(np.matmul(W,W))) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
+            evals, evects = np.linalg.eig(W)
+            largest_eigenval = np.ndarray.max(evals)
                 
             #create dictionary of stats and save
-            stats = dict([('L_left', L_left), ('L_right', L_right), ('p_AVG', p_AVG), ('alpha_recip', alpha_recip), ('alpha_conv', alpha_conv), ('alpha_div', alpha_div), ('alpha_chain', alpha_chain), ('p_hat', p_hat), ('alpha_recip_hat', alpha_recip_hat), ('alpha_conv_hat', alpha_conv_hat), ('alpha_div_hat', alpha_div_hat), ('alpha_chain_hat', alpha_chain_hat)])
+            stats = dict([('N', N), ('L_left', L_left), ('L_right', L_right), ('p_AVG', p_AVG), ('alpha_recip', alpha_recip), ('alpha_conv', alpha_conv), ('alpha_div', alpha_div), ('alpha_chain', alpha_chain), ('p_hat', p_hat), ('alpha_recip_hat', alpha_recip_hat), ('alpha_conv_hat', alpha_conv_hat), ('alpha_div_hat', alpha_div_hat), ('alpha_chain_hat', alpha_chain_hat), ('largest eigenvalue', largest_eigenval)])
             
             stat_filename = "matrices/Stats_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,i) #pickle the dictionary of stats for each W
             with open(stat_filename, "wb") as f:
