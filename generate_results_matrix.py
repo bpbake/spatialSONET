@@ -36,10 +36,10 @@ for w_index in range(start_index, end_index+1):
         except (EOFError):
             print("unpickling error")
           
-    result_matrix[w_index, 0] = w_index
+    result_matrix[w_index-start_index, 0] = w_index
     
     for k in range(1, len(results_header)):    
-        result_matrix[w_index, k] = results[results_header[k]]
+        result_matrix[w_index-start_index, k] = results[results_header[k]]
 #    result_matrix[w_index, 2] = results['N']
 #    result_matrix[w_index, 2] = results['L_left']
 #    result_matrix[w_index, 2] = results['L_right']
@@ -56,7 +56,7 @@ for w_index in range(start_index, end_index+1):
 #    result_matrix[w_index, 12] = results['p_AVG']
 
 
-np.savetxt('result_matrix.txt', result_matrix, delimiter=',', header=str(results_header)) 
+np.savetxt('result_matrix.csv', result_matrix, delimiter=',', header=str(results_header)) 
     
     
 
