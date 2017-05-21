@@ -50,3 +50,10 @@ Temporary Items
 __pycache__
 matrices
 #twoL
+build
+
+# emacs backup files
+*~
+
+# compiled cython
+*.so

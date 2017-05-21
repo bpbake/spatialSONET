@@ -15,8 +15,14 @@ except:
 
 import sys
 
-N = 5000 #minimum of 1000
-p_AVG = 0.05 #50/N
+try:
+    del input # brian overwrites this, we want to reset it to the python default
+except:
+    pass
+
+
+N = 3000 #minimum of 1000
+p_AVG = 50/N
 
 if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
@@ -34,18 +40,18 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
             print("\nmaking matrix {0}".format(i))
             
             #generate Ls, alphas
-            # L_left = math.exp(np.random.uniform(4.5, 10))# L=[90,22000]ish
-            # L_right = 0 #math.exp(np.random.uniform(4.5, 10))
-            # alpha_recip = np.random.uniform(0, 0.3)
-            # alpha_conv = np.random.uniform(0, 0.3)
-            # alpha_div = np.random.uniform(0, 0.3)
-            # alpha_chain = np.random.uniform(-0.4, 0.3)
-            L_left = math.inf
-            L_right = math.inf
-            alpha_recip = 0.2
-            alpha_conv = 0.2
-            alpha_div = 0.2
-            alpha_chain = 0.2
+            L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
+            L_right = L_left #math.exp(np.random.uniform(4.5, 10))
+            alpha_recip = np.random.uniform(0, 0.3)
+            alpha_conv = np.random.uniform(0, 0.3)
+            alpha_div = np.random.uniform(0, 0.3)
+            alpha_chain = np.random.uniform(-0.4, 0.3)
+#            L_left = 40#float("inf")# math.inf
+#            L_right =40#float("inf")#math.inf
+#            alpha_recip = 0.3
+#            alpha_conv = 0.3
+#            alpha_div = 0.3
+#            alpha_chain = 0.3
 
             P = create_P(N, L_left, L_right, p_AVG)
             print("P has been created \n")
@@ -65,7 +71,7 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
             alpha_conv_hat = ((np.sum(np.matmul(np.transpose(W),W)) - np.sum(W)) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             alpha_div_hat = ((np.sum(np.matmul(W,np.transpose(W))) - np.sum(W)) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             alpha_chain_hat = ((np.sum(np.matmul(W,W)) - np.trace(np.matmul(W,W))) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
-            evals, evects = np.linalg.eig(W)
+            evals = np.linalg.eigvals(W)
             largest_eigenval = np.ndarray.max(evals)
                 
             #create dictionary of stats and save
