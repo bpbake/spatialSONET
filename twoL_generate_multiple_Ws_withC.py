@@ -15,8 +15,8 @@ except:
 
 import sys
 
-N = 5000 #minimum of 1000
-p_AVG = 0.05 #50/N
+N = 3000 #minimum of 1000
+p_AVG = 50/N
 
 if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
@@ -36,16 +36,16 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
             #generate Ls, alphas
             # L_left = math.exp(np.random.uniform(4.5, 10))# L=[90,22000]ish
             # L_right = 0 #math.exp(np.random.uniform(4.5, 10))
-            # alpha_recip = np.random.uniform(0, 0.3)
-            # alpha_conv = np.random.uniform(0, 0.3)
-            # alpha_div = np.random.uniform(0, 0.3)
-            # alpha_chain = np.random.uniform(-0.4, 0.3)
-            L_left = math.inf
-            L_right = math.inf
-            alpha_recip = 0.2
-            alpha_conv = 0.2
-            alpha_div = 0.2
-            alpha_chain = 0.2
+            alpha_recip = np.random.uniform(0, 0.3)
+            alpha_conv = np.random.uniform(0, 0.3)
+            alpha_div = np.random.uniform(0, 0.3)
+            alpha_chain = np.random.uniform(-0.4, 0.3)
+            L_left = 90
+            L_right = 50
+            #alpha_recip = 0.2
+            #alpha_conv = 0.2
+            #alpha_div = 0.2
+            #alpha_chain = 0.2
 
             P = create_P(N, L_left, L_right, p_AVG)
             print("P has been created \n")
@@ -82,8 +82,8 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
                 print(k+":{0}".format(v))
 
             # plot the W matrix
-            plt.matshow(W)
-            plt.show()
+            #plt.matshow(W)
+            #plt.show()
                 
             trying = False
                 
