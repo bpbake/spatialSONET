@@ -5,6 +5,8 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
+data_dir = 'matrices/10000_sample/'
+
 try:
    import cPickle as pickle # used to store python data types
 except:
@@ -25,7 +27,7 @@ np.set_printoptions(threshold=np.nan)
 import matplotlib.pyplot as plt
 import math
 
-N = 3000 # Number of excitatory neurons
+N = 10000 # Number of excitatory neurons
 p_AVG =50/N # average probability of connectivity between neurons
 
 
@@ -49,7 +51,7 @@ for w_index in range(start_index, end_index+1):
     
     print("w_index = {0}".format(w_index))
     
-    results_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index) 
+    results_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
 
     with open(results_filename, 'rb') as sf:
         try:
@@ -63,7 +65,7 @@ for w_index in range(start_index, end_index+1):
         results[key][ind]=stats[key]
 
 # save results (pickle new stats dictionary)
-result_filename = "matrices/Summary_W_N{0}_p{1}.pickle".format(N,p_AVG) 
+result_filename = "{0}Summary_W_N{1}_p{2}.pickle".format(data_dir,N,p_AVG) 
 with open(result_filename, "wb") as rf:
     pickle.dump(results, rf)
 

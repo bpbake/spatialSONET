@@ -5,6 +5,8 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
+data_dir = 'matrices/10000_symmetric/'
+
 try:
    import cPickle as pickle # used to store python data types
 except:
@@ -29,7 +31,7 @@ import math
 
 start_scope() # start fresh with magic settings
 
-N = 3000 # Number of excitatory neurons
+N = 10000 # Number of excitatory neurons
 p_AVG =50/N # average probability of connectivity between neurons
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
@@ -90,14 +92,14 @@ for w_index in range(start_index, end_index+1):
     
     restore() # set the state back to what it was when the store() command was called
     
-    W_filename = "matrices/W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index)
+    W_filename = "{0}W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
     with open(W_filename, 'rb') as wf:
         try:
             W = pickle.load(wf) # load in W matrix
         except (EOFError):
             print("unpickling error")
     
-    stats_filename = "matrices/Stats_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index)
+    stats_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
     with open(stats_filename, 'rb') as sf:
         try:
             stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
@@ -115,7 +117,7 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes > (transienttime*N/refract*0.5): # if the number of spikes it too large, assume it's saturated
         print("\nnetwork saturated, skipping matrix {0}\n".format(w_index))
         stats['saturated'] = True # add to the stats dict
-        result_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index) 
+        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) #pickle the new stats dict 
         continue # go to next matrix
@@ -123,7 +125,7 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes < (2*N): # if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(w_index))
         stats['not spiking'] = True #add to the stats dict
-        result_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index)  
+        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) # pickle the new stats file
         continue # go to next matrix
@@ -183,6 +185,6 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    result_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index) 
+    result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)

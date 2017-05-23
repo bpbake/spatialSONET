@@ -55,5 +55,8 @@ build
 # emacs backup files
 *~
 
+# output files
+_outfile*
+
 # compiled cython
 *.so
