@@ -5,6 +5,8 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
+data_dir = 'matrices/10000_symmetric/'
+
 try:
    import cPickle as pickle # used to store python data types
 except:
@@ -21,6 +23,7 @@ input_orig = input # rename the python default for input (brian will overwrite i
 
 from brian2 import * #scary, but there are so many things that we need from brian2 for simulation that it would be a pain to import them all individually
 
+
 import numpy as np
 np.set_printoptions(threshold=np.nan)
 
@@ -29,7 +32,7 @@ import math
 
 start_scope() # start fresh with magic settings
 
-N = 3000 # Number of excitatory neurons
+N = 10000 # Number of excitatory neurons
 p_AVG = 50/N # average probability of connectivity between neurons
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
@@ -77,8 +80,12 @@ transient_PRM = PopulationRateMonitor(G) # records voltage (of some kind)
 store() # record state of simulation for future reference
 
 ######Load in matrices one at a time and simulate!
-start_index = int(input_orig("enter a starting index: "))
-end_index = int(input_orig("enter end index: "))
+if len(sys.argv) >= 3:
+   start_index = int(sys.argv[1])
+   end_index = int(sys.argv[2])
+else:
+   start_index = int(input_orig("enter a starting index: "))
+   end_index = int(input_orig("enter end index: "))
 
 for w_index in range(start_index, end_index+1):
     
@@ -86,14 +93,15 @@ for w_index in range(start_index, end_index+1):
     
     restore() # set the state back to what it was when the store() command was called
     
-    W_filename = "matrices/W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index)
+    W_filename = "{0}W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
+
     with open(W_filename, 'rb') as wf:
         try:
             W = pickle.load(wf) # load in W matrix
         except (EOFError):
             print("unpickling error")
     
-    stats_filename = "matrices/Stats_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index)
+    stats_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
     with open(stats_filename, 'rb') as sf:
         try:
             stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
@@ -111,7 +119,7 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes > (transienttime*N/refract*0.5): # if the number of spikes it too large, assume it's saturated
         print("\nnetwork saturated, skipping matrix {0}\n".format(w_index))
         stats['saturated'] = True # add to the stats dict
-        result_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index) 
+        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) #pickle the new stats dict 
         continue # go to next matrix
@@ -119,7 +127,7 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes < (2*N): # if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(w_index))
         stats['not spiking'] = True #add to the stats dict
-        result_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index)  
+        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) # pickle the new stats file
         continue # go to next matrix
@@ -136,33 +144,44 @@ for w_index in range(start_index, end_index+1):
     simulation_spikemon = SpikeMonitor(G)
     simulation_PRM = PopulationRateMonitor(G)   
     run(simulationtime)
+    
+    print("\nnumber of spikes in simulation: {0}\n".format(simulation_spikemon.num_spikes))
+
 
     synchrony = analyze_autocor(simulation_PRM.rate) # monotonic measure of synchrony
     print("\nExcitatory Synchrony = {0}\n".format(synchrony))
     
     # add results to the stats dict
+    stats['j'] = j
+    stats['ext_rate'] = ext_rate
+    stats['ext_mag'] = ext_mag
+    
     stats['synchrony'] = synchrony
     stats['PRM rate'] = simulation_PRM.rate/hertz
     stats['PRM time'] = simulation_PRM.t/ms
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
     
-    # #plot the results of the simulation
-#    figure(figsize=(20,10))
-#    # #subplot(122)
-#    # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
-#    # #xlabel('Time (ms)')
-#    # #ylabel('v')
-#    
-#    subplot(211)
-#    plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k')
-#    xlabel('Time (ms)')
-#    ylabel('Neuron index')
-#    plt.tight_layout()
-#    
-#    subplot(212)
-#    plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz)
-    
+    try:
+        # #plot the results of the simulation
+        figure(figsize=(20,10))
+        # #subplot(122)
+        # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
+        # #xlabel('Time (ms)')
+        # #ylabel('v')
+        
+          
+        subplot(211)
+        plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k')
+        axis([simulationtime/ms-500, simulationtime/ms, 1, N])
+        xlabel('Time (ms)')
+        ylabel('Neuron index')
+        plt.tight_layout()
+        
+        subplot(212)
+        plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz)
+    except Exception as e:
+        print("Error: %s" % e)
 
     #delete monitors so they don't cause restore() to get an error when looped through    
     del simulation_statemon 
@@ -170,6 +189,7 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    result_filename = "matrices/Results_W_N{0}_p{1}_{2}.pickle".format(N,p_AVG,w_index) 
+
+    result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)

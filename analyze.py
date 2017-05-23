@@ -92,7 +92,7 @@ def analyze_autocor(means):
 def _autocorrelation(means):
     from numpy.core import multiarray
     result = multiarray.correlate(means, means, mode=2)
-    return result[result.size/2:]
+    return result[round(result.size/2):]
 
 # ENTRY CONDITIONS:
 # - `ts` is a timeseries to smooth
