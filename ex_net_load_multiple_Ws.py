@@ -23,8 +23,9 @@ input_orig = input # rename the python default for input (brian will overwrite i
 
 from brian2 import * #scary, but there are so many things that we need from brian2 for simulation that it would be a pain to import them all individually
 
-import numpy
-numpy.set_printoptions(threshold=numpy.nan)
+
+import numpy as np
+np.set_printoptions(threshold=np.nan)
 
 import matplotlib.pyplot as plt
 import math
@@ -32,7 +33,7 @@ import math
 start_scope() # start fresh with magic settings
 
 N = 10000 # Number of excitatory neurons
-p_AVG =50/N # average probability of connectivity between neurons
+p_AVG = 50/N # average probability of connectivity between neurons
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
 tau = 10*ms 
@@ -93,6 +94,7 @@ for w_index in range(start_index, end_index+1):
     restore() # set the state back to what it was when the store() command was called
     
     W_filename = "{0}W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
+
     with open(W_filename, 'rb') as wf:
         try:
             W = pickle.load(wf) # load in W matrix
@@ -187,6 +189,7 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
+
     result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)

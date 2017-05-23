@@ -63,6 +63,7 @@ for i in range(start_index, start_index+num_matrices): #so i=start_index, start_
             # alpha_div = 0.3
             # alpha_chain = -0.3
             
+
             P = create_P(N, L_left, L_right, p_AVG)
             print("P has been created \n")
             
