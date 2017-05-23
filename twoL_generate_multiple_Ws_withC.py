@@ -5,7 +5,7 @@ Created on Mon Apr  3 16:41:12 2017
 @author: Brittany
 """
 
-data_dir = 'matrices/10000_asymmetric/'
+data_dir = 'matrices/10000_sample/'
 
 import os
 

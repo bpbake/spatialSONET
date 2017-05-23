@@ -160,24 +160,26 @@ for w_index in range(start_index, end_index+1):
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
     
-#    # #plot the results of the simulation
-#    figure(figsize=(20,10))
-#    # #subplot(122)
-#    # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
-#    # #xlabel('Time (ms)')
-#    # #ylabel('v')
-#    
-#      
-#    subplot(211)
-#    plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k')
-#    axis([simulationtime/ms-500, simulationtime/ms, 1, N])
-#    xlabel('Time (ms)')
-#    ylabel('Neuron index')
-#    plt.tight_layout()
-#    
-#    subplot(212)
-#    plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz)
-    
+    try:
+        # #plot the results of the simulation
+        figure(figsize=(20,10))
+        # #subplot(122)
+        # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
+        # #xlabel('Time (ms)')
+        # #ylabel('v')
+        
+          
+        subplot(211)
+        plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k')
+        axis([simulationtime/ms-500, simulationtime/ms, 1, N])
+        xlabel('Time (ms)')
+        ylabel('Neuron index')
+        plt.tight_layout()
+        
+        subplot(212)
+        plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz)
+    except Exception as e:
+        print("Error: %s" % e)
 
     #delete monitors so they don't cause restore() to get an error when looped through    
     del simulation_statemon 
