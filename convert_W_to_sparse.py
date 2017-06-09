@@ -5,7 +5,7 @@ Created on Thu Jun  8 10:01:50 2017
 @author: Brittany
 """
 
-data_dir = 'matrices/N3000_LL90_LR0_W/'
+data_dir = 'matrices/10000_one_sided/'
 
 try:
    import cPickle as pickle # used to store python data types
@@ -22,20 +22,23 @@ import numpy as np
 np.set_printoptions(threshold=np.nan)
 
 import scipy as sp
+from scipy import sparse
 
 import matplotlib.pyplot as plt
 import math
 
+import sys
 
-N = 3000
+
+N = 10000
 p_AVG = 50/N
 
-#if len(sys.argv) >= 3:
-#   start_index = int(sys.argv[1])
-#   end_index = int(sys.argv[2])
-#else:
-start_index = int(input_orig("enter a starting index: "))
-end_index = int(input_orig("enter end index: "))
+if len(sys.argv) >= 3:
+   start_index = int(sys.argv[1])
+   end_index = int(sys.argv[2])
+else:
+    start_index = int(input_orig("enter a starting index: "))
+    end_index = int(input_orig("enter end index: "))
 
 for w_index in range(start_index, end_index+1):
     print("w_index = {0}".format(w_index))    
@@ -47,8 +50,8 @@ for w_index in range(start_index, end_index+1):
         except (EOFError):
             print("unpickling error")
     
-    Wsparse = sp.sparse.csr_matrix(W)
-    plt.matshow(Wsparse.toarray())
+    Wsparse = sparse.csr_matrix(W)
+    #plt.matshow(Wsparse.toarray())
     
     Wsparse_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
     with open(Wsparse_filename, 'wb') as fp:

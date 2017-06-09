@@ -10,7 +10,7 @@ Created on Mon Apr  3 16:41:12 2017
 #   create_P.py
 #   produceW.pyx converted into produceW.c
 
-data_dir = 'matrices/3000_sample/'
+data_dir = 'matrices/10000_sample/'
 
 import os
 try:
@@ -94,7 +94,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             largest_eigenval = np.ndarray.max(evals)
             max_eigenval = sp.sparse.linalg.eigs(Wsparse, k=1, which='LM', return_eigenvectors=False)
             
-            if largest_eigenval != eigenval:
+            if largest_eigenval != max_eigenval:
                 print("different max eigenvalues. \n np largest = {0} \n sp largest = {1}".format(largest_eigenval, max_eigenval))
                 
             #create dictionary of stats and save
