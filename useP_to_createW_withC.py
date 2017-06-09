@@ -17,6 +17,7 @@ class MyException(Exception):
     pass
 
 def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
+    print("creating W")
     ## Generate the sonet matrix with spatial structure from P
     c1=0.2658  #coefficients for best fit equation of rho as a function of p1, p2, alpha
     c2=0.0470  #rho(p1,p2,alpha)~c3*(p1+c1)*(p2+c1)*(alpha+c2)
