@@ -31,11 +31,14 @@ def create_P(N, L_left, L_right, p_AVG):
     
     for i in range(1,N):
         if L_right == 0:
-            v = (N-i)/L_left
+            #v = (N-i)/L_left #exponential kernel
+            v = math.pow((N-i), 2)/(2*math.pow(L_left,2)) #gaussian kernel
         elif L_left == 0:
-            v = i/L_right
+            #v = i/L_right #exponential kernel
+            v = math.pow(i, 2)/(2*math.pow(L_right,2)) #gaussian kernel
         else:
-            v = min((N-i)/L_left, i/L_right)
+            #v = min((N-i)/L_left, i/L_right)
+            v = min(math.pow((N-i), 2)/(2*math.pow(L_left,2)), math.pow(i, 2)/(2*math.pow(L_right,2)))
             
         if v <= threshold:
             p[i] = math.exp(-v)
@@ -64,6 +67,10 @@ def create_P(N, L_left, L_right, p_AVG):
     p_short = p[1::]
     p_new = np.concatenate(([p[0]], p_short[::-1]), 0)
     P = linalg.toeplitz(p_new, p)
+    
+    
+    #plt.matshow(P)
+    #plt.show()
     
     
     ## Generate the sonet matrix with spatial structure from P

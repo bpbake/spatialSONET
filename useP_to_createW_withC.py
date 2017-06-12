@@ -11,7 +11,7 @@ from scipy import linalg, special
 import math
 import matplotlib.pyplot as plt
 import warnings
-import produceW
+import produceW, sys
 
 class MyException(Exception):
     pass
@@ -24,11 +24,15 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     c3=1.9531
     
     M_theta = np.zeros((N,N)) # M_theta(i,j) = theta_ij 
+    print("M_theta has been initialized. Line 27")
+    sys.stdout.flush()
     # matrix of thresholds.  If Z_ij > theta_ij then W_ij = 1
     for i in range(N):
         for j in range(N):
             M_theta[i,j] = math.sqrt(2)*special.erfinv(1 - (2*P[i,j]))
-
+    print("M_theta has been created. Line 33")
+    sys.stdout.flush()
+    
     Msigma = np.ones((N,N)) - np.identity(N)# Matrix of sigmas.
 
     M_tilde = np.multiply(Msigma, np.add(P,c1))# M_tilde(i,j) = sigma_ij^tilde
@@ -40,6 +44,8 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     # now, we will solve for c, d, and e using (AA)*(AA)^T = E
     E = np.array([[(c3*(alpha_conv +c2)), (c3*(alpha_chain +c2))], [(c3*(alpha_chain +c2)), (c3*(alpha_div +c2))]])
 
+    print("Now finding eigenvalues of E to calculate c, d, e.  Line 47")
+    sys.stdout.flush()
     D, V = np.linalg.eig(E)
     # D is a vector of the eigenvalues, each repeated according to its multiplicity. The eigenvalues are not necessarily ordered. 
     #   The resulting array will be of complex type, unless the imaginary part is zero in which case it will be cast to a real type. 
@@ -49,6 +55,8 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     
     BB = np.zeros((2, 2))
     
+    print("Eigenvalues have been calculated.  Now checking for negatives. Line 58")
+    sys.stdout.flush()
     for i in range(2):
         if (D[i] < 0) and (D[i] > -1e-12):
             D[i] = 0 # If eigenvalue is really small and negative, we can assume there's a roundoff error and it should be zero
@@ -63,28 +71,39 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     c = AA[0,0]/np.sqrt(m)
     d = AA[1,1]/np.sqrt(m)
     e = AA[0,1]/np.sqrt(m)
+    print("c,d,e have been calculated. Line 74")
+    sys.stdout.flush()
     
     # Now we'll define F, G, and H
     # Lets's make things easier by defining these:
     M_square = np.square(M_tilde) # M_square[i,j] = sigma_ij^tilde^2
     m_sq = np.subtract(m,M_square) # m_sq[i,j] = m - sigma_ij^tilde^2
     m_sqT = np.subtract(m,np.transpose(M_square)) # m_sqT[i,j] = m - sigma_ji^tilde^2
+    print("Next creating F, G, H. Line 82")
+    sys.stdout.flush()
     
     F = np.subtract(np.square(Msigma), np.multiply(M_square,np.add(np.multiply(math.pow(c,2), m_sq),np.add(np.multiply(math.pow(d,2), m_sq), np.multiply(2*math.pow(e,2),m_sqT)))))   
     #F[i,j] = A[i,j]^2+B[i,j]^2 = Msigma[i,j]^2 - M[i,j]^2*((c^2 + d^2)*(m-M[i,j]^2) + 2*e^2*(m-M[j,i]^2));
     # note this requires F[i,j] >=0
+    print("matrix F has been created. Line 88")
+    sys.stdout.flush()
 
     G = np.transpose(F)#G[i,j] = A[j,i]^2 + B[i,j]^2 = Msigma[j,i]^2 - M[j,i]^2*((c^2 + d^2)*(m-M[j,i]^2) + 2*e^2*(m - M[i,j]^2));
     # note this requires G[i,j]>=0
+    print("matrix G has been created. Line 93")
+    sys.stdout.flush()
     
     H = np.multiply(np.multiply(M_square, np.transpose(M_square)),np.subtract(c3*(alpha_recip +c2), np.multiply(e*(c+d),np.add(m_sq, m_sqT))))
     # H[i,j] = 2*A[i,j]*B[i,j] = M[i,j]*M[j,i]*rho_recip - M[i,j]*M[j,i]*(c*e*(m-M[i,j])^2) + c*e*(m-M[j,i]^2) + d*e*(m-M[i,j]^2) + d*e*(m-M[j,i]^2);
     # note sign(H[i,j]) = sign(B[i,j]) since A[i,j]>=0
+    print("matrix H has been created. Line 99")
+    sys.stdout.flush()
     
     # note that F[i,j], G[i,j], and H[i,j] do not depend on m because of how c, d, and e depend on m
     # note that F[i,j]=G[j,i] and H[i,j]=H[j,i]
     
-    
+    print("Now creating A, B. Line 105")
+    sys.stdout.flush()
     A = np.zeros((N, N)) # A[i,j] = a_ij
     B = np.zeros((N, N)) # B[i,j] = b_ij
     
@@ -102,11 +121,14 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     coeff_b = -2*(np.multiply(np.square(H),np.subtract(F,G))) - 2*(np.multiply(F,np.square(np.subtract(F,G)))) - 4*(np.multiply(np.square(H),F))
     coeff_c = np.square(np.square(H)) + 2*(np.multiply(np.multiply(np.square(H),F),np.subtract(F,G))) + np.multiply(np.square(np.subtract(F,G)),np.square(F))
     Disc = np.square(coeff_b) - 4*np.multiply(coeff_a, coeff_c)
-
+    print("Discriminant calculated to find A and B. Line 124")
+    sys.stdout.flush()
 
     Asq = np.divide(np.add(-1*coeff_b, np.sqrt(Disc)),2*coeff_a)
     A = np.sqrt(Asq)
     B = np.divide(H, np.add(A,np.transpose(A)))
+    print("Initial A and B have been created.  Next making zeros along diagonals. Line 130")
+    sys.stdout.flush()
         
     np.fill_diagonal(A,0)
     np.fill_diagonal(B,0)
@@ -121,11 +143,18 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
                 if Disc[j,i] < 0:
                     B[j,i] = 0
                     A[j,i] = math.sqrt(F[j,i])
+    print("Values in A have been edited to be sqrt(F) if discriminant was negative. Line 146")
+    sys.stdout.flush()
                     
     checkFmat = np.amax(np.absolute(np.subtract(np.add(np.square(A),np.square(B)),F)))
-    print("|A^2 + B^2 - F| leq {0}".format(checkFmat)) 
+    print("|A^2 + B^2 - F| leq {0}".format(checkFmat))
+    sys.stdout.flush()
 
     # Now we get to the fun part where we calculate W
+    print("Now calling cython function to created W. Line 154")
+    sys.stdout.flush()
     W = np.array(produceW.produceW(A, B, M_tilde, M_theta, c, d, e, N))
+    print("W creation is complete. Line 157")
+    sys.stdout.flush()
     
     return(W)

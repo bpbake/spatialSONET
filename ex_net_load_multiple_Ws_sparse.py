@@ -39,15 +39,15 @@ p_AVG = 50/N # average probability of connectivity between neurons
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
 tau = 10*ms 
-Er = -60*mV
+Er = -60*mV # rest potential (equilibrium voltage)
 tauS = 5*ms # used for inhibitory only (not used in this program)
 Ee = 0*mV  #used for inhibitory only (not used in this program)
 eqs= '''
 dv/dt = (-v+Er)/tau: volt
-'''
+''' # leaky integrate and fire model
 
 vthreshold = -55*mV # if voltage passes this, it counts as a spike
-vreset = -65*mV # equilibrium voltage
+vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
@@ -60,8 +60,8 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate=300*Hz # rate of input?
-ext_mag=1*mV # how much the voltage is affected by the PoissonGroup
+ext_rate=300*Hz # rate of external input
+ext_mag=1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
@@ -169,20 +169,20 @@ for w_index in range(start_index, end_index+1):
         # #plot the results of the simulation
         figure(figsize=(20,10))
         # #subplot(122)
-        # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
+        # #plot(simulation_statemon.t/ms, simulation_statemon.v[0]) # plot of voltage of one node vs. time
         # #xlabel('Time (ms)')
         # #ylabel('v')
         
           
         subplot(211)
-        plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k')
+        plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k') # raster plot: y-axis = neuron index, x-axis = time, dot at (t,i) if neuron i fires at time t
         axis([simulationtime/ms-500, simulationtime/ms, 1, N])
         xlabel('Time (ms)')
         ylabel('Neuron index')
         plt.tight_layout()
         
         subplot(212)
-        plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz)
+        plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
     except Exception as e:
         print("Error: %s" % e)
 
