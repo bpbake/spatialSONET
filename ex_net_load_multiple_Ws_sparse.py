@@ -6,6 +6,7 @@ Created on Sun Mar  5 14:06:45 2017
 """
 
 data_dir = 'matrices/10000_symmetric/'
+import sys
 
 try:
    import cPickle as pickle # used to store python data types

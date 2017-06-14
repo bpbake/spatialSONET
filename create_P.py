@@ -12,12 +12,14 @@ import math
 import matplotlib.pyplot as plt
 import warnings
 import produceW
+import sys
 
 class MyException(Exception):
     pass
 
 def create_P(N, L_left, L_right, p_AVG):
     print("creating P")
+    sys.stdout.flush()
     
     threshold = 1e100
     

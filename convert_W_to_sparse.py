@@ -41,7 +41,8 @@ else:
     end_index = int(input_orig("enter end index: "))
 
 for w_index in range(start_index, end_index+1):
-    print("w_index = {0}".format(w_index))    
+    print("w_index = {0}".format(w_index))
+    sys.stdout.flush()    
     
     W_filename = "{0}W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
     with open(W_filename, 'rb') as wf:

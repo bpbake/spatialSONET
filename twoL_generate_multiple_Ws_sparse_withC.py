@@ -39,7 +39,7 @@ except:
 input_orig = input
 
 
-N = 3000 #minimum of 1000
+N = 10000 #minimum of 1000
 p_AVG = 50/N
 
 if len(sys.argv) >= 3:
@@ -56,28 +56,31 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
     while trying:  
         try:
             print("\nmaking matrix {0}".format(w_index))
+            sys.stdout.flush()
             
             #generate Ls, alphas
-            L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
-            L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish  L_left #math.exp(np.random.uniform(4.5, 10))
-            alpha_recip = np.random.uniform(0, 0.3)
-            alpha_conv = np.random.uniform(0, 0.3)
-            alpha_div = np.random.uniform(0, 0.3)
-            alpha_chain = np.random.uniform(-0.4, 0.3)
-            # L_left = 90#float("inf")# math.inf
-            # L_right = 0#float("inf")#math.inf
-            # alpha_recip = 0.3
-            # alpha_conv = 0.3
-            # alpha_div = 0.3
-            # alpha_chain = -0.3
+#            L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
+#            L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish  L_left #math.exp(np.random.uniform(4.5, 10))
+#            alpha_recip = np.random.uniform(0, 0.3)
+#            alpha_conv = np.random.uniform(0, 0.3)
+#            alpha_div = np.random.uniform(0, 0.3)
+#            alpha_chain = np.random.uniform(-0.4, 0.3)
+            L_left = 90 #float("inf")# math.inf
+            L_right = 0 #float("inf")#math.inf
+            alpha_recip = 0.3
+            alpha_conv = 0.3
+            alpha_div = 0.3
+            alpha_chain = 0.3
             
 
             P = create_P(N, L_left, L_right, p_AVG)
             print("P has been created \n")
+            sys.stdout.flush()
             
             #call other program to create W (and return W)
             W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
             print("W has been created \n")
+            sys.stdout.flush()
             Wsparse = sparse.csr_matrix(W)
             
             #save the W
@@ -85,18 +88,24 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             with open(W_filename, 'wb') as fp:
                 pickle.dump(Wsparse, fp)    
             print("W has been pickled.")
+            sys.stdout.flush()
                 
             # generate statistics of W
             print("generating stats")
-            p_hat = np.sum(W)/(N*(N-1))
-            alpha_recip_hat = (np.trace(np.matmul(W,W))/(N*(N-1)*math.pow(p_hat,2)))-1
-            alpha_conv_hat = ((np.sum(np.matmul(np.transpose(W),W)) - np.sum(W)) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
-            alpha_div_hat = ((np.sum(np.matmul(W,np.transpose(W))) - np.sum(W)) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
-            alpha_chain_hat = ((np.sum(np.matmul(W,W)) - np.trace(np.matmul(W,W))) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
+            sys.stdout.flush()
+            WL1 = sparse.csr_matrix.sum(Wsparse)
+            Wsquare = Wsparse*Wsparse
+            p_hat = WL1/(N*(N-1))
+            alpha_recip_hat = (np.trace(Wsquare.toarray())/(N*(N-1)*math.pow(p_hat,2)))-1
+            alpha_conv_hat = ((sparse.csr_matrix.sum((Wsparse.transpose())*Wsparse) -WL1) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
+            alpha_div_hat = ((sparse.csr_matrix.sum(Wsparse*(Wsparse.transpose())) - WL1) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
+            alpha_chain_hat = ((sparse.csr_matrix.sum(Wsquare) - np.trace(Wsquare.toarray())) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             
             #evals = np.linalg.eigvals(W)
             #largest_eigenval = np.ndarray.max(evals)
             max_eigenval = sparse.linalg.eigs(Wsparse, k=1, which='LM', return_eigenvectors=False)
+            print("stats have been calculated. Now saving as a dict")
+            sys.stdout.flush()
             
             #if largest_eigenval != max_eigenval:
             #    print("different max eigenvalues. \n np largest = {0} \n sp largest = {1}".format(largest_eigenval, max_eigenval))
@@ -108,10 +117,12 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             with open(stat_filename, "wb") as f:
                 pickle.dump(stats, f)
             print("stats have been pickled")
+            sys.stdout.flush()
 
             # print the stats
             for k,v in sorted(stats.items()):
                 print(k+":{0}".format(v))
+                sys.stdout.flush()
 
             trying = False
 
