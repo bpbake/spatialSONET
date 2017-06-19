@@ -46,8 +46,8 @@ def produceW(double[:,:] A, double[:,:] B, double[:,:] M_tilde, double[:,:] M_th
 
             if result >= M_theta[i,j]:
                 W[i,j]=1
-            else:
-                W[i,j]=0
+            #else:
+            #   W[i,j]=0
 
         if (i%100 == 0):
             print("row={0} out of N={1}".format(i,N))

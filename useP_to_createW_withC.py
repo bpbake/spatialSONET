@@ -106,11 +106,11 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     A = np.zeros((N, N)) # A[i,j] = a_ij
     B = np.zeros((N, N)) # B[i,j] = b_ij
     
-    quit_fg0 = 0 #check: if F[i,j]=0 and G[i,j]=0, then we should have H[i,j]=0
-    quit_f0 = 0 #check: if F[i,j]=0 then we should have H[i,j]=0
-    quit_g0 = 0 #check: if G[i,j]=0 then we should have H[i,j]=0
-    quit_a2f = 0 #check: if A[i,j]=sqrt(F[i,j]) then we should have H[i,j]=0
-    quit_neg = 0 #check: discriminant should be non-negative
+    #quit_fg0 = 0 #check: if F[i,j]=0 and G[i,j]=0, then we should have H[i,j]=0
+    #quit_f0 = 0 #check: if F[i,j]=0 then we should have H[i,j]=0
+    #quit_g0 = 0 #check: if G[i,j]=0 then we should have H[i,j]=0
+    #quit_a2f = 0 #check: if A[i,j]=sqrt(F[i,j]) then we should have H[i,j]=0
+    #quit_neg = 0 #check: discriminant should be non-negative
     # note that above, we already ruled out the cases where F[i,j]<0 or G[i,j]<0
 
     if (F < np.zeros(N)).any():

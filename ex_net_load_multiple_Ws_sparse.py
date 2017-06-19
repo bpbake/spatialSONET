@@ -5,7 +5,7 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/10000_symmetric/'
+data_dir = 'matrices/10000_sample/'
 import sys
 
 try:
@@ -87,7 +87,7 @@ if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
    end_index = int(sys.argv[2])
 else:
-   start_index = int(input_orig("enter a starting index: "))
+   start_index = int(input_orig("enter starting index: "))
    end_index = int(input_orig("enter end index: "))
 
 for w_index in range(start_index, end_index+1):

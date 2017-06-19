@@ -11,24 +11,32 @@ except:
    
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
+from scipy import sparse
 import math
 
-N = 3000
-p = 50/N
-i = 3
+data_dir = 'matrices/10000_sample/'
+
+N = 10000 #minimum of 1000
+p_AVG = 50/N
 print("N={0}".format(N))
 
+w_index = 8
+
 #read in pickled W matrix
-W_filename = "matrices/W_N{0}_p{1}_{2}.pickle".format(N,p,i)
+W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
 
 with open(W_filename, 'rb') as wf:
     try:
-        W = pickle.load(wf)
+        Wsparse = pickle.load(wf)
     except (EOFError):
         print("unpickling error")
 
+#eigenvals = sparse.linalg.eigs(Wsparse, k=10, which='LR', return_eigenvectors=False, ncv = 500)
+#plt.scatter(np.real(eigenvals), np.imag(eigenvals))
+
 # reading in pickled stats file:        
-stat_filename = "matrices/Stats_W_N{0}_p{1}_{2}.pickle".format(N,p,i)
+stat_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir, N,p_AVG, w_index)
 with open(stat_filename, 'rb') as sf:
     try:
         stats = pickle.load(sf)
@@ -49,7 +57,7 @@ for k,v in sorted(stats.items()):
 #     pickle.dump(stats, f)
 
 # plot the W matrix
-plt.matshow(W)
+#plt.matshow(W)
     
 # generate statistics of matrix
 #p_hat = np.sum(W)/(N*(N-1))

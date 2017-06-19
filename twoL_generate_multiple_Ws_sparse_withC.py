@@ -18,6 +18,7 @@ try:
 except FileExistsError:
    pass
 
+import math
 import numpy as np
 import scipy as sp
 from scipy import sparse
@@ -65,7 +66,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
 #            alpha_conv = np.random.uniform(0, 0.3)
 #            alpha_div = np.random.uniform(0, 0.3)
 #            alpha_chain = np.random.uniform(-0.4, 0.3)
-            L_left = 90 #float("inf")# math.inf
+            L_left = 70 #float("inf")# math.inf
             L_right = 0 #float("inf")#math.inf
             alpha_recip = 0.3
             alpha_conv = 0.3
@@ -94,7 +95,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             print("generating stats")
             sys.stdout.flush()
             WL1 = sparse.csr_matrix.sum(Wsparse)
-            Wsquare = Wsparse*Wsparse
+            Wsquare = Wsparse**2
             p_hat = WL1/(N*(N-1))
             alpha_recip_hat = (np.trace(Wsquare.toarray())/(N*(N-1)*math.pow(p_hat,2)))-1
             alpha_conv_hat = ((sparse.csr_matrix.sum((Wsparse.transpose())*Wsparse) -WL1) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
@@ -103,7 +104,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             
             #evals = np.linalg.eigvals(W)
             #largest_eigenval = np.ndarray.max(evals)
-            max_eigenval = sparse.linalg.eigs(Wsparse, k=1, which='LM', return_eigenvectors=False)
+            max_eigenval = sparse.linalg.eigs(Wsparse, k=1, which='LR', return_eigenvectors=False, ncv = 500)
             print("stats have been calculated. Now saving as a dict")
             sys.stdout.flush()
             
