@@ -10,8 +10,8 @@ Created on Mon Apr  3 16:41:12 2017
 #   create_P.py
 #   produceW.pyx converted into produceW.c
 
-data_dir = 'matrices/10000_sample/'
 
+data_dir = 'matrices/N10000_LL70_LR0_alphaRandom/'
 import os
 try:
    os.mkdir(data_dir)
@@ -40,14 +40,14 @@ except:
 input_orig = input
 
 
-N = 10000 #minimum of 1000
-p_AVG = 50/N
+N = 10000 # Number of excitatory neurons
+p_AVG = 50/N # average probability of connectivity between neurons
 
 if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
    end_index = int(sys.argv[2])
 else:
-   start_index = int(input_orig("enter a starting index: "))
+   start_index = int(input_orig("enter starting index: "))
    end_index = int(input_orig("enter end index: "))
 
 for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1,start_index+2,...,start_index+num_matrices-1
@@ -62,16 +62,16 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             #generate Ls, alphas
 #            L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
 #            L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish  L_left #math.exp(np.random.uniform(4.5, 10))
-#            alpha_recip = np.random.uniform(0, 0.3)
-#            alpha_conv = np.random.uniform(0, 0.3)
-#            alpha_div = np.random.uniform(0, 0.3)
-#            alpha_chain = np.random.uniform(-0.4, 0.3)
+            alpha_recip = np.random.uniform(0, 0.3)
+            alpha_conv = np.random.uniform(0, 0.3)
+            alpha_div = np.random.uniform(0, 0.3)
+            alpha_chain = np.random.uniform(-0.4, 0.3)
             L_left = 70 #float("inf")# math.inf
             L_right = 0 #float("inf")#math.inf
-            alpha_recip = 0.3
-            alpha_conv = 0.3
-            alpha_div = 0.3
-            alpha_chain = 0.3
+            # alpha_recip = 0.3
+            # alpha_conv = 0.3
+            # alpha_div = 0.3
+            # alpha_chain = 0.3
             
 
             P = create_P(N, L_left, L_right, p_AVG)

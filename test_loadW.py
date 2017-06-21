@@ -31,6 +31,9 @@ with open(W_filename, 'rb') as wf:
         Wsparse = pickle.load(wf)
     except (EOFError):
         print("unpickling error")
+        
+W = Wsparse.todense()
+print("W= {0}".format(W))
 
 #eigenvals = sparse.linalg.eigs(Wsparse, k=10, which='LR', return_eigenvectors=False, ncv = 500)
 #plt.scatter(np.real(eigenvals), np.imag(eigenvals))
@@ -57,7 +60,7 @@ for k,v in sorted(stats.items()):
 #     pickle.dump(stats, f)
 
 # plot the W matrix
-#plt.matshow(W)
+plt.matshow(W)
     
 # generate statistics of matrix
 #p_hat = np.sum(W)/(N*(N-1))

@@ -5,7 +5,7 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/10000_sample/'
+data_dir = 'matrices/N10000_LL70_LR0_alphaRandom/'
 import sys
 
 try:
@@ -102,7 +102,7 @@ for w_index in range(start_index, end_index+1):
             Wsparse = pickle.load(wf) # load in W matrix
         except (EOFError):
             print("unpickling error")
-    W = Wsparse.todense()
+    W = np.array(Wsparse.todense())
     
     
     stats_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
