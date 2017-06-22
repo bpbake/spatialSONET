@@ -6,7 +6,7 @@ Created on Mon Apr  3 16:41:12 2017
 """
 
 # Other scripts needed to run this code:  
-#   useP_to_createW_withC.py
+#   useP_to_createW.py
 #   create_P.py
 #   produceW.pyx converted into produceW.c
 
@@ -23,7 +23,7 @@ import numpy as np
 import scipy as sp
 from scipy import sparse
 
-from useP_to_createW_withC import *
+from useP_to_createW import *
 from create_P import *
 
 try:
@@ -68,10 +68,10 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
 #            alpha_chain = np.random.uniform(-0.4, 0.3)
             L_left = 70 #float("inf")# math.inf
             L_right = 0 #float("inf")#math.inf
-            alpha_recip = -0.3
+            alpha_chain = -0
             alpha_conv = 0.3
             alpha_div = 0.3
-            alpha_chain = 0.3
+            alpha_recip = 0.3
             
 
             P = create_P(N, L_left, L_right, p_AVG)

@@ -5,7 +5,7 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/N10000_LL70_LR0_alphaRandom/'
+data_dir = 'matrices/N10000_LL70_LR0/'
 import sys
 
 try:

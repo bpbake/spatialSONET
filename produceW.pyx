@@ -49,7 +49,7 @@ def produceW(double[:,:] A, double[:,:] B, double[:,:] M_tilde, double[:,:] M_th
             #else:
             #   W[i,j]=0
 
-        if (i%100 == 0):
+        if (i%500 == 0):
             print("row={0} out of N={1}".format(i,N))
             sys.stdout.flush()
     print("\n")

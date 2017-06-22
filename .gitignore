@@ -60,3 +60,6 @@ _outfile*
 
 # compiled cython
 *.so
+
+# other files to ignore
+siamds2017.pdf

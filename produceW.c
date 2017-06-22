@@ -1534,8 +1534,8 @@ static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cyt
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
 static const char __pyx_k_Created_on_Wed_Apr_19_12_32_09[] = "\nCreated on Wed Apr 19 12:32:09 2017\n\n@author: Brittany\n";
 static const char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
-static const char __pyx_k_home_nykamp_groupwork_spatialSO[] = "/home/nykamp/groupwork/spatialSONET/produceW.pyx";
 static const char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
+static const char __pyx_k_C_Users_Brittany_Documents_GitHu[] = "C:\\Users\\Brittany\\Documents\\GitHub\\spatialSONET\\produceW.pyx";
 static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
 static const char __pyx_k_Empty_shape_tuple_for_cython_arr[] = "Empty shape tuple for cython.array";
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
@@ -1549,6 +1549,7 @@ static PyObject *__pyx_n_s_A;
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_n_s_B;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
+static PyObject *__pyx_kp_s_C_Users_Brittany_Documents_GitHu;
 static PyObject *__pyx_kp_s_Can_only_create_a_buffer_that_is;
 static PyObject *__pyx_kp_s_Cannot_index_with_type_s;
 static PyObject *__pyx_n_s_Ellipsis;
@@ -1598,7 +1599,6 @@ static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_fortran;
 static PyObject *__pyx_n_u_fortran;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
-static PyObject *__pyx_kp_s_home_nykamp_groupwork_spatialSO;
 static PyObject *__pyx_n_s_i;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
@@ -1883,8 +1883,6 @@ static PyObject *__pyx_pf_8produceW_produceW(CYTHON_UNUSED PyObject *__pyx_self,
   int __pyx_t_40;
   Py_ssize_t __pyx_t_41;
   Py_ssize_t __pyx_t_42;
-  Py_ssize_t __pyx_t_43;
-  Py_ssize_t __pyx_t_44;
   __Pyx_RefNannySetupContext("produceW", 0);
 
   /* "produceW.pyx":16
@@ -2446,7 +2444,7 @@ static PyObject *__pyx_pf_8produceW_produceW(CYTHON_UNUSED PyObject *__pyx_self,
  * 
  *             if result >= M_theta[i,j]:             # <<<<<<<<<<<<<<
  *                 W[i,j]=1
- *             else:
+ *             #else:
  */
       __pyx_t_38 = __pyx_v_i;
       __pyx_t_39 = __pyx_v_j;
@@ -2470,8 +2468,8 @@ static PyObject *__pyx_pf_8produceW_produceW(CYTHON_UNUSED PyObject *__pyx_self,
  * 
  *             if result >= M_theta[i,j]:
  *                 W[i,j]=1             # <<<<<<<<<<<<<<
- *             else:
- *                 W[i,j]=0
+ *             #else:
+ *             #   W[i,j]=0
  */
         __pyx_t_41 = __pyx_v_i;
         __pyx_t_42 = __pyx_v_j;
@@ -2495,52 +2493,24 @@ static PyObject *__pyx_pf_8produceW_produceW(CYTHON_UNUSED PyObject *__pyx_self,
  * 
  *             if result >= M_theta[i,j]:             # <<<<<<<<<<<<<<
  *                 W[i,j]=1
- *             else:
+ *             #else:
  */
-        goto __pyx_L7;
       }
-
-      /* "produceW.pyx":50
- *                 W[i,j]=1
- *             else:
- *                 W[i,j]=0             # <<<<<<<<<<<<<<
- * 
- *         if (i%100 == 0):
- */
-      /*else*/ {
-        __pyx_t_43 = __pyx_v_i;
-        __pyx_t_44 = __pyx_v_j;
-        __pyx_t_15 = -1;
-        if (__pyx_t_43 < 0) {
-          __pyx_t_43 += __pyx_v_W.shape[0];
-          if (unlikely(__pyx_t_43 < 0)) __pyx_t_15 = 0;
-        } else if (unlikely(__pyx_t_43 >= __pyx_v_W.shape[0])) __pyx_t_15 = 0;
-        if (__pyx_t_44 < 0) {
-          __pyx_t_44 += __pyx_v_W.shape[1];
-          if (unlikely(__pyx_t_44 < 0)) __pyx_t_15 = 1;
-        } else if (unlikely(__pyx_t_44 >= __pyx_v_W.shape[1])) __pyx_t_15 = 1;
-        if (unlikely(__pyx_t_15 != -1)) {
-          __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          __PYX_ERR(0, 50, __pyx_L1_error)
-        }
-        *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_W.data + __pyx_t_43 * __pyx_v_W.strides[0]) ) + __pyx_t_44 * __pyx_v_W.strides[1]) )) = 0.0;
-      }
-      __pyx_L7:;
     }
 
     /* "produceW.pyx":52
- *                 W[i,j]=0
+ *             #   W[i,j]=0
  * 
- *         if (i%100 == 0):             # <<<<<<<<<<<<<<
+ *         if (i%500 == 0):             # <<<<<<<<<<<<<<
  *             print("row={0} out of N={1}".format(i,N))
  *             sys.stdout.flush()
  */
-    __pyx_t_40 = ((__Pyx_mod_long(__pyx_v_i, 0x64) == 0) != 0);
+    __pyx_t_40 = ((__Pyx_mod_long(__pyx_v_i, 0x1F4) == 0) != 0);
     if (__pyx_t_40) {
 
       /* "produceW.pyx":53
  * 
- *         if (i%100 == 0):
+ *         if (i%500 == 0):
  *             print("row={0} out of N={1}".format(i,N))             # <<<<<<<<<<<<<<
  *             sys.stdout.flush()
  *     print("\n")
@@ -2604,7 +2574,7 @@ static PyObject *__pyx_pf_8produceW_produceW(CYTHON_UNUSED PyObject *__pyx_self,
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
       /* "produceW.pyx":54
- *         if (i%100 == 0):
+ *         if (i%500 == 0):
  *             print("row={0} out of N={1}".format(i,N))
  *             sys.stdout.flush()             # <<<<<<<<<<<<<<
  *     print("\n")
@@ -2639,9 +2609,9 @@ static PyObject *__pyx_pf_8produceW_produceW(CYTHON_UNUSED PyObject *__pyx_self,
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
       /* "produceW.pyx":52
- *                 W[i,j]=0
+ *             #   W[i,j]=0
  * 
- *         if (i%100 == 0):             # <<<<<<<<<<<<<<
+ *         if (i%500 == 0):             # <<<<<<<<<<<<<<
  *             print("row={0} out of N={1}".format(i,N))
  *             sys.stdout.flush()
  */
@@ -15050,6 +15020,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ASCII, __pyx_k_ASCII, sizeof(__pyx_k_ASCII), 0, 0, 1, 1},
   {&__pyx_n_s_B, __pyx_k_B, sizeof(__pyx_k_B), 0, 0, 1, 1},
   {&__pyx_kp_s_Buffer_view_does_not_expose_stri, __pyx_k_Buffer_view_does_not_expose_stri, sizeof(__pyx_k_Buffer_view_does_not_expose_stri), 0, 0, 1, 0},
+  {&__pyx_kp_s_C_Users_Brittany_Documents_GitHu, __pyx_k_C_Users_Brittany_Documents_GitHu, sizeof(__pyx_k_C_Users_Brittany_Documents_GitHu), 0, 0, 1, 0},
   {&__pyx_kp_s_Can_only_create_a_buffer_that_is, __pyx_k_Can_only_create_a_buffer_that_is, sizeof(__pyx_k_Can_only_create_a_buffer_that_is), 0, 0, 1, 0},
   {&__pyx_kp_s_Cannot_index_with_type_s, __pyx_k_Cannot_index_with_type_s, sizeof(__pyx_k_Cannot_index_with_type_s), 0, 0, 1, 0},
   {&__pyx_n_s_Ellipsis, __pyx_k_Ellipsis, sizeof(__pyx_k_Ellipsis), 0, 0, 1, 1},
@@ -15099,7 +15070,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 0, 1, 1},
   {&__pyx_n_u_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 0, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
-  {&__pyx_kp_s_home_nykamp_groupwork_spatialSO, __pyx_k_home_nykamp_groupwork_spatialSO, sizeof(__pyx_k_home_nykamp_groupwork_spatialSO), 0, 0, 1, 0},
   {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
@@ -15321,7 +15291,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__15 = PyTuple_Pack(21, __pyx_n_s_A, __pyx_n_s_B, __pyx_n_s_M_tilde, __pyx_n_s_M_theta, __pyx_n_s_c, __pyx_n_s_d, __pyx_n_s_e, __pyx_n_s_N, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_X, __pyx_n_s_W, __pyx_n_s_MX, __pyx_n_s_MXrowsum, __pyx_n_s_MXcolsum, __pyx_n_s_cMij, __pyx_n_s_dMij, __pyx_n_s_eMij, __pyx_n_s_sumCDEij, __pyx_n_s_result); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
-  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(8, 0, 21, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_nykamp_groupwork_spatialSO, __pyx_n_s_produceW, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(8, 0, 21, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_Brittany_Documents_GitHu, __pyx_n_s_produceW, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 13, __pyx_L1_error)
 
   /* "View.MemoryView":282
  *         return self.name
