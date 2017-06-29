@@ -61,7 +61,7 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate=300*Hz # rate of external input
+ext_rate=200*Hz # rate of external input
 ext_mag=1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
@@ -194,6 +194,6 @@ for w_index in range(start_index, end_index+1):
 
     # save results (pickle new stats dictionary)
 
-    result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+    result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)
