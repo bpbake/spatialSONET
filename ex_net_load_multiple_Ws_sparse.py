@@ -5,7 +5,7 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/N10000_LL70_LR0/'
+data_dir = 'matrices/N10000_LL70_LR0_trunc/'
 import sys
 
 try:
@@ -61,7 +61,7 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate=200*Hz # rate of external input
+ext_rate=200*Hz # rate of external input (how often input happens)
 ext_mag=1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation

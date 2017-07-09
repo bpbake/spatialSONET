@@ -35,13 +35,14 @@ def plot_results(N,p,i, data_dir='matrices/'):
     # #ylabel('v')
     
       
-    mintime=1600
+    mintime=1900
     maxtime=2000
     plt.subplot(211)
     
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
+    
     #axis([mintime, maxtime, 1, N])
     #xlabel('Time (ms)')
     plt.xticks([])

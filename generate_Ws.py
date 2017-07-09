@@ -11,7 +11,7 @@ Created on Mon Apr  3 16:41:12 2017
 #   produceW.pyx converted into produceW.c
 
 
-data_dir = 'matrices/N10000_LL70_LR0/'
+data_dir = 'matrices/N10000_LL70_LR0_trunc/'
 import os
 try:
    os.mkdir(data_dir)
@@ -82,7 +82,8 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
             print("W has been created \n")
             sys.stdout.flush()
-            Wsparse = sparse.csr_matrix(W)
+            W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix
+            Wsparse = sparse.csr_matrix(W_lowerTri)
             
             #save the W
             W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
