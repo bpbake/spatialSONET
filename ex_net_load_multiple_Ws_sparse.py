@@ -5,7 +5,7 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/N10000_LL70_LR0_trunc/'
+data_dir = 'matrices/N10000_LL70_LR0_ff/'
 import sys
 
 try:
@@ -69,7 +69,7 @@ Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 0.15*mV # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
+j = 0.17*mV # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
 S.connect() # no specificications of where connections are made... W will be used for this later
@@ -152,7 +152,8 @@ for w_index in range(start_index, end_index+1):
     print("\nnumber of spikes in simulation: {0}\n".format(simulation_spikemon.num_spikes))
 
 
-    synchrony = analyze_autocor(simulation_PRM.rate) # monotonic measure of synchrony
+    #synchrony = analyze_autocor(simulation_PRM.rate) # monotonic measure of synchrony
+    synchrony = -100
     print("\nExcitatory Synchrony = {0}\n".format(synchrony))
     
     # add results to the stats dict
@@ -177,7 +178,7 @@ for w_index in range(start_index, end_index+1):
           
         subplot(211)
         plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k') # raster plot: y-axis = neuron index, x-axis = time, dot at (t,i) if neuron i fires at time t
-        axis([simulationtime/ms-500, simulationtime/ms, 1, N])
+        #axis([simulationtime/ms-500, simulationtime/ms, 1, N])
         xlabel('Time (ms)')
         ylabel('Neuron index')
         plt.tight_layout()

@@ -11,7 +11,7 @@ Created on Mon Apr  3 16:41:12 2017
 #   produceW.pyx converted into produceW.c
 
 
-data_dir = 'matrices/N10000_LL70_LR0_trunc/'
+data_dir = 'matrices/N10000_LL70_LR0_ff/'
 import os
 try:
    os.mkdir(data_dir)
@@ -21,7 +21,8 @@ except FileExistsError:
 import math
 import numpy as np
 import scipy as sp
-from scipy import sparse
+from scipy import linalg, special, sparse
+from scipy.sparse import linalg as splinalg
 
 from useP_to_createW import *
 from create_P import *
@@ -68,10 +69,10 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
 #            alpha_chain = np.random.uniform(-0.4, 0.3)
             L_left = 70 #float("inf")# math.inf
             L_right = 0 #float("inf")#math.inf
-            alpha_chain = 0.3
-            alpha_conv = 0.3
-            alpha_div = 0.3
-            alpha_recip = 0.3
+            alpha_chain = 0
+            alpha_conv = 0
+            alpha_div = 0
+            alpha_recip = 0
             
 
             P = create_P(N, L_left, L_right, p_AVG)
@@ -103,15 +104,10 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             alpha_div_hat = ((sparse.csr_matrix.sum(Wsparse*(Wsparse.transpose())) - WL1) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             alpha_chain_hat = ((sparse.csr_matrix.sum(Wsquare) - np.trace(Wsquare.toarray())) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             
-            #evals = np.linalg.eigvals(W)
-            #largest_eigenval = np.ndarray.max(evals)
-            max_eigenval = sparse.linalg.eigs(Wsparse, k=1, which='LR', return_eigenvectors=False, ncv = 500)
+            max_eigenval = splinalg.eigs(Wsparse, k=1, which='LR', return_eigenvectors=False, ncv = 500)
             print("stats have been calculated. Now saving as a dict")
             sys.stdout.flush()
-            
-            #if largest_eigenval != max_eigenval:
-            #    print("different max eigenvalues. \n np largest = {0} \n sp largest = {1}".format(largest_eigenval, max_eigenval))
-                
+              
             #create dictionary of stats and save
             stats = dict([('N', N), ('L_left', L_left), ('L_right', L_right), ('p_AVG', p_AVG), ('alpha_recip', alpha_recip), ('alpha_conv', alpha_conv), ('alpha_div', alpha_div), ('alpha_chain', alpha_chain), ('p_hat', p_hat), ('alpha_recip_hat', alpha_recip_hat), ('alpha_conv_hat', alpha_conv_hat), ('alpha_div_hat', alpha_div_hat), ('alpha_chain_hat', alpha_chain_hat), ('largest eigenvalue', max_eigenval)])
             

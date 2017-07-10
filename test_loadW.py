@@ -15,13 +15,13 @@ import scipy as sp
 from scipy import sparse
 import math
 
-data_dir = 'matrices/10000_sample/'
+data_dir = 'matrices/N10000_LL70_LR0_ff/'
 
 N = 10000 #minimum of 1000
 p_AVG = 50/N
 print("N={0}".format(N))
 
-w_index = 8
+w_index = 1
 
 #read in pickled W matrix
 W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
@@ -32,8 +32,9 @@ with open(W_filename, 'rb') as wf:
     except (EOFError):
         print("unpickling error")
         
-W = Wsparse.todense()
-print("W= {0}".format(W))
+#W = Wsparse.todense()
+#print("W= {0}".format(W))
+
 
 #eigenvals = sparse.linalg.eigs(Wsparse, k=10, which='LR', return_eigenvectors=False, ncv = 500)
 #plt.scatter(np.real(eigenvals), np.imag(eigenvals))
@@ -60,7 +61,7 @@ for k,v in sorted(stats.items()):
 #     pickle.dump(stats, f)
 
 # plot the W matrix
-plt.matshow(W)
+plt.spy(W, markersize=1)
     
 # generate statistics of matrix
 #p_hat = np.sum(W)/(N*(N-1))

@@ -13,7 +13,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     import matplotlib.pyplot as plt
     import pickle
     
-    result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,i) 
+    result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
        results = pickle.load(rf)
 
@@ -28,15 +28,15 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.rc('ytick', labelsize=15)
 
     # #plot the results of the simulation
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=(20,10))
     # #subplot(122)
     # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
     # #xlabel('Time (ms)')
     # #ylabel('v')
     
       
-    mintime=1900
-    maxtime=2000
+    mintime=500
+    maxtime=2500
     plt.subplot(211)
     
 

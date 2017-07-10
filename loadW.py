@@ -18,7 +18,7 @@ def loadW(N,p,i, data_dir='matrices/') :
 
 
    #read in pickled W matrix
-   W_filename = "{0}W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,i)
+   W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,i)
 
    with open(W_filename, 'rb') as wf:
        try:
