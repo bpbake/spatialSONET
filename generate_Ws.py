@@ -71,7 +71,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             L_right = 0 #float("inf")#math.inf
             alpha_chain = 0
             alpha_conv = 0
-            alpha_div = 0
+            alpha_div = 0.5
             alpha_recip = 0
             
 

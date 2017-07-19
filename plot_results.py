@@ -36,7 +36,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     
       
     mintime=500
-    maxtime=2500
+    maxtime=3500
     plt.subplot(211)
     
 

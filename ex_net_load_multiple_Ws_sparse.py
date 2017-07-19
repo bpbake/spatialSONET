@@ -52,7 +52,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 2000*ms # the part of the simulation we care about
+simulationtime = 3000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -69,7 +69,7 @@ Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 0.17*mV # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
+j = 0.18*mV # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
 S.connect() # no specificications of where connections are made... W will be used for this later
