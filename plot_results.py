@@ -17,6 +17,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     with open(result_filename, "rb") as rf:
        results = pickle.load(rf)
 
+    print('Matrix {0}'.format(i))
     for k,v in sorted(results.items()):
         if not isinstance(v,np.ndarray):
             print(k+":{0}".format(v))
@@ -28,7 +29,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.rc('ytick', labelsize=15)
 
     # #plot the results of the simulation
-    plt.figure(figsize=(20,10))
+    plt.figure(figsize=(20,7))
     # #subplot(122)
     # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
     # #xlabel('Time (ms)')
@@ -38,7 +39,8 @@ def plot_results(N,p,i, data_dir='matrices/'):
     mintime=500
     maxtime=3500
     plt.subplot(211)
-    
+
+    plt.suptitle('Matrix {0}'.format(i))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
