@@ -8,14 +8,11 @@ def plot_results(N,p,i, data_dir='matrices/'):
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
-	try:
-	   import cPickle as pickle
-	except:
-	   import pickle
+ 	import pickle
     
     result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
-       results = pickle.load(rf)
+       	results = pickle.load(rf)
 
     print('Matrix {0}'.format(i))
     for k,v in sorted(results.items()):
@@ -45,8 +42,8 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
     
     #axis([mintime, maxtime, 1, N])
-    #xlabel('Time (ms)')
-    plt.xticks([])
+    plt.xlabel('Time (ms)')
+    #plt.xticks([])
     plt.ylabel('Neuron index')
     plt.tight_layout()
     
@@ -60,19 +57,16 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.tight_layout()
 
 
-def reformat_results(N,p,i, data_dir='matrices/'):
+def create_subPR(N,p,i, data_dir='matrices/'):
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
-	try:
-	   import cPickle as pickle
-	except:
-	   import pickle
+	import pickle
 
     
     result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
-       results = pickle.load(rf)
+       	results = pickle.load(rf)
 
     print('Matrix {0}'.format(i))
     for k,v in sorted(results.items()):
@@ -80,3 +74,40 @@ def reformat_results(N,p,i, data_dir='matrices/'):
             print(k+":{0}".format(v))
     print("\n")
 
+   	subspike_indices = []
+   	subspike_times = []
+
+   	# First attempt method... it definitely works, but...
+   	# takes a long time to run since we're looping through 'spikemon indices'(len ~ 30,000) N/100 = 1000 times
+   	subi = 0
+   	while subi < N:
+   		si = []
+   		st = []
+   		for n in range(len(results['spikemon indices'])):
+   			index = results['spikemon indices'][n]
+   			time = results['spikemon times'][n]
+   			if index in range(subi, subi+100):
+   				si.append(index)
+   				st.append(time)
+   		subspike_indices.append(si)
+   		subspike_times.append(st)
+   		subi = subi + 100
+
+   	# Second attempt
+   	# need to figure out how to make the array
+   	if len(results['spikemon times']) == len(results['spikemon indices']):
+   		for n in range(len(results['spikemon times'])):
+   			index = results['spikemon indices'][n]
+   			time = results['spikemon times'][n]
+
+   			subi = 0
+   			while (100*subi) < N:
+   			#for subi in range(0, N/100):
+   				while index < (100*subi):
+   					subi = subi + 1
+			
+			if index in range((100*subi), (100*(subi+1))):
+
+
+    subPR_time = np.array()
+    subPR_rate = np.array()

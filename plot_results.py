@@ -46,8 +46,8 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
     
     #axis([mintime, maxtime, 1, N])
-    #xlabel('Time (ms)')
-    plt.xticks([])
+    plt.xlabel('Time (ms)')
+    #plt.xticks([])
     plt.ylabel('Neuron index')
     plt.tight_layout()
     
