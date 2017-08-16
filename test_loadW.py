@@ -21,7 +21,7 @@ N = 10000 #minimum of 1000
 p_AVG = 50/N
 print("N={0}".format(N))
 
-w_index = 1
+w_index = 10
 
 #read in pickled W matrix
 W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
@@ -32,7 +32,7 @@ with open(W_filename, 'rb') as wf:
     except (EOFError):
         print("unpickling error")
         
-#W = Wsparse.todense()
+W = Wsparse.todense()
 #print("W= {0}".format(W))
 
 

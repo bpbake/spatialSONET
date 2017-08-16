@@ -8,7 +8,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
- 	import pickle
+ 	  import pickle
     
     result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
@@ -57,11 +57,12 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.tight_layout()
 
 
-def create_subPR(N,p,i, data_dir='matrices/'):
+def create_subPR(N,p,i, data_dir='matrices/', neuron_bin_size):
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
-	import pickle
+    import pickle
+    import math
 
     
     result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
@@ -74,40 +75,35 @@ def create_subPR(N,p,i, data_dir='matrices/'):
             print(k+":{0}".format(v))
     print("\n")
 
-   	subspike_indices = []
-   	subspike_times = []
-
-   	# First attempt method... it definitely works, but...
-   	# takes a long time to run since we're looping through 'spikemon indices'(len ~ 30,000) N/100 = 1000 times
-   	subi = 0
-   	while subi < N:
-   		si = []
-   		st = []
-   		for n in range(len(results['spikemon indices'])):
-   			index = results['spikemon indices'][n]
-   			time = results['spikemon times'][n]
-   			if index in range(subi, subi+100):
-   				si.append(index)
-   				st.append(time)
-   		subspike_indices.append(si)
-   		subspike_times.append(st)
-   		subi = subi + 100
-
-   	# Second attempt
-   	# need to figure out how to make the array
-   	if len(results['spikemon times']) == len(results['spikemon indices']):
-   		for n in range(len(results['spikemon times'])):
-   			index = results['spikemon indices'][n]
-   			time = results['spikemon times'][n]
-
-   			subi = 0
-   			while (100*subi) < N:
-   			#for subi in range(0, N/100):
-   				while index < (100*subi):
-   					subi = subi + 1
-			
-			if index in range((100*subi), (100*(subi+1))):
+   	# subspike_indices = []
+   	# subspike_times = []
+   	# # First attempt method... it definitely works, but...
+   	# # takes a long time to run since we're looping through 'spikemon indices'(len ~ 30,000) N/100 = 1000 times
+   	# subi = 0
+   	# while subi < N:
+   	# 	si = []
+   	# 	st = []
+   	# 	for n in range(len(results['spikemon indices'])):
+   	# 		index = results['spikemon indices'][n]
+   	# 		time = results['spikemon times'][n]
+   	# 		if index in range(subi, subi+100):
+   	# 			si.append(index)
+   	# 			st.append(time)
+   	# 	subspike_indices.append(si)
+   	# 	subspike_times.append(st)
+   	# 	subi = subi + 100
 
 
-    subPR_time = np.array()
-    subPR_rate = np.array()
+    num_neuron_bins = math.ceil(N/neuron_bin_size)
+    time_bin_size = results['PRM time'][1] - results['PRM time'][0]
+    num_time_bins = len(results['PRM time'])
+
+    subPR = np.zeros((num_neuron_bins, num_time_bins))
+
+    for n in range(len(results['spikemon indices'])):
+        neuron_bin_index = math.floor((results['spikemon indices'][n])/neuron_bin_size)
+        time_bin_index = results['spikemon times'][n]
+        
+        subPR[neuron_bin_index, time_bin_index] += 1
+
+    return(np.divide(subPR,(np.multiply(neuron_bin_size,time_bin_size))))

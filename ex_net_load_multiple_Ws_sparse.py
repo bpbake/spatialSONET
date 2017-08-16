@@ -70,7 +70,7 @@ Sp.connect(j='i') # where to connect P and G
 
 
 j = 0.18*mV # coupling strength
-#Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
+# Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
 S.connect() # no specificications of where connections are made... W will be used for this later
