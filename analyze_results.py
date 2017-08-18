@@ -8,7 +8,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
- 	  import pickle
+ 	  #import pickle
     
     result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
@@ -57,7 +57,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.tight_layout()
 
 
-def create_subPR(N,p,i, data_dir='matrices/', neuron_bin_size):
+def create_subPR(N,p,i, neuron_bin_size=100, data_dir='matrices/'):
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
@@ -102,8 +102,7 @@ def create_subPR(N,p,i, data_dir='matrices/', neuron_bin_size):
 
     for n in range(len(results['spikemon indices'])):
         neuron_bin_index = math.floor((results['spikemon indices'][n])/neuron_bin_size)
-        time_bin_index = results['spikemon times'][n]
-        
+        time_bin_index = int(10*results['spikemon times'][n])-5000
         subPR[neuron_bin_index, time_bin_index] += 1
 
     return(np.divide(subPR,(np.multiply(neuron_bin_size,time_bin_size))))
