@@ -57,6 +57,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.tight_layout()
 
 
+###############################################################################################################
 def create_subPR(N,p,i, neuron_bin_size=100, data_dir='matrices/'):
     import numpy as np
     import matplotlib
@@ -101,8 +102,33 @@ def create_subPR(N,p,i, neuron_bin_size=100, data_dir='matrices/'):
     subPR = np.zeros((num_neuron_bins, num_time_bins))
 
     for n in range(len(results['spikemon indices'])):
-        neuron_bin_index = math.floor((results['spikemon indices'][n])/neuron_bin_size)
-        time_bin_index = int(10*results['spikemon times'][n])-5000
+        neuron_bin_index = int((results['spikemon indices'][n])//neuron_bin_size)
+        time_bin_index = int(10*(results['spikemon times'][n] - results['spikemon times'][0]))
         subPR[neuron_bin_index, time_bin_index] += 1
 
-    return(np.divide(subPR,(np.multiply(neuron_bin_size,time_bin_size))))
+    scale_factor = np.multiply(neuron_bin_size, time_bin_size)
+
+    return(np.true_divide(subPR, scale_factor))
+
+
+
+###############################################################################################################
+def get_thresholds(N, subPR, neuron_bin_size=100):
+    import numpy as np
+
+    num_neuron_bins = math.ceil(N/neuron_bin_size)
+    thresholds = np.zeros(num_neuron_bins)
+
+    for i in range(num_neuron_bins):
+        thresholds[i] = np.percentile(subPR[i],90)
+
+    return(thresholds)
+
+
+
+###############################################################################################################
+def get_events(N, subPR, thresholds, consecutive_count = 3, neuron_bin_size=100):
+    import numpy as np
+
+    events = np.zeros(np.shape(subPR))
+
