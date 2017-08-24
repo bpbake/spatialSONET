@@ -130,5 +130,12 @@ def get_thresholds(N, subPR, neuron_bin_size=100):
 def get_events(N, subPR, thresholds, consecutive_count = 3, neuron_bin_size=100):
     import numpy as np
 
-    events = np.zeros(np.shape(subPR))
+    #spikes = np.zeros(np.shape(subPR))
 
+    thresh_matrix = np.broadcast_to(thresholds, np.shape(subPR))
+    above_thresh = np.greater_equal(subPR, thresholds_matrix)
+
+    start_times = []
+    start_neuron_bin = []
+    end_times = []
+    end_neuron_bin = [] # every entry should be 9999 (or 9900, because bins)... that's the type of event we care about.
