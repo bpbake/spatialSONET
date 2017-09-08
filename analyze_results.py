@@ -173,38 +173,47 @@ def get_events(N, subPR, thresholds, group_spacing = 1, neuron_bin_size = 100, c
         # end_time_bin.append(j)
         # end_neuron_bin.append(i)
 
-        events_by_bin.append((i, i, j-count, j))
+        events_by_nbin.append((i, i, (j-count)*.1, j*.1))
         
         count = 0
 
   dtype = [('start_neuron_bin', int), ('end_neuron_bin', int), ('start_time', float), ('end_time', float)]
-  sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), order=['start_time', 'start_neuron_bin'])
+  sorted_events_by_bin_array = np.sort(np.array(events_by_nbin, dtype=dtype), order=['start_time', 'start_neuron_bin'])
 
-  events_list = []
+  events_list = [(-1, -1, -1, -1)]
+  starting_events_list = []
 
   for newe in sorted_events_by_bin_array:
     used = False
     for event in event_list:
       #while used == False:
-        if (newe['start_time'] >= event['start_time']) and (newe['start_time'] <= (event['end_time']+group_spacing)):
-          if (event['start_neuron_bin'] <= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']+1)):
-            # event is moving forward through neuron bins
+        # if (newe['start_time'] >= event['start_time']) and (newe['start_time'] <= (event['end_time']+group_spacing)):
+        #   if (event['start_neuron_bin'] <= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']+1)):
+        if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+group_spacing)):
+          if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)): # event is moving forward through neuron bins
             # update event in events_list
+            event[1] = newe['end_neuron_bin']
+            event[3] = newe['end_time']
+
             if used:
-              print("error: can append new event onto multiple existing events")
+              print("error: new event fits with multiple existing events")
 
             used = True
 
-          elif (event['start_neuron_bin'] >= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']-1)):
-            # event is moving backwards through neuron bins
+          # elif (event['start_neuron_bin'] >= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']-1)):
+          elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): # event is moving backwards through neuron bins
             # update event in events_list
+            event[1] = newe['end_neuron_bin']
+            event[3] = newe['end_time']
+            
             if used:
-              print("error: can append new event onto multiple existing events")
+              print("error: new event fits with multiple existing events")
 
             used = True
           else:
             events_list.append(newe)
             events_list.append(newe) # add twice because it could travel in both directions
+            starting_events_list.append(newe) # record info about first event in chain
             used = True
 
   return(events)
