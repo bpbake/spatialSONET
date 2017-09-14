@@ -99,13 +99,21 @@ def get_thresholds(N, subPR, neuron_bin_size=100):
   import math
 
   num_neuron_bins = math.ceil(N/neuron_bin_size)
-  thresholds = np.zeros(num_neuron_bins)
+  tempThresh = np.zeros(num_neuron_bins)
 
   for i in range(num_neuron_bins):
     #thresholds[i] = np.percentile(subPR[i],90)
     std = np.std(subPR[i])
-    mean = np.median(subPR[i])
-    thresholds[i] = mean + (2.5*std)
+    median = np.median(subPR[i])
+    tempThresh[i] = median + (5*std)
+ 
+  tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
+
+  thresholds = np.zeros(num_neuron_bins)
+  for i in range(num_neuron_bins):
+    std = np.std(tempSubPR[i])
+    median = np.median(tempSubPR[i])
+    thresholds[i] = median + (20*std)
 
   return(thresholds.reshape((num_neuron_bins,1)))
 
@@ -129,9 +137,11 @@ def get_events(N, subPR, thresholds, consecutive_count = 1, group_spacing = 1, n
       elif count >= consecutive_count: # save time and bin, reset count
         events_by_bin.append((i, i, (j-count)*.1, j*.1))
         count = 0
+  #return(events_by_bin)
 
   dtype = [('start_neuron_bin', int), ('end_neuron_bin', int), ('start_time', float), ('end_time', float)] # these are labels for the event tuples
   sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), order=['start_time', 'start_neuron_bin'])
+  #return(sorted_events_by_bin_array)
 
   events_list = [(-1, -1, -1, -1)] # each entry is (start_neuron_bin, end_neuron_bin, start_time, end_time)
   starting_events_list = []
