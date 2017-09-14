@@ -76,25 +76,6 @@ def create_subPR(N,p,i, neuron_bin_size=100, data_dir='matrices/'):
       print(k+":{0}".format(v))
   print("\n")
 
- 	# subspike_indices = []
- 	# subspike_times = []
- 	# # First attempt method... it definitely works, but...
- 	# # takes a long time to run since we're looping through 'spikemon indices'(len ~ 30,000) N/100 = 1000 times
- 	# subi = 0
- 	# while subi < N:
- 	# 	si = []
- 	# 	st = []
- 	# 	for n in range(len(results['spikemon indices'])):
- 	# 		index = results['spikemon indices'][n]
- 	# 		time = results['spikemon times'][n]
- 	# 		if index in range(subi, subi+100):
- 	# 			si.append(index)
- 	# 			st.append(time)
- 	# 	subspike_indices.append(si)
- 	# 	subspike_times.append(st)
- 	# 	subi = subi + 100
-
-
   num_neuron_bins = math.ceil(N/neuron_bin_size)
   time_bin_size = results['PRM time'][1] - results['PRM time'][0]
   num_time_bins = len(results['PRM time'])
@@ -130,90 +111,66 @@ def get_thresholds(N, subPR, neuron_bin_size=100):
 
 
 ###############################################################################################################
-# class Event(object):
-#   start_neuron_bin = 0
-#   end_neuron_bin = 0
-#   start_time = 0
-#   end_time = 0
-
-#   def __init__(self, start_neuron_bin, end_neuron_bin, start_time_bin, end_time_bin):
-#     self.start_neuron_bin = start_neuron_bin
-#     self.end_neuron_bin = end_neuron_bin
-#     self.start_time = start_time_bin*.1
-#     self.end_time = end_time_bin*.1
-
-# def make_event(start_neuron_bin, end_neuron_bin, start_time_bin, end_time_bin):
-#   event = Event(start_neuron_bin, end_neuron_bin, start_time_bin, end_time_bin)
-#   return event
-
-###############################################################################################################
-def get_events(N, subPR, thresholds, group_spacing = 1, neuron_bin_size = 100, consecutive_count = 1):
+def get_events(N, subPR, thresholds, consecutive_count = 1, group_spacing = 1, neuron_bin_size = 100):
   import numpy as np
   import math
 
   #thresh_matrix = np.broadcast_to(thresholds, np.shape(subPR))
   above_thresh = np.greater_equal(subPR, thresholds)#_matrix)
 
-  events_by_bin = [] # a list of Event objects - nope!- (see section directly above for class definition)
-
-  # start_time_bin = []
-  # start_neuron_bin = []
-  # end_time_bin = []
-  # end_neuron_bin = [] # every entry should be 9999 (or 9900, because bins)... that's the type of event we care about.
+  events_by_bin = [] # a list of event tuples
 
   num_neuron_bins = math.ceil(N/neuron_bin_size)
   for i in range(num_neuron_bins):
     count = 0
     for j in range(len(subPR[i])):
-      if above_thresh[i,j]: # add to count (consecutive)
+      if above_thresh[i,j]: # add to count (number consecutive)
         count += 1
       elif count >= consecutive_count: # save time and bin, reset count
-        # start_time_bin.append(j-count)
-        # start_neuron_bin.append(i)
-        # end_time_bin.append(j)
-        # end_neuron_bin.append(i)
-
-        events_by_nbin.append((i, i, (j-count)*.1, j*.1))
-        
+        events_by_bin.append((i, i, (j-count)*.1, j*.1))
         count = 0
 
-  dtype = [('start_neuron_bin', int), ('end_neuron_bin', int), ('start_time', float), ('end_time', float)]
-  sorted_events_by_bin_array = np.sort(np.array(events_by_nbin, dtype=dtype), order=['start_time', 'start_neuron_bin'])
+  dtype = [('start_neuron_bin', int), ('end_neuron_bin', int), ('start_time', float), ('end_time', float)] # these are labels for the event tuples
+  sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), order=['start_time', 'start_neuron_bin'])
 
-  events_list = [(-1, -1, -1, -1)]
+  events_list = [(-1, -1, -1, -1)] # each entry is (start_neuron_bin, end_neuron_bin, start_time, end_time)
   starting_events_list = []
 
   for newe in sorted_events_by_bin_array:
     used = False
-    for event in event_list:
+    for event in events_list:
       #while used == False:
-        # if (newe['start_time'] >= event['start_time']) and (newe['start_time'] <= (event['end_time']+group_spacing)):
-        #   if (event['start_neuron_bin'] <= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']+1)):
-        if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+group_spacing)):
-          if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)): # event is moving forward through neuron bins
-            # update event in events_list
-            event[1] = newe['end_neuron_bin']
-            event[3] = newe['end_time']
-
-            if used:
-              print("error: new event fits with multiple existing events")
-
-            used = True
-
-          # elif (event['start_neuron_bin'] >= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']-1)):
-          elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): # event is moving backwards through neuron bins
-            # update event in events_list
-            event[1] = newe['end_neuron_bin']
-            event[3] = newe['end_time']
-            
-            if used:
-              print("error: new event fits with multiple existing events")
-
-            used = True
+      # if (newe['start_time'] >= event['start_time']) and (newe['start_time'] <= (event['end_time']+group_spacing)):
+      #   if (event['start_neuron_bin'] <= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']+1)):
+      if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+group_spacing)):
+        if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)): # event is moving forward through neuron bins
+          # update event in events_list
+          if used:
+            print("error: new event fits with multiple existing events")
           else:
-            events_list.append(newe)
-            events_list.append(newe) # add twice because it could travel in both directions
-            starting_events_list.append(newe) # record info about first event in chain
+            event[1] = newe['end_neuron_bin'] # new end_neuron_bin
+            event[3] = newe['end_time']
             used = True
+
+        # elif (event['start_neuron_bin'] >= event['end_neuron_bin']) and (newe['start_neuron_bin'] == (event['end_neuron_bin']-1)):
+        elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): # event is moving backwards through neuron bins
+          # update event in events_list
+          if used:
+            print("error: new event fits with multiple existing events")
+          else:
+            event[1] = newe['end_neuron_bin'] # new end_neuron_bin
+            event[3] = newe['end_time']
+            used = True
+
+    if not used: # if it doesn't work with any current event in events_list, add it to the list
+      events_list.append(newe)
+      events_list.append(newe) # add twice because it could travel in both directions
+      starting_events_list.append(newe) # record info about first event in chain
+      used = True
+
+      if events_list[0] == (-1, -1, -1, -1):
+        events_list.remove((-1, -1, -1, -1)) 
+
+  events = np.array(events_list, dtype=dtype)
 
   return(events)
