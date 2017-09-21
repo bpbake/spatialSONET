@@ -86,7 +86,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix
             Wsparse = sparse.csr_matrix(W_lowerTri)
             
-            #save the W
+            #save the W as a python pickle file
             W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
             with open(W_filename, 'wb') as fp:
                 pickle.dump(Wsparse, fp)    
@@ -113,7 +113,7 @@ for w_index in range(start_index, end_index+1): #so i=start_index, start_index+1
             
             stat_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir, N,p_AVG, w_index) #pickle the dictionary of stats for each W
             with open(stat_filename, "wb") as f:
-                pickle.dump(stats, f)
+                pickle.dump(stats, f) # write the python pickle file for stats
             print("stats have been pickled")
             sys.stdout.flush()
 
