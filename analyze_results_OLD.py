@@ -6,22 +6,95 @@ Created on Mon Jul 24 09:46:52 2017
 """
 
 # functions in this script are:
-# create_subPR(N, results, neuron_bin_size=100) 
+# plot_results(N,p,i, data_dir='matrices/') 
+#     -- plots raster plot and PRM for matrix i
+# create_subPR(N,p,i, neuron_bin_size=100, data_dir='matrices/') 
 #     -- returns numpy array: subPR and float: time_bin_size
-# get_thresholds(subPR, num_neuron_bins) 
+# get_thresholds(N, subPR, neuron_bin_size=100) 
 #     -- returns numpy array: thresholds
-# get_events(subPR, thresholds, num_neuron_bins, time_bin_size = .1, consecutive_count = 1, group_spacing = 1, consecutive_bin = 1) 
+# get_events(N, subPR, thresholds, neuron_bin_size = 100, time_bin_size = .1, consecutive_count = 1, group_spacing = 1, consecutive_bin = 1) 
 #     -- returns numpy array of event "objects"
+# plot_subPR_thresh(nbin, subPR, thresholds) 
+#     -- plots subPR and threshold value for a given neuron bin
 #
 # to reimport a module, use importlib.reload(module), you must first import importlib
 #
 #####
 
-###############################################################################################################
-def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
+
+def plot_results(N,p,i, data_dir='matrices/'):
   import numpy as np
+  import matplotlib
+  import matplotlib.pyplot as plt
+  import pickle
+
+  result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
+  with open(result_filename, "rb") as rf:
+   	results = pickle.load(rf)
+
+  print('Matrix {0}'.format(i))
+  for k,v in sorted(results.items()):
+    if not isinstance(v,np.ndarray):
+      print(k+":{0}".format(v))
+  print("\n")
+
+
+  matplotlib.rcParams.update({'font.size': 20})
+  plt.rc('xtick', labelsize=15)
+  plt.rc('ytick', labelsize=15)
+
+  # #plot the results of the simulation
+  plt.figure(figsize=(20,7))
+  # #subplot(122)
+  # #plot(simulation_statemon.t/ms, simulation_statemon.v[0])
+  # #xlabel('Time (ms)')
+  # #ylabel('v')
+  
+  mintime=500
+  maxtime=3500
+  plt.subplot(211)
+
+  plt.suptitle('Matrix {0}'.format(i))    
+
+  inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
+  plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
+  
+  #axis([mintime, maxtime, 1, N])
+  plt.xlabel('Time (ms)')
+  #plt.xticks([])
+  plt.ylabel('Neuron index')
+  plt.tight_layout()
+  
+  plt.subplot(212)
+  ind1=np.min(np.where(results['PRM time']>mintime))
+  ind2=np.max(np.where(results['PRM time']<maxtime))
+  plt.plot(results['PRM time'][ind1:ind2],results['PRM rate'][ind1:ind2])
+  plt.xlabel('Time (ms)')
+  plt.ylabel('Population rate (Hz)')
+  #axis([1500, 2000, 0, ceil(max(results['PRM rate'])/100)*100])
+  plt.tight_layout()
+
+
+###############################################################################################################
+def create_subPR(N,p,i, neuron_bin_size=100, data_dir='matrices/'):
+  import numpy as np
+  import matplotlib
+  import matplotlib.pyplot as plt
+  import pickle
   import math
 
+  
+  result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
+  with open(result_filename, "rb") as rf:
+   	results = pickle.load(rf)
+
+  # print('Matrix {0}'.format(i))
+  # for k,v in sorted(results.items()):
+  #   if not isinstance(v,np.ndarray):
+  #     print(k+":{0}".format(v))
+  # print("\n")
+
+  num_neuron_bins = math.ceil(N/neuron_bin_size)
   time_bin_size = results['PRM time'][1] - results['PRM time'][0] # return this too, to save for future use
   num_time_bins = len(results['PRM time'])
 
@@ -39,10 +112,11 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
 
 
 ###############################################################################################################
-def get_thresholds(subPR, num_neuron_bins):
+def get_thresholds(N, subPR, neuron_bin_size=100):
   import numpy as np
   import math
 
+  num_neuron_bins = math.ceil(N/neuron_bin_size)
   tempThresh = np.zeros(num_neuron_bins)
 
   for i in range(num_neuron_bins):
@@ -62,7 +136,7 @@ def get_thresholds(subPR, num_neuron_bins):
 
 
 ###############################################################################################################
-def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, consecutive_time = 1, time_spacing = 1, consecutive_bin = 1):
+def get_events(N, subPR, thresholds, neuron_bin_size = 100, time_bin_size = .1, consecutive_time = 1, time_spacing = 1, consecutive_bin = 1):
   import numpy as np
   import math
 
@@ -71,6 +145,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, consecutive
 
   events_by_bin = [] # a list of event tuples
 
+  num_neuron_bins = math.ceil(N/neuron_bin_size)
   for i in range(num_neuron_bins):
     count = 0
     success = False
@@ -131,18 +206,12 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, consecutive
 
 
 ###############################################################################################################
-def calculate_events(N, results, neuron_bin_size=100):
-  import numpy as np
-  import math
+def plot_subPR_thresh(nbin, subPR, thresholds): # hard coded ranges for specific scenerios
+    import numpy as np
+    import matplotlib.pyplot as plt
 
-  num_neuron_bins = math.ceil(N/neuron_bin_size)
-
-  (subPR, time_bin_size) = create_subPR(results, neuron_bin_size, num_neuron_bins)
-  thresholds = get_thresholds(subPR, num_neuron_bins)
-  events = get_events(subPR, thresholds, num_neuron_bins, time_bin_size)
-
-  return(events)
-
-
-###############################################################################################################
-def analyze_events(events, ):
+    plt.plot(subPR[nbin])
+    plt.hold(True)
+    plt.plot([0,30000], [thresholds[nbin], thresholds[nbin]])
+    plt.plot([0,30000], [3*thresholds[nbin], 3*thresholds[nbin]])
+    plt.hold(False)
