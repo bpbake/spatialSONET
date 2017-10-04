@@ -14,7 +14,8 @@ except:
    import pickle
 #import dill #pickle works fine
 
-from analyze import analyze_autocor # used to analyze synchrony of networks
+#from analyze import analyze_autocor # used to analyze synchrony of networks
+from analyze_results import calculate_events, analyze_events
 
 try:
     del input # brian overwrites this, we want to reset it to the python default
@@ -37,6 +38,7 @@ start_scope() # start fresh with magic settings
 
 N = 10000 # Number of excitatory neurons
 p_AVG = 50/N # average probability of connectivity between neurons
+neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
 tau = 10*ms 
@@ -154,19 +156,28 @@ for w_index in range(start_index, end_index+1):
 
 
     #synchrony = analyze_autocor(simulation_PRM.rate) # monotonic measure of synchrony
-    synchrony = -100
-    print("\nExcitatory Synchrony = {0}\n".format(synchrony))
+    #print("\nExcitatory Synchrony = {0}\n".format(synchrony))
     
-    # add results to the stats dict
+    # update the stats dict
     stats['j'] = j
     stats['ext_rate'] = ext_rate
     stats['ext_mag'] = ext_mag
     
-    stats['synchrony'] = synchrony
+    #stats['synchrony'] = synchrony
     stats['PRM rate'] = simulation_PRM.rate/hertz
     stats['PRM time'] = simulation_PRM.t/ms
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
+
+    #results = dict([('PRM time', simulation_PRM.t/ms), ('spikemon times', simulation_spikemon.t/ms), ('spikemon indices', simulation_spikemon.i/1)])
+    events = calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
+    stats['events'] = events
+    print("\nNumber of events: {0}".format(len(events)))
+
+    (event_rate, event_mag, IEIs) = analyze_events(N, events, simulationtime/ms, neuron_bin_size)
+    stats['event_rate'] = event_rate
+    stats['event_mag'] = event_mag
+    stats['IEIs'] = IEIs 
     
     try:
         # #plot the results of the simulation

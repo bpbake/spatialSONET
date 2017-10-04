@@ -6,12 +6,14 @@ Created on Mon Jul 24 09:46:52 2017
 """
 
 # functions in this script are:
-# create_subPR(N, results, neuron_bin_size=100) 
+# create_subPR(N, results, neuron_bin_size=100, num_neuron_bins) 
 #     -- returns numpy array: subPR and float: time_bin_size
 # get_thresholds(subPR, num_neuron_bins) 
 #     -- returns numpy array: thresholds
 # get_events(subPR, thresholds, num_neuron_bins, time_bin_size = .1, consecutive_count = 1, group_spacing = 1, consecutive_bin = 1) 
-#     -- returns numpy array of event "objects"
+#     -- returns numpy array of event tuples
+# calculate_events(N, results, neuron_bin_size=100)
+#     -- calls other funtions in this script and returns numpy array of event tuples
 #
 # to reimport a module, use importlib.reload(module), you must first import importlib
 #
@@ -130,7 +132,17 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, consecutive
   return(events)
 
 
-###############################################################################################################
+################################################################################################################ 
+# Inputs for the calculate_events function:
+#   N: number of neurons in the network
+#   results: a python dictionary containing "PRM time", "spikemon times", "spikemon indices"
+#   neuron_bin_size: how many neurons to use per neuron bin (default = 100)
+#
+# Uses functions: create_subPR, get_thresholds, and get_events
+#
+# Returns a numpy array/list of event "objects" as tuples:
+#   (start_neuron_bin, end_neuron_bin, start_time, end_time)
+#########################################################################
 def calculate_events(N, results, neuron_bin_size=100):
   import numpy as np
   import math
@@ -139,10 +151,31 @@ def calculate_events(N, results, neuron_bin_size=100):
 
   (subPR, time_bin_size) = create_subPR(results, neuron_bin_size, num_neuron_bins)
   thresholds = get_thresholds(subPR, num_neuron_bins)
-  events = get_events(subPR, thresholds, num_neuron_bins, time_bin_size)
+  events = get_events(subPR, thresholds, num_neuron_bins, time_bin_size) # a numpy array of tuples
 
   return(events)
 
 
 ###############################################################################################################
-def analyze_events(events, ):
+def analyze_events(N, events, simulation_time, neuron_bin_size=100):
+  import numpy as np
+
+  event_rate = len(events)/simulation_time # number of events proportional to simulation time
+
+  events_length = 0 # will be the total number of neurons that are included in all events
+
+  IEIs = [] # will be a list of inter-event intervals (times)
+  etime = 0 # end time of "current event"
+
+  for event in events:
+    events_length += neuron_bin_size*(event['end_neuron_bin'] - event['start_neuron_bin'] + 1) # update num neurons covered by event
+    
+    IEIs.append(event['start_time']-etime) # update IEIs list with time beteween previous event and current event
+    etime = event['end_time'] # update with end time of current event
+
+  event_mag = events_length/(N*simulation_time) # normalized magnitude of events 
+  # (number of neurons covered by events, proportional to num neurons in network and simulation time)
+
+  #IEIs.append(simulation_time - etime) # simulation time after last event ended
+
+  return(event_rate, event_mag, IEIs)
