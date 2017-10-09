@@ -169,15 +169,16 @@ for w_index in range(start_index, end_index+1):
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
 
-    #results = dict([('PRM time', simulation_PRM.t/ms), ('spikemon times', simulation_spikemon.t/ms), ('spikemon indices', simulation_spikemon.i/1)])
     events = calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
     stats['events'] = events
     print("\nNumber of events: {0}".format(len(events)))
 
-    (event_rate, event_mag, IEIs) = analyze_events(N, events, simulationtime/ms, neuron_bin_size)
+    (event_rate, event_mag, IEIs, excess_kurtosis, skew) = analyze_events(N, events, simulationtime/ms, neuron_bin_size)
     stats['event_rate'] = event_rate
     stats['event_mag'] = event_mag
     stats['IEIs'] = IEIs 
+    stats['IEI excess_kurtosis'] = excess_kurtosis
+    stats['IEI skew'] = skew
     
     try:
         # #plot the results of the simulation
@@ -206,7 +207,6 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-
     result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)

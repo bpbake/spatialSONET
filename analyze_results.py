@@ -6,6 +6,8 @@ Created on Mon Jul 24 09:46:52 2017
 """
 
 # functions in this script are:
+# load_results(N, p, i, data_dir='matrices/')
+#     -- returns a python dict: results
 # create_subPR(N, results, neuron_bin_size=100, num_neuron_bins) 
 #     -- returns numpy array: subPR and float: time_bin_size
 # get_thresholds(subPR, num_neuron_bins) 
@@ -18,6 +20,16 @@ Created on Mon Jul 24 09:46:52 2017
 # to reimport a module, use importlib.reload(module), you must first import importlib
 #
 #####
+
+##############################################################################################################
+def load_results(N, p, i, data_dir='matrices/'):
+  import pickle
+
+  result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
+  with open(result_filename, "rb") as rf:
+    results = pickle.load(rf)
+
+  return(results)
 
 ###############################################################################################################
 def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
@@ -64,7 +76,8 @@ def get_thresholds(subPR, num_neuron_bins):
 
 
 ###############################################################################################################
-def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, consecutive_time = 1, time_spacing = 1, consecutive_bin = 1):
+def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, 
+  consecutive_time = 1, time_spacing = 1, consecutive_bin = 2):
   import numpy as np
   import math
 
@@ -124,11 +137,12 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, consecutive
       starting_events_list.append(newe) # record info about first event in chain
       used = True
 
+  final_events_list = []
   for event in events_list: # now remove all events that cover fewer than a certain number (consecutive_bin) of neuron bins
-    if abs(event[0] - event[1]) <= consecutive_bin:
-      events_list.remove(event) 
+    if abs(event[1] - event[0]) >= consecutive_bin:
+      final_events_list.append(event)
 
-  events = np.array(events_list, dtype=dtype)
+  events = np.array(final_events_list, dtype=dtype)
   return(events)
 
 
@@ -149,9 +163,9 @@ def calculate_events(N, results, neuron_bin_size=100):
 
   num_neuron_bins = math.ceil(N/neuron_bin_size)
 
-  (subPR, time_bin_size) = create_subPR(results, neuron_bin_size, num_neuron_bins)
+  subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
   thresholds = get_thresholds(subPR, num_neuron_bins)
-  events = get_events(subPR, thresholds, num_neuron_bins, time_bin_size) # a numpy array of tuples
+  events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) # a numpy array of tuples
 
   return(events)
 
@@ -159,23 +173,26 @@ def calculate_events(N, results, neuron_bin_size=100):
 ###############################################################################################################
 def analyze_events(N, events, simulation_time, neuron_bin_size=100):
   import numpy as np
+  from scipy import stats
 
   event_rate = len(events)/simulation_time # number of events proportional to simulation time
 
   events_length = 0 # will be the total number of neurons that are included in all events
 
   IEIs = [] # will be a list of inter-event intervals (times)
-  etime = 0 # end time of "current event"
+  stime = None # we don't care about the time before the first event
 
   for event in events:
-    events_length += neuron_bin_size*(event['end_neuron_bin'] - event['start_neuron_bin'] + 1) # update num neurons covered by event
+    events_length += neuron_bin_size*(abs(event['end_neuron_bin'] - event['start_neuron_bin']) + 1) # update num neurons covered by event
     
-    IEIs.append(event['start_time']-etime) # update IEIs list with time beteween previous event and current event
-    etime = event['end_time'] # update with end time of current event
+    if stime is not None:
+      IEIs.append(event['start_time']-stime) # update IEIs list with time beteween previous event and current event
+    stime = event['start_time'] # update with start time of current event
 
   event_mag = events_length/(N*simulation_time) # normalized magnitude of events 
   # (number of neurons covered by events, proportional to num neurons in network and simulation time)
 
-  #IEIs.append(simulation_time - etime) # simulation time after last event ended
+  excess_kurtosis = stats.kurtosis(IEIs, bias=False)
+  skew = stats.skew(IEIs, bias=False)
 
-  return(event_rate, event_mag, IEIs)
+  return(event_rate, event_mag, IEIs, excess_kurtosis, skew)
