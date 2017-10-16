@@ -12,19 +12,22 @@ Created on Mon Jul 24 09:46:52 2017
 #     -- saves results as pickle file (ovewrites existing pickle file if one exists), 
 #     -- returns nothing
 # create_subPR(N, results, neuron_bin_size=100, num_neuron_bins=100) 
-#     -- returns numpy array: subPR and float: time_bin_size
+#     -- returns numpy array: subPR; float: time_bin_size; float: simulation_time
 # get_thresholds(subPR, num_neuron_bins) 
 #     -- returns numpy array: thresholds
 # get_events(subPR, thresholds, num_neuron_bins, time_bin_size = .1, consecutive_count = 1, 
 #             group_spacing = 1, consecutive_bin = 1) 
 #     -- returns numpy array of event tuples
 # calculate_events(N, results, neuron_bin_size=100)
-#     -- calls other funtions in this script and returns numpy array of event tuples
+#     -- calls other funtions in this script and 
+#     -- returns numpy array of event tuples; float: simulation_time 
 # analyze_events(N, events, simulation_time, neuron_bin_size=100)
 #     -- returns event_rate, event_mag, IEIs, excess_kurtosis(of IEIs), and skew (of IEIs)
 # update_results(N, p, i, data_dir='matrices/', neuron_bin_size=100, num_neuron_bins=100, 
 #                  time_bin_size = .1, consecutive_count = 1, group_spacing = 1, consecutive_bin = 1)
+#     -- calls load_results(), calculate_events(), analyze_events(), and save_results()
 #     -- updates the results pickle file of a given matrix with events and outputs from analyze_events
+#     -- also prints new results
 #
 # to reimport a module, use importlib.reload(module), you must first import importlib
 #
@@ -55,6 +58,7 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
 
   time_bin_size = results['PRM time'][1] - results['PRM time'][0] # return this too, to save for future use
   num_time_bins = len(results['PRM time'])
+  simulation_time = results['PRM time'][num_time_bins-1] - results['PRM time'][0]
 
   subPR = np.zeros((num_neuron_bins, num_time_bins))
 
@@ -66,7 +70,7 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
 
   scale_factor = np.multiply(neuron_bin_size, time_bin_size)
 
-  return(np.true_divide(subPR, scale_factor), time_bin_size)
+  return(np.true_divide(subPR, scale_factor), time_bin_size, simulation_time)
 
 
 
@@ -187,15 +191,15 @@ def calculate_events(N, results, neuron_bin_size=100):
 
   num_neuron_bins = math.ceil(N/neuron_bin_size)
 
-  subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
+  subPR, time_bin_size, simulation_time = create_subPR(results, neuron_bin_size, num_neuron_bins)
   thresholds = get_thresholds(subPR, num_neuron_bins)
   events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
 
-  return(events) # a numpy array of tuples
+  return(events, simulation_time) # a numpy array of tuples
 
 
 ###############################################################################################################
-def analyze_events(N, events, simulation_time, neuron_bin_size=100):
+def analyze_events(N, events, simulation_time=3000, neuron_bin_size=100):
   import numpy as np
   from scipy import stats
 
@@ -226,15 +230,18 @@ def analyze_events(N, events, simulation_time, neuron_bin_size=100):
 
 
 ###############################################################################################################
-def update_results(N, p, i, data_dir='matrices/', simulation_time = 3000, neuron_bin_size=100):
+def update_results(N, p, i, data_dir='matrices/', neuron_bin_size=100):
   import numpy as np
   import sys
   
   results = load_results(N, p, i, data_dir)
-  events = calculate_events(N, results, neuron_bin_size)
+  events, simulation_time = calculate_events(N, results, neuron_bin_size)
+  try:
+    simulation_time = results['simulation_time']
+  except:
+    pass
 
-  (event_rate, event_mag, IEIs, excess_kurtosis, skew) = analyze_events(N, 
-      events, simulation_time, neuron_bin_size)
+  event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, simulation_time, neuron_bin_size)
 
   results['event_rate'] = event_rate
   results['event_mag'] = event_mag

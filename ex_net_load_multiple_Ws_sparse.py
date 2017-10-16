@@ -95,7 +95,7 @@ else:
 
 for w_index in range(start_index, end_index+1):
     
-    print("w_index = {0}".format(w_index))
+    print("\n\nw_index = {0}".format(w_index))
     
     restore() # set the state back to what it was when the store() command was called
     
@@ -152,7 +152,7 @@ for w_index in range(start_index, end_index+1):
     simulation_PRM = PopulationRateMonitor(G)   
     run(simulationtime)
     
-    print("\nnumber of spikes in simulation: {0}\n".format(simulation_spikemon.num_spikes))
+    print("\nnumber of spikes in simulation: {0}".format(simulation_spikemon.num_spikes))
 
 
     #synchrony = analyze_autocor(simulation_PRM.rate) # monotonic measure of synchrony
@@ -162,6 +162,7 @@ for w_index in range(start_index, end_index+1):
     stats['j'] = j
     stats['ext_rate'] = ext_rate
     stats['ext_mag'] = ext_mag
+    stats['simulation_time'] = simulationtime/ms
     
     #stats['synchrony'] = synchrony
     stats['PRM rate'] = simulation_PRM.rate/hertz
@@ -169,9 +170,9 @@ for w_index in range(start_index, end_index+1):
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
 
-    events = calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
+    events, simulation_time = calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
     stats['events'] = events
-    print("\nNumber of events: {0}".format(len(events)))
+    print("\nnumber of events: {0}\n".format(len(events)))
 
     (event_rate, event_mag, IEIs, excess_kurtosis, skew) = analyze_events(N, events, simulationtime/ms, neuron_bin_size)
     stats['event_rate'] = event_rate
