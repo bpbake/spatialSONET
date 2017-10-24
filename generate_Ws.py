@@ -66,13 +66,13 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
 #                #math.exp(np.random.uniform(4.5, 10))
 #            alpha_recip = np.random.uniform(0, 0.3)
 #            alpha_conv = np.random.uniform(0, 0.3)
-#            alpha_div = np.random.uniform(0, 0.3)
+            alpha_div = np.random.uniform(0, 0.5)
 #            alpha_chain = np.random.uniform(-0.4, 0.3)
             L_left = 70 #float("inf")# math.inf
             L_right = 0 #float("inf")#math.inf
             alpha_chain = 0
             alpha_conv = 0
-            alpha_div = 0
+#            alpha_div = 0
             alpha_recip = 0
             
 
