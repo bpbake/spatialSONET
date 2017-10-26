@@ -13,7 +13,8 @@ def plot_results(N,p,i, data_dir='matrices/'):
     import matplotlib.pyplot as plt
     import pickle
     
-    result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
+    result_filename = "{0}Results_W_N{1}_p{2}_r{3}.pickle".format(data_dir,N,p,i) 
+    #result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
        results = pickle.load(rf)
 

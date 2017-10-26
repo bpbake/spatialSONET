@@ -5,7 +5,7 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/N10000_LL70_LR0_ff/'
+data_dir = 'matrices/N10000_LL70_LR0_ff_randadiv/'
 import sys
 
 try:
@@ -63,8 +63,11 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate=200*Hz # rate of external input (how often input happens)
-ext_mag=1*mV # how much the voltage gets affected by the external input
+# ext_tot = 200
+# ext_mag = 1.25*mV
+# ext_rate = (ext_tot/(ext_mag/mV)**2)*Hz
+ext_rate = 150*Hz # rate of external input (how often input happens)
+ext_mag = 1.25*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
@@ -172,6 +175,7 @@ for w_index in range(start_index, end_index+1):
 
     events, simulation_time = calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
     stats['events'] = events
+    stats['num events'] = len(events)
     print("\nnumber of events: {0}\n".format(len(events)))
 
     (event_rate, event_mag, IEIs, excess_kurtosis, skew) = analyze_events(N, events, simulationtime/ms, neuron_bin_size)
@@ -208,6 +212,7 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+    # result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+    result_filename = "{0}Results_W_N{1}_p{2}_r{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)
