@@ -47,6 +47,7 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
 
     results_matrix = np.zeros((end_index-start_index+1, len(results_header)))
     result_list = []
+
     alpha_divs = []
     alpha_chains = []
     # alpha_recips = []
@@ -58,7 +59,8 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
                                                       
     for w_index in range(start_index, end_index+1):
        
-        results_filename = "{0}Results_W_N{1}_p{2}_r{3}.pickle".format(data_dir,N,p,w_index)
+        # results_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,w_index)
+        results_filename = "{0}Results_W_N{1}_p{2}_rr{3}.pickle".format(data_dir,N,p,w_index)
         with open(results_filename, 'rb') as rf:
             try:
                 results = pickle.load(rf) 
@@ -66,20 +68,21 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
                 print("unpickling error")
               
         results_matrix[w_index-start_index, 0] = w_index
-        result = (w_index, results['alpha_div_hat'], results['event_rate'], results['event_mag'], 
-            results['IEI excess_kurtosis'], results['IEI skew'])
-
         for k in range(1, len(results_header)):    
             results_matrix[w_index-start_index, k] = results[results_header[k]]
 
+        result = (w_index, results['alpha_div_hat'], results['event_rate'], results['event_mag'], 
+            results['IEI excess_kurtosis'], results['IEI skew'])
         result_list.append(result)
 
         alpha_divs.append(results['alpha_div_hat'])
+        alpha_chains.append(results['alpha_chain_hat'])
+        # alpha_recips.append(results['alpha_recip_hat'])
+        # alpha_convs.append(results['alpha_conv_hat'])
         event_rates.append(results['event_rate'])
         event_mags.append(results['event_mag'])
         IEIkurtosis.append(results['IEI excess_kurtosis'])
         IEIskews.append(results['IEI skew'])
-        alpha_chains.append(results['alpha_chain_hat'])
 
     result_summary = np.array(result_list, results_type)
 
@@ -87,7 +90,7 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
     # with open(r_filename, "wb") as rf:
     #     pickle.dump(np.array(result_list, results_type), rf)
 
-    np.savetxt('{0}Result_Matrices_{1}_{2}.csv'.format(data_dir, start_index, end_index), 
+    np.savetxt('{0}Result_Matrices_rr_{1}_{2}.csv'.format(data_dir, start_index, end_index), 
         results_matrix, delimiter=',', header=str(results_header)) 
 
     matplotlib.rcParams.update({'font.size': 20})
@@ -97,24 +100,28 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
     plt.subplot(221)
     plt.plot(alpha_divs, event_rates, 'o')
     plt.ylabel('event_rate')
+    plt.ylim(0,0.03)
     plt.xlabel('alpha_div_hat')
     plt.grid(True)
 
     plt.subplot(224)
     plt.plot(alpha_divs, IEIkurtosis, 'o')
     plt.ylabel('IEI excess kurtosis')
+    plt.ylim(-4, 20)
     plt.xlabel('alpha_div_hat')
     plt.grid(True)
 
     plt.subplot(223)
     plt.plot(alpha_divs, event_mags, 'o')
     plt.ylabel('event_mag')
+    plt.ylim(0,0.02)
     plt.xlabel('alpha_div_hat')
     plt.grid(True)
 
     plt.subplot(222)
     plt.plot(alpha_chains, event_rates, 'o')
     plt.ylabel('event_rate')
+    plt.ylim(0,0.03)
     plt.xlabel('alpha_chain_hat')
     plt.grid(True)
 

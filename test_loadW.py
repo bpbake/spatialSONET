@@ -15,7 +15,10 @@ import scipy as sp
 from scipy import sparse
 import math
 
-data_dir = 'matrices/N10000_LL70_LR0_ff/'
+data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff/'
 
 N = 10000 #minimum of 1000
 p_AVG = 50/N
