@@ -78,10 +78,10 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             # alpha_div = 0
             alpha_chain = 0
 
-            print('alpha_recip={0}'.format(alpha_recip))
-            print('alpha_conv={0}'.format(alpha_conv))
-            print('alpha_div={0}'.format(alpha_div))
-            print('alpha_chain={0}'.format(alpha_chain))
+            # print('alpha_recip={0}'.format(alpha_recip))
+            # print('alpha_conv={0}'.format(alpha_conv))
+            # print('alpha_div={0}'.format(alpha_div))
+            # print('alpha_chain={0}'.format(alpha_chain))
             
 
             P = create_P(N, L_left, L_right, p_AVG)

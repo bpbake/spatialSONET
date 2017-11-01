@@ -7,7 +7,7 @@ Created on Sun Apr 30 00:02:45 2017
 # to reimport a module, use importlib.reload(module), you must first import importlib
 """
 
-def results(N, p, start_index, end_index, data_dir='matrices/'):
+def results(N, p, start_index, end_index, style, data_dir='matrices/'):
     try:
        import cPickle as pickle # used to store python data types
     except:
@@ -60,7 +60,7 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
     for w_index in range(start_index, end_index+1):
        
         # results_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,w_index)
-        results_filename = "{0}Results_W_N{1}_p{2}_rr{3}.pickle".format(data_dir,N,p,w_index)
+        results_filename = "{0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir, N, p, style, w_index)
         with open(results_filename, 'rb') as rf:
             try:
                 results = pickle.load(rf) 
@@ -90,17 +90,25 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
     # with open(r_filename, "wb") as rf:
     #     pickle.dump(np.array(result_list, results_type), rf)
 
-    np.savetxt('{0}Result_Matrices_rr_{1}_{2}.csv'.format(data_dir, start_index, end_index), 
-        results_matrix, delimiter=',', header=str(results_header)) 
+    matrix_filename = '{0}Result_Matrices_{1}_{2}_{3}'.format(data_dir, start_index, end_index, style)
+    np.savetxt('{0}.csv'.format(matrix_filename), results_matrix, delimiter=',', 
+        header=str(results_header)) 
+
+    z = np.polyfit(alpha_divs, event_rates, 1)
+    xp = np.linspace(0, 0.5, 100)
+    p = np.poly1d(z)
+    print(z)
 
     matplotlib.rcParams.update({'font.size': 20})
     plt.rc('xtick', labelsize=15)
     plt.rc('ytick', labelsize=15)
 
-    plt.subplot(221)
-    plt.plot(alpha_divs, event_rates, 'o')
+    plt.suptitle(matrix_filename)
+
+    plt.subplot(221)    
+    plt.plot(alpha_divs, event_rates, 'o', xp, p(xp), '-')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.03)
+    plt.ylim(0,0.02)
     plt.xlabel('alpha_div_hat')
     plt.grid(True)
 
@@ -121,7 +129,7 @@ def results(N, p, start_index, end_index, data_dir='matrices/'):
     plt.subplot(222)
     plt.plot(alpha_chains, event_rates, 'o')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.03)
+    plt.ylim(0,0.02)
     plt.xlabel('alpha_chain_hat')
     plt.grid(True)
 

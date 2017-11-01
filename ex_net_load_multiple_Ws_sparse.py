@@ -142,11 +142,6 @@ for w_index in range(start_index, end_index+1):
         continue # go to next matrix
 
     print("\nnumber of spikes in transient: {0}\n".format(transient_spikemon.num_spikes))
-    
-    # print the stats for W
-    for k,v in sorted(stats.items()):
-        print(k+":{0}".format(v))
-    print("\n")
         
     # reset monitors before run(simulationtime)
     simulation_statemon = StateMonitor(G, 'v', record=0)
@@ -183,6 +178,12 @@ for w_index in range(start_index, end_index+1):
     stats['IEIs'] = IEIs 
     stats['IEI excess_kurtosis'] = excess_kurtosis
     stats['IEI skew'] = skew
+    
+    # print the stats for W
+    for k,v in sorted(stats.items()):
+        if not isinstance(v,np.ndarray):
+            print(k+":{0}".format(v))
+    print("\n")
     
     try:
         # #plot the results of the simulation
