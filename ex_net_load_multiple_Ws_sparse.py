@@ -180,9 +180,9 @@ for w_index in range(start_index, end_index+1):
     stats['IEI skew'] = skew
     
     # print the stats for W
-    for k,v in sorted(stats.items()):
-        if not isinstance(v,np.ndarray):
-            print(k+":{0}".format(v))
+    for key,value in sorted(stats.items()):
+        if not isinstance(value,np.ndarray):
+            print(key+":{0}".format(value))
     print("\n")
     
     try:
