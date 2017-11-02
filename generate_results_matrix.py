@@ -94,22 +94,47 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
     np.savetxt('{0}.csv'.format(matrix_filename), results_matrix, delimiter=',', 
         header=str(results_header)) 
 
-    z = np.polyfit(alpha_divs, event_rates, 1)
-    xp = np.linspace(0, 0.5, 100)
-    p = np.poly1d(z)
-    print(z)
+    # calculate best fit lines to data
+    bfl_div_er = np.polyfit(alpha_divs, event_rates, 1)
+    bfl_div_em = np.polyfit(alpha_divs, event_mags, 1)
+    # bfl_chain_er = np.polyfit(alpha_chains, event_rates, 1)
 
+    xp = np.linspace(0, 0.5, 100)
+
+    pdr = np.poly1d(bfl_div_er)
+    print("Best fit line for alpha_div vs. event_rate: {0}".format(bfl_div_er))
+    pdm = np.poly1d(bfl_div_em)
+    print("Best fit line for alpha_div vs. event_mag: {0}".format(bfl_div_em))
+    # pcr = np.poly1d(bfl_chain_er)
+    # print("Best fit line for alpha_chain vs. event_rate: {0}".format(bfl_chain_er))
+
+    # configure the plots
     matplotlib.rcParams.update({'font.size': 20})
     plt.rc('xtick', labelsize=15)
     plt.rc('ytick', labelsize=15)
 
     plt.suptitle(matrix_filename)
 
+    # plot the things
     plt.subplot(221)    
-    plt.plot(alpha_divs, event_rates, 'o', xp, p(xp), '-')
+    plt.plot(alpha_divs, event_rates, 'o', xp, pdr(xp), '-')
     plt.ylabel('event_rate')
     plt.ylim(0,0.02)
     plt.xlabel('alpha_div_hat')
+    plt.grid(True)
+
+    plt.subplot(223)
+    plt.plot(alpha_divs, event_mags, 'o', xp, pdm(xp), '-')
+    plt.ylabel('event_mag')
+    plt.ylim(0,0.0125)
+    plt.xlabel('alpha_div_hat')
+    plt.grid(True)
+
+    plt.subplot(222)
+    plt.plot(alpha_chains, event_rates, 'o')#, xp, pcr(xp), '-')
+    plt.ylabel('event_rate')
+    plt.ylim(0,0.02)
+    plt.xlabel('alpha_chain_hat')
     plt.grid(True)
 
     plt.subplot(224)
@@ -117,20 +142,6 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
     plt.ylabel('IEI excess kurtosis')
     plt.ylim(-4, 20)
     plt.xlabel('alpha_div_hat')
-    plt.grid(True)
-
-    plt.subplot(223)
-    plt.plot(alpha_divs, event_mags, 'o')
-    plt.ylabel('event_mag')
-    plt.ylim(0,0.02)
-    plt.xlabel('alpha_div_hat')
-    plt.grid(True)
-
-    plt.subplot(222)
-    plt.plot(alpha_chains, event_rates, 'o')
-    plt.ylabel('event_rate')
-    plt.ylim(0,0.02)
-    plt.xlabel('alpha_chain_hat')
     plt.grid(True)
 
     plt.show()
