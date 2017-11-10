@@ -6,14 +6,14 @@ Created on Sun May 21 10:25:06 2017
 @author: nykamp
 """
 
-def plot_results(N,p,i, data_dir='matrices/'):
+def plot_results(N,p,i, style, data_dir='matrices/'):
     
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
     import pickle
     
-    result_filename = "{0}Results_W_N{1}_p{2}_r{3}.pickle".format(data_dir,N,p,i) 
+    result_filename = "{0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p,style, i) 
     #result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
     with open(result_filename, "rb") as rf:
        results = pickle.load(rf)
@@ -38,7 +38,7 @@ def plot_results(N,p,i, data_dir='matrices/'):
     
       
     mintime=500
-    maxtime=3500
+    maxtime=12500
     plt.subplot(211)
 
     plt.suptitle('Matrix {0}'.format(i))    
@@ -60,3 +60,5 @@ def plot_results(N,p,i, data_dir='matrices/'):
     plt.ylabel('Population rate (Hz)')
     #axis([1500, 2000, 0, ceil(max(results['PRM rate'])/100)*100])
     plt.tight_layout()
+
+    plt.show()

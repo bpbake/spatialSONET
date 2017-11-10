@@ -51,8 +51,8 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
 
     alpha_divs = []
     alpha_chains = []
-    # alpha_recips = []
-    # alpha_convs = []
+    alpha_recips = []
+    alpha_convs = []
     event_rates = []
     event_mags = []
     IEIkurtosis = []
@@ -78,8 +78,8 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
 
         alpha_divs.append(results['alpha_div_hat'])
         alpha_chains.append(results['alpha_chain_hat'])
-        # alpha_recips.append(results['alpha_recip_hat'])
-        # alpha_convs.append(results['alpha_conv_hat'])
+        alpha_recips.append(results['alpha_recip_hat'])
+        alpha_convs.append(results['alpha_conv_hat'])
         event_rates.append(results['event_rate'])
         event_mags.append(results['event_mag'])
         IEIkurtosis.append(results['IEI excess_kurtosis'])
@@ -105,33 +105,66 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
     xp = np.linspace(0, 0.5, 100)
 
     slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_divs, event_rates)
+    print('\nBest fit for alpha_div vs. event_rate: {0}'.format([slope, intercept]))
+    err = 0
+    for i in range(0, end_index-start_index+1):
+        e = (event_rates[i] - (intercept + slope*alpha_divs[i]))**2
+        err += e
+    print('mean squared error:{0}'.format(err/(end_index-start_index-1)))
+    print('r-square: {0}'.format(r_value**2))
+    print('p-value:{0}'.format(p_value))
     z = np.poly1d(np.array([slope, intercept]))
-    print('Best fit for alpha_div vs. event_rate: {0}'.format([slope, intercept]))
-    print('r-squared:{0}'.format(r_value**2))
     plt.subplot(221)
     plt.plot(alpha_divs, event_rates, 'o', xp, z(xp), '-')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.02)
+    plt.ylim(0,0.05)
     plt.xlabel('alpha_div_hat')
     plt.grid(True)
 
-    slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_divs, event_mags)
-    z = np.poly1d(np.array([slope, intercept]))
-    print('Best fit for alpha_div vs. event_mag: {0}'.format([slope, intercept]))
-    print('r-squared:{0}'.format(r_value**2))
+    # slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_divs, event_mags)
+    # z = np.poly1d(np.array([slope, intercept]))
+    # print('\nBest fit for alpha_div vs. event_mag: {0}'.format([slope, intercept]))
+    # plt.subplot(223)
+    # plt.plot(alpha_divs, event_mags, 'o', xp, z(xp), '-')
+    # plt.ylabel('event_mag')
+    # plt.ylim(0,0.005)
+    # plt.xlabel('alpha_div_hat')
+    # plt.grid(True)
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_convs, event_rates)
+    print('\nBest fit for alpha_conv vs. event_rate: {0}'.format([slope, intercept]))
+    print('p-value:{0}'.format(p_value))
+    z_conv = np.poly1d(np.array([slope, intercept]))
     plt.subplot(223)
-    plt.plot(alpha_divs, event_mags, 'o', xp, z(xp), '-')
-    plt.ylabel('event_mag')
-    plt.ylim(0,0.0125)
-    plt.xlabel('alpha_div_hat')
+    plt.plot(alpha_convs, event_rates, 'o', xp, z_conv(xp), '-')#, xp, pcr(xp), '-')
+    plt.ylabel('event_rate')
+    plt.ylim(0,0.05)
+    plt.xlabel('alpha_conv_hat')
     plt.grid(True)
 
+    xch = np.linspace(0, 0.05, 100)
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_chains, event_rates)
+    print('\nBest fit for alpha_chain vs. event_rate: {0}'.format([slope, intercept]))
+    print('p-value:{0}'.format(p_value))
+    z_chain = np.poly1d(np.array([slope, intercept]))
     plt.subplot(222)
-    plt.plot(alpha_chains, event_rates, 'o')#, xp, pcr(xp), '-')
+    plt.plot(alpha_chains, event_rates, 'o', xch, z_chain(xch), '-')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.02)
+    plt.ylim(0,0.05)
     plt.xlabel('alpha_chain_hat')
     plt.grid(True)
+
+    # slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_recips, event_rates)
+    # print('Best fit for alpha_recip vs. event_rate: {0}'.format([slope, intercept]))
+    # print('p-value:{0}'.format(p_value))
+    # z_recip = np.poly1d(np.array([slope, intercept]))
+    # plt.subplot(224)
+    # plt.plot(alpha_recips, event_rates, 'o')#, xp, z_recip(xp), '-')
+    # plt.ylabel('event_rate')
+    # plt.ylim(0,0.035)
+    # plt.xlabel('alpha_recip_hat')
+    # plt.grid(True)
 
     plt.subplot(224)
     plt.plot(alpha_divs, IEIkurtosis, 'o')

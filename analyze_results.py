@@ -203,7 +203,7 @@ def analyze_events(N, events, simulation_time=3000, neuron_bin_size=100):
   import numpy as np
   from scipy import stats
 
-  event_rate = len(events)/simulation_time # number of events proportional to simulation time
+  event_rate = (len(events)/simulation_time)*1000 # number of events per second (simulation time units: ms)
 
   events_length = 0 # will be the total number of neurons that are included in all events
 
@@ -223,8 +223,12 @@ def analyze_events(N, events, simulation_time=3000, neuron_bin_size=100):
   event_mag = events_length/(N*simulation_time) # normalized magnitude of events 
   # (number of neurons covered by events, proportional to num neurons in network and simulation time)
 
-  excess_kurtosis = stats.kurtosis(IEIs, bias=False)
-  skew = stats.skew(IEIs, bias=False)
+  try:
+    excess_kurtosis = stats.kurtosis(IEIs, bias=False)
+    skew = stats.skew(IEIs, bias=False)
+  except:
+    excess_kurtosis = float('nan')
+    skew = float('nan')
 
   return(event_rate, event_mag, IEIs, excess_kurtosis, skew)
 

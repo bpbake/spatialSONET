@@ -11,9 +11,9 @@ Created on Mon Apr  3 16:41:12 2017
 #   produceW.pyx converted into produceW.c
 
 
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
-data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
+data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 
 import os
 try:
@@ -67,15 +67,15 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
 #            L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
 #            L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish  L_left 
 #                #math.exp(np.random.uniform(4.5, 10))
-            alpha_recip = np.random.uniform(-0.5, 1)
-            alpha_conv = np.random.uniform(0, 0.5)
-            alpha_div = np.random.uniform(0, 0.5)
+            # alpha_recip = np.random.uniform(-0.5, 1)
+            # alpha_conv = np.random.uniform(0, 0.5)
+            # alpha_div = np.random.uniform(0, 0.5)
             # alpha_chain = np.random.uniform(-0.4, 0.5)
             L_left = 70 #float("inf")# math.inf
             L_right = 0 #float("inf")#math.inf
-            # alpha_recip = 0
-            # alpha_conv = 0
-            # alpha_div = 0
+            alpha_recip = 0
+            alpha_conv = 0
+            alpha_div = 0
             alpha_chain = 0
 
             # print('alpha_recip={0}'.format(alpha_recip))
