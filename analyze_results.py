@@ -34,20 +34,20 @@ Created on Mon Jul 24 09:46:52 2017
 #####
 
 #######################################################################################################
-def load_results(N, p, i, data_dir='matrices/'):
+def load_results(N, p, i, style, data_dir='matrices/'):
   import pickle
 
-  result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
+  result_filename = "{0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p,style,i) 
   with open(result_filename, "rb") as rf:
     results = pickle.load(rf)
 
   return(results)
 
 #######################################################################################################
-def save_results(N, p, i, results, data_dir='matrices/'):
+def save_results(N, p, i, results, style, data_dir='matrices/'):
   import pickle
 
-  result_filename = "{0}Results_W_N{1}_p{2}_slower{3}.pickle".format(data_dir,N,p,i) 
+  result_filename = "{0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p,style,i) 
   with open(result_filename, "wb") as rf:
     pickle.dump(results, rf)
 
@@ -132,7 +132,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
 
   events_list = [] # each entry will be tuple: 
   #  (start_neuron_bin, end_neuron_bin, start_time, end_time)
-  starting_events_list = []
+  # starting_events_list = []
 
   for newe in sorted_events_by_bin_array:
     used = False
@@ -161,7 +161,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
     if not used: # if it doesn't work with any current event in events_list, add it to the list
       events_list.append(newe)
       events_list.append(newe.copy()) # add twice because it could travel in both directions
-      starting_events_list.append(newe) # record info about first event in chain
+      # starting_events_list.append(newe) # record info about first event in chain
       used = True
 
   final_events_list = []

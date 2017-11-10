@@ -58,7 +58,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 3000*ms # the part of the simulation we care about
+simulationtime = 100000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -214,6 +214,6 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    result_filename = "{0}Results_W_N{1}_p{2}_t{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+    result_filename = "{0}Results_W_N{1}_p{2}_tlong{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     with open(result_filename, "wb") as rf:
        pickle.dump(stats, rf)

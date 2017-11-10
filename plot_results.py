@@ -38,7 +38,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     
       
     mintime=500
-    maxtime=12500
+    maxtime=results['simulation_time']+mintime
     plt.subplot(211)
 
     plt.suptitle('Matrix {0}'.format(i))    
