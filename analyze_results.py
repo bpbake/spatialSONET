@@ -52,6 +52,52 @@ def save_results(N, p, i, results, style, data_dir='matrices/'):
     pickle.dump(results, rf)
 
 #######################################################################################################
+def clean_results(N, p, i, style, data_dir='matrices/'):
+  import pickle
+  import numpy as np
+
+  results = load_results(N, p, i, style, data_dir)
+  cleanResults = dict()
+
+  for key,value in results.items():
+        if not isinstance(value,np.ndarray):
+            cleanResults[key] = results[key]
+    
+  cleanResults['largest eigenvalue'] = results['largest eigenvalue']
+
+  save_results(N, p, i, cleanResults, style+"Clean", data_dir)
+
+
+###############################################################################################################
+def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
+  import numpy as np
+  import sys
+  
+  results = load_results(N, p, i, style, data_dir)
+  events, simulation_time = calculate_events(N, results, neuron_bin_size)
+  try:
+    simulation_time = results['simulation_time']
+  except:
+    pass
+
+  event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, simulation_time, neuron_bin_size)
+
+  results['event_rate'] = event_rate
+  results['event_mag'] = event_mag
+  results['IEIs'] = IEIs 
+  results['IEI excess_kurtosis'] = excess_kurtosis
+  results['IEI skew'] = skew
+
+  save_results(N, p, i, results, data_dir)
+
+  for k,v in sorted(results.items()):
+    if not isinstance(v,np.ndarray):
+      print(k+":{0}".format(v))
+  print("\n")
+  sys.stdout.flush()
+
+#######################################################################################################
+#######################################################################################################
 def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
   import numpy as np
   import math
@@ -231,32 +277,3 @@ def analyze_events(N, events, simulation_time=3000, neuron_bin_size=100):
     skew = float('nan')
 
   return(event_rate, event_mag, IEIs, excess_kurtosis, skew)
-
-
-###############################################################################################################
-def update_results(N, p, i, data_dir='matrices/', neuron_bin_size=100):
-  import numpy as np
-  import sys
-  
-  results = load_results(N, p, i, data_dir)
-  events, simulation_time = calculate_events(N, results, neuron_bin_size)
-  try:
-    simulation_time = results['simulation_time']
-  except:
-    pass
-
-  event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, simulation_time, neuron_bin_size)
-
-  results['event_rate'] = event_rate
-  results['event_mag'] = event_mag
-  results['IEIs'] = IEIs 
-  results['IEI excess_kurtosis'] = excess_kurtosis
-  results['IEI skew'] = skew
-
-  save_results(N, p, i, results, data_dir)
-
-  for k,v in sorted(results.items()):
-    if not isinstance(v,np.ndarray):
-      print(k+":{0}".format(v))
-  print("\n")
-  sys.stdout.flush()

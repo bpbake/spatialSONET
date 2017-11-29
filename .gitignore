@@ -51,7 +51,7 @@ __pycache__
 matrices
 #twoL
 build
-Papers
+papers
 
 # emacs backup files
 *~
@@ -63,4 +63,4 @@ _outfile*
 *.so
 
 # other files to ignore
-siamds2017.pdf
+twoD_distance_matrix.py

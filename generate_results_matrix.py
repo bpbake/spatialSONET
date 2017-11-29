@@ -15,6 +15,7 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
        
     import numpy as np
     from scipy import stats
+    import math
 
     import matplotlib.pyplot as plt
     import matplotlib
@@ -111,13 +112,13 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
         e = (event_rates[i] - (intercept + slope*alpha_divs[i]))**2
         err += e
     print('mean squared error:{0}'.format(err/(end_index-start_index-1)))
-    print('r-square: {0}'.format(r_value**2))
     print('p-value:{0}'.format(p_value))
+    print('r-square: {0}'.format(r_value**2))
     z = np.poly1d(np.array([slope, intercept]))
     plt.subplot(221)
     plt.plot(alpha_divs, event_rates, 'o', xp, z(xp), '-')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.05)
+    # plt.ylim(0,0.05)
     plt.xlabel('alpha_div_hat')
     plt.grid(True)
 
@@ -134,24 +135,25 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
     slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_convs, event_rates)
     print('\nBest fit for alpha_conv vs. event_rate: {0}'.format([slope, intercept]))
     print('p-value:{0}'.format(p_value))
+    print('r-square: {0}'.format(r_value**2))
     z_conv = np.poly1d(np.array([slope, intercept]))
     plt.subplot(223)
     plt.plot(alpha_convs, event_rates, 'o', xp, z_conv(xp), '-')#, xp, pcr(xp), '-')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.05)
+    # plt.ylim(0,0.05)
     plt.xlabel('alpha_conv_hat')
     plt.grid(True)
 
-    xch = np.linspace(0, 0.05, 100)
-
+    xch = np.linspace(-0.4, 0.5, 100)
     slope, intercept, r_value, p_value, std_err = stats.linregress(alpha_chains, event_rates)
     print('\nBest fit for alpha_chain vs. event_rate: {0}'.format([slope, intercept]))
     print('p-value:{0}'.format(p_value))
+    print('r-square: {0}'.format(r_value**2))
     z_chain = np.poly1d(np.array([slope, intercept]))
     plt.subplot(222)
     plt.plot(alpha_chains, event_rates, 'o', xch, z_chain(xch), '-')
     plt.ylabel('event_rate')
-    plt.ylim(0,0.05)
+    # plt.ylim(0,0.05)
     plt.xlabel('alpha_chain_hat')
     plt.grid(True)
 
@@ -166,6 +168,9 @@ def results(N, p, start_index, end_index, style, data_dir='matrices/'):
     # plt.xlabel('alpha_recip_hat')
     # plt.grid(True)
 
+
+    print('IEI excess kurtosis mean: {0}'.format(np.nanmean(IEIkurtosis)))
+    print('IEI excess kurtosis range: {0}, {1}'.format(np.nanmin(IEIkurtosis), np.nanmax(IEIkurtosis)))
     plt.subplot(224)
     plt.plot(alpha_divs, IEIkurtosis, 'o')
     plt.ylabel('IEI excess kurtosis')
