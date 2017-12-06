@@ -101,11 +101,17 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             Wsparse = sparse.csr_matrix(W)
             
             #save the W as a python pickle file
-            W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
-            with open(W_filename, 'wb') as fp:
-                pickle.dump(Wsparse, fp)    
+            W_filename = "{0}Wsparse_N{1}_p{2}_{3}".format(data_dir, N, p_AVG, w_index)
+            with open(W_filename+'.pickle', 'wb') as fp:
+                pickle.dump(Wsparse, fp)  
             print("W has been pickled.")
             sys.stdout.flush()
+
+            np.savetxt(W_filename+'.csv', W, delimiter=',')  
+            print("W has been saved as csv file.")
+            sys.stdout.flush()
+
+
                 
             # generate statistics of W
             print("generating stats")
