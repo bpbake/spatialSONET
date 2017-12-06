@@ -13,7 +13,8 @@ Created on Mon Apr  3 16:41:12 2017
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
-data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
+data_dir = 'matrices/twoD/'
 
 import os
 try:
@@ -28,7 +29,8 @@ from scipy import linalg, special, sparse
 from scipy.sparse import linalg as splinalg
 
 from useP_to_createW import *
-from create_P import *
+# from create_P import *
+from twoD_distance_matrix import *
 
 try:
    import cPickle as pickle
@@ -46,6 +48,7 @@ input_orig = input
 
 N = 10000 # Number of excitatory neurons
 p_AVG = 50/N # average probability of connectivity between neurons
+A = 100 # a number that divides N, preferrably sqrt(N)
 
 if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
@@ -72,7 +75,7 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             # alpha_div = np.random.uniform(0, 0.5)
             # alpha_chain = np.random.uniform(-0.4, 0.5)
             L_left = 70 #float("inf")# math.inf
-            L_right = 0 #float("inf")#math.inf
+            L_right = 70 #float("inf")#math.inf
             alpha_recip = 0
             alpha_conv = 0
             alpha_div = 0
@@ -84,7 +87,8 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             # print('alpha_chain={0}'.format(alpha_chain))
             
 
-            P = create_P(N, L_left, L_right, p_AVG)
+            neuron_locations,distance = create_distance(N, A)
+            P = create_P(N, distance, L_left, L_right, p_AVG)
             print("P has been created \n")
             sys.stdout.flush()
             
@@ -92,8 +96,9 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
             print("W has been created \n")
             sys.stdout.flush()
-            W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix
-            Wsparse = sparse.csr_matrix(W_lowerTri)
+            # W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix
+            # Wsparse = sparse.csr_matrix(W_lowerTri)
+            Wsparse = sparse.csr_matrix(W)
             
             #save the W as a python pickle file
             W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
@@ -121,11 +126,11 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             sys.stdout.flush()
               
             #create dictionary of stats and save
-            stats = dict([('N', N), ('L_left', L_left), ('L_right', L_right), ('p_AVG', p_AVG), 
+            stats = dict([('N', N), ('L_left', L_left), ('L_right', L_right), ('p_AVG', p_AVG),  
                 ('alpha_recip', alpha_recip), ('alpha_conv', alpha_conv), ('alpha_div', alpha_div), 
                 ('alpha_chain', alpha_chain), ('p_hat', p_hat), ('alpha_recip_hat', alpha_recip_hat), 
                 ('alpha_conv_hat', alpha_conv_hat), ('alpha_div_hat', alpha_div_hat), ('alpha_chain_hat', alpha_chain_hat), 
-                ('largest eigenvalue', max_eigenval)])
+                ('largest eigenvalue', max_eigenval), ('neuron_locations', neuron_locations)])
             
             stat_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir, N,p_AVG, w_index) #pickle the dictionary of stats for each W
             with open(stat_filename, "wb") as f:
