@@ -49,6 +49,7 @@ input_orig = input
 N = 10000 # Number of excitatory neurons
 p_AVG = 50/N # average probability of connectivity between neurons
 A = 100 # a number that divides N, preferrably sqrt(N)
+neuron_locations,distance = create_distance(N, A)
 
 if len(sys.argv) >= 3:
    start_index = int(sys.argv[1])
@@ -74,8 +75,10 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             # alpha_conv = np.random.uniform(0, 0.5)
             # alpha_div = np.random.uniform(0, 0.5)
             # alpha_chain = np.random.uniform(-0.4, 0.5)
-            L_left = 70 #float("inf")# math.inf
-            L_right = 70 #float("inf")#math.inf
+            # L_left = 70 
+            # L_right = 70 
+            L_left = float("inf")
+            L_right = float("inf")
             alpha_recip = 0
             alpha_conv = 0
             alpha_div = 0
@@ -87,7 +90,6 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             # print('alpha_chain={0}'.format(alpha_chain))
             
 
-            neuron_locations,distance = create_distance(N, A)
             P = create_P(N, distance, L_left, L_right, p_AVG)
             print("P has been created \n")
             sys.stdout.flush()
@@ -96,12 +98,12 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
             print("W has been created \n")
             sys.stdout.flush()
-            # W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix
+            # W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix... Feed Forward case
             # Wsparse = sparse.csr_matrix(W_lowerTri)
             Wsparse = sparse.csr_matrix(W)
             
             #save the W as a python pickle file
-            W_filename = "{0}Wsparse_N{1}_p{2}_{3}".format(data_dir, N, p_AVG, w_index)
+            W_filename = "{0}W_N{1}_p{2}_alphas_random{3}".format(data_dir, N, p_AVG, w_index)
             with open(W_filename+'.pickle', 'wb') as fp:
                 pickle.dump(Wsparse, fp)  
             print("W has been pickled.")
@@ -126,6 +128,8 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
                 / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
             alpha_chain_hat = ((sparse.csr_matrix.sum(Wsquare) - np.trace(Wsquare.toarray())) 
                 / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
+
+            # also calculate in-degree and out-degree of each neuron?
             
             max_eigenval = splinalg.eigs(Wsparse, k=1, which='LR', return_eigenvectors=False, ncv = 500)
             print("stats have been calculated. Now saving as a dict")

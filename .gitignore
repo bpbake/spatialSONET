@@ -63,4 +63,5 @@ _outfile*
 *.so
 
 # other files to ignore
-#twoD_distance_matrix.py
+twoD_distance_matrix.py
+#layer_test.py
