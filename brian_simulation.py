@@ -8,8 +8,9 @@ Created on Sun Mar  5 14:06:45 2017
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
-data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
+data_dir = 'matrices/CNS18/'
 print("data_dir: "+data_dir)
 
 import sys
@@ -42,7 +43,9 @@ import math
 
 start_scope() # start fresh with magic settings
 
-N = 10000 # Number of excitatory neurons
+# alpha_chain = 0.3
+L = 70
+N = 3000 # Number of excitatory neurons
 p_AVG = 50/N # average probability of connectivity between neurons
 neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
 
@@ -60,7 +63,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 100000*ms # the part of the simulation we care about
+simulationtime = 2000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -69,8 +72,8 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate = 112*Hz # rate of external input (how often input happens)
-ext_mag = 1.5*mV # how much the voltage gets affected by the external input
+ext_rate = 150*Hz # rate of external input (how often input happens)
+ext_mag = 1.3*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
@@ -105,8 +108,8 @@ for w_index in range(start_index, end_index+1):
     
     restore() # set the state back to what it was when the store() command was called
     
-    Wsparse_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
-    with open(Wsparse_filename, 'rb') as wf:
+    W_filename = "{0}W_N{1}_p{2}_FF_L{3}_{4}".format(data_dir, N, p_AVG, L, w_index)
+    with open(W_filename+'.pickle', 'rb') as wf:
         try:
             Wsparse = pickle.load(wf) # load in W matrix
         except (EOFError):
@@ -114,8 +117,8 @@ for w_index in range(start_index, end_index+1):
     W = np.array(Wsparse.todense())
     
     
-    stats_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index)
-    with open(stats_filename, 'rb') as sf:
+    stat_filename = "{0}Stats_W_N{1}_p{2}_FF_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L, w_index)
+    with open(stat_filename, 'rb') as sf:
         try:
             stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
         except (EOFError):
@@ -217,7 +220,7 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    style = "ttLong"
+    style = "FF_L{0}".format(L)
     ar.save_results(N, p_AVG, w_index, stats, style, data_dir)
     ar.clean_results(N, p_AVG, w_index, style, data_dir)
     # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p_AVG,w_index) 

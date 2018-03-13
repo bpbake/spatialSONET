@@ -20,12 +20,12 @@ except:
 
 data_dir = "matrices/layer_test/"
 
-num_x = 100 #number of neurons in first layer
-num_y = 100 #number of neurons in second layer
+num_x = 1000 #number of neurons in first layer
+num_y = 1000 #number of neurons in second layer
 num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 sigma_square = 1 #variance of neurons in first layer
-rho = .7 #rho*sigma_squre = cov of any pair of neurons in first layer 
+rho = 0.05 #rho*sigma_squre = cov of any pair of neurons in first layer 
 #(rho is the correleation coeff - it's a value between 0 & 1)
 
 alpha_divs = []
@@ -60,28 +60,28 @@ plt.rc('ytick', labelsize=15)
 
 plt.subplot(221)
 plt.plot(alpha_convs, y_corr_coeffs, 'o')
-plt.ylabel('y_corr_coeffs')
+plt.ylabel('y_corr_coeff')
 # plt.ylim(0,0.05)
 plt.xlabel('alpha_conv_hat')
 plt.grid(True)
 
 plt.subplot(222)
 plt.plot(alpha_chains, y_corr_coeffs, 'o')
-plt.ylabel('y_corr_coeffs')
+plt.ylabel('y_corr_coeff')
 # plt.ylim(0,0.05)
 plt.xlabel('alpha_chain_hat')
 plt.grid(True)
 
 plt.subplot(223)
 plt.plot(alpha_divs, y_corr_coeffs, 'o')
-plt.ylabel('y_corr_coeffs')
+plt.ylabel('y_corr_coeff')
 # plt.ylim(0,0.05)
 plt.xlabel('alpha_div_hat')
 plt.grid(True)
 
 plt.subplot(224)
 plt.plot(alpha_recips, y_corr_coeffs, 'o')
-plt.ylabel('y_corr_coeffs')
+plt.ylabel('y_corr_coeff')
 # plt.ylim(0,0.05)
 plt.xlabel('alpha_recip_hat')
 plt.grid(True)

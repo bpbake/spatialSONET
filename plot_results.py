@@ -18,7 +18,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     with open(result_filename, "rb") as rf:
        results = pickle.load(rf)
 
-    print('Matrix {0}'.format(i))
+    print('Matrix {0}, style {1}'.format(i, style))
     for k,v in sorted(results.items()):
         if not isinstance(v,np.ndarray):
             print(k+":{0}".format(v))
@@ -41,7 +41,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     maxtime=results['simulation_time']+mintime
     plt.subplot(211)
 
-    plt.suptitle('Matrix {0}'.format(i))    
+    plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
