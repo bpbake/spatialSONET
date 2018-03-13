@@ -72,15 +72,15 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate = 150*Hz # rate of external input (how often input happens)
-ext_mag = 1.3*mV # how much the voltage gets affected by the external input
+ext_rate = 300*Hz # rate of external input (how often input happens)
+ext_mag = 1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 0.18*mV # coupling strength
+j = 0.15*mV # coupling strength
 # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
@@ -117,7 +117,7 @@ for w_index in range(start_index, end_index+1):
     W = np.array(Wsparse.todense())
     
     
-    stat_filename = "{0}Stats_W_N{1}_p{2}_FF_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L, w_index)
+    stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L, w_index)
     with open(stat_filename, 'rb') as sf:
         try:
             stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
@@ -220,7 +220,7 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    style = "FF_L{0}".format(L)
+    style = "L{0}".format(L)
     ar.save_results(N, p_AVG, w_index, stats, style, data_dir)
     ar.clean_results(N, p_AVG, w_index, style, data_dir)
     # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p_AVG,w_index) 

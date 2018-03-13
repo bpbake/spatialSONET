@@ -5,7 +5,8 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-data_dir = 'matrices/10000_sample/'
+# data_dir = 'matrices/10000_sample/'
+data_dir = 'matrices/CNS18/'
 
 try:
    import cPickle as pickle # used to store python data types
@@ -25,10 +26,10 @@ np.set_printoptions(threshold=np.nan)
 
 import matplotlib.pyplot as plt
 
-N = 10000 # Number of excitatory neurons
+N = 3000 # Number of excitatory neurons
 p_AVG =50/N # average probability of connectivity between neurons
 
-reload=False
+reload=True
 
 summary_filename = "{0}Summary_W_N{1}_p{2}.pickle".format(data_dir,N,p_AVG) 
 
@@ -114,15 +115,19 @@ plt.xlabel(r'$\alpha_{div}$')
 plt.xticks(np.arange(0,0.5,0.1))
 plt.tight_layout()
 
+
+
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=25)
-plt.rc('xtick', labelsize=20)
-plt.rc('ytick', labelsize=20)
+plt.rc('font', family='serif', size=60)
+plt.rc('xtick', labelsize=50)
+plt.rc('ytick', labelsize=50)
 
 
 plt.figure()
-plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['synchrony'],s=100)
+plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=(results['synchrony']/10),s=400)
 plt.xlabel(r'$\alpha_{conv}$')
 plt.ylabel(r'$\alpha_{chain}$')
 cb=plt.colorbar()
 cb.set_label('synchrony')
+
+plt.show()
