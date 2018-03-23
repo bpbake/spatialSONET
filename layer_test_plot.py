@@ -20,8 +20,7 @@ except:
 
 data_dir = "matrices/layer_test/"
 
-num_x = 1000 #number of neurons in first layer
-num_y = 1000 #number of neurons in second layer
+n = 1000 #number of neurons in each layer
 num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 sigma_square = 1 #variance of neurons in first layer
@@ -34,16 +33,20 @@ alpha_recips = []
 alpha_convs = []
 y_corr_coeffs = []
 
-if len(sys.argv) >= 3:
+if len(sys.argv) >= 4:
    start_index = int(sys.argv[1])
    end_index = int(sys.argv[2])
+   num_layers = int(sys.argv[3])
 else:
    start_index = int(input("enter starting index: "))
    end_index = int(input("enter end index: "))
+   num_layers = int(input("how many layers? "))
+
+N = n*num_layers
 
 for index in range(start_index, end_index+1):
 
-	stat_filename = "{0}Stats_numX{1}_numY{2}_rho{3}_{4}.pickle".format(data_dir, num_x, num_y, rho, index)
+	stat_filename = "{0}Stats_N{1}_numLay{2}_rho{3}_{4}.pickle".format(data_dir, N, num_layers, rho, index)
 	with open(stat_filename, "rb") as sf:
 		stats = pickle.load(sf)
 
