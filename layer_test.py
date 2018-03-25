@@ -55,18 +55,14 @@ for index in range(start_index, end_index+1):
 
 			Z = np.random.standard_normal((n, num_samp)) # array of iid standard normals (each column reps one sample vector)
 			X = np.matmul(L, Z) # sample of r.v. representing neurons in first layer
-			# print("samples of X have been calcuated.  Now generating W.")
-			# sys.stdout.flush()
 
-			# if num_layers == 2:
-			# 	N = n
-			# else:
-			# 	N = num_layers*n
 			N = num_layers*n
 
 			p = .1 #constant probability of connection between any two neurons
-			P = p*np.ones((N,N)) # probability matrix
-			# P = p*np.ones((n,n)) # probability matrix
+			base_P = np.zeros((N, N))
+			for i in range(num_layers-1):
+				base_P[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))] = np.ones((n,n))
+			P = p*base_P # probability matrix
 
 
 			alpha_recip = np.random.uniform(-0.5, 1)
@@ -81,27 +77,12 @@ for index in range(start_index, end_index+1):
 				alpha_chain, alpha_conv, alpha_div, alpha_recip))
 
 			W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
-			# W = create_W(n, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
-			# if num_x == num_y:
-			# 	W_star = W
-			# else:
-			# 	W_star = W[num_x:, :num_x] 
-			# the connectivity matrix for x's to y's (W_star[i,j] = 1 if x_j to y_i, 0 o.w.)
-			W_star = np.zeros((N,N))
-			for i in range(num_layers-1):
-				W_star[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))] = W[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))]
-				# W_star[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))] = W
-			# plt.matshow(W_star)
-			# plt.show()
+			Wsparse = sparse.csr_matrix(W)
 
 			W_filename = "{0}W_N{1}_numLay{2}_{3}".format(data_dir, N, num_layers, index)
 			with open(W_filename+'.pickle', 'wb') as fp:
-			    pickle.dump(W_star, fp)  
-			# print("W has been generated and pickled.")
-			# sys.stdout.flush()
+			    pickle.dump(Wsparse, fp)  
 
-
-			Wsparse = sparse.csr_matrix(W_star)
 			WL1 = sparse.csr_matrix.sum(Wsparse)
 			Wsquare = Wsparse**2
 			p_hat = WL1/(N*(N-1))
@@ -109,14 +90,10 @@ for index in range(start_index, end_index+1):
 			alpha_conv_hat = ((sparse.csr_matrix.sum((Wsparse.transpose())*Wsparse) -WL1) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
 			alpha_div_hat = ((sparse.csr_matrix.sum(Wsparse*(Wsparse.transpose())) - WL1) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
 			alpha_chain_hat = ((sparse.csr_matrix.sum(Wsquare) - np.trace(Wsquare.toarray())) / (N*(N-1)*(N-2)*math.pow(p_hat,2))) -1
-			# print("hat values for W have been calculated. Now calculating Y.")
-			# sys.stdout.flush()
-
 
 			Y = X
 			for i in range(num_layers-1):
-				Y = np.matmul(W_star[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))], Y)
-				# Y = np.matmul(W, Y)
+				Y = np.matmul(W[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))], Y)
 
 			Y_cov = np.cov(Y)
 
@@ -124,9 +101,6 @@ for index in range(start_index, end_index+1):
 			y_avg_var = np.trace(Y_cov)/n
 
 			y_corr_coeff = y_avg_cov/y_avg_var
-
-			# print("Y and wants have been calculated. Now saving all stats as a dict")
-			# sys.stdout.flush()
 
 			stats = dict([('index', index), ('N', N), ('num_layers', num_layers), ('n', n), ('num_samp', num_samp), 
 				('rho', rho), ('sigma_square', sigma_square), ('p', p), ('p_hat', p_hat),
@@ -140,13 +114,6 @@ for index in range(start_index, end_index+1):
 			stat_filename = "{0}Stats_N{1}_numLay{2}_rho{3}_{4}.pickle".format(data_dir, N, num_layers, rho, index) #pickle the dictionary of stats for each W
 			with open(stat_filename, "wb") as f:
 			    pickle.dump(stats, f) # write the python pickle file for stats
-			# print("stats have been pickled")
-			# sys.stdout.flush()
-
-			# print the stats
-			# for k,v in sorted(stats.items()):
-			#     print(k+":{0}".format(v))
-			#     sys.stdout.flush()
 
 			trying = False
 
