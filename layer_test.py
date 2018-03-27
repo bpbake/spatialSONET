@@ -36,7 +36,7 @@ else:
 
 for index in range(start_index, end_index+1):
 	np.random.seed(index)
-	print("trial number {0}".format(index))
+	print("\n\n\ntrial number {0}".format(index))
 	sys.stdout.flush()
 
 	trying = True
@@ -46,7 +46,7 @@ for index in range(start_index, end_index+1):
 			num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 			sigma_square = 1 #variance of neurons in first layer
-			rho = 0.05 #rho*sigma_squre = cov of any pair of neurons in first layer 
+			rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer 
 			#(rho is the correleation coeff - it's a value between 0 & 1)
 
 			cov_x = (sigma_square*np.identity(n)) + (rho*sigma_square*(np.ones((n,n))-np.identity(n)))
@@ -58,7 +58,7 @@ for index in range(start_index, end_index+1):
 
 			N = num_layers*n
 
-			p = .1 #constant probability of connection between any two neurons
+			p = 50/N #constant probability of connection between any two neurons
 			base_P = np.zeros((N, N))
 			for i in range(num_layers-1):
 				base_P[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))] = np.ones((n,n))
@@ -78,8 +78,10 @@ for index in range(start_index, end_index+1):
 
 			W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
 			Wsparse = sparse.csr_matrix(W)
+			# plt.matshow(W)
+			# plt.show()
 
-			W_filename = "{0}W_N{1}_numLay{2}_{3}".format(data_dir, N, num_layers, index)
+			W_filename = "{0}W_N{1}_p{2}_numLay{3}_{4}".format(data_dir, N, p, num_layers, index)
 			with open(W_filename+'.pickle', 'wb') as fp:
 			    pickle.dump(Wsparse, fp)  
 
@@ -111,9 +113,14 @@ for index in range(start_index, end_index+1):
 			    ('y_avg_cov', y_avg_cov), ('y_avg_var', y_avg_var), ('y_corr_coeff', y_corr_coeff)])
 
 
-			stat_filename = "{0}Stats_N{1}_numLay{2}_rho{3}_{4}.pickle".format(data_dir, N, num_layers, rho, index) #pickle the dictionary of stats for each W
+			stat_filename = "{0}Stats_N{1}_p{2}_numLay{3}_rho{4}_{5}.pickle".format(data_dir, N, p, num_layers, rho, index) #pickle the dictionary of stats for each W
 			with open(stat_filename, "wb") as f:
 			    pickle.dump(stats, f) # write the python pickle file for stats
+
+			# print the stats
+			for k,v in sorted(stats.items()):
+				print(k+":{0}".format(v))
+				sys.stdout.flush()
 
 			trying = False
 
