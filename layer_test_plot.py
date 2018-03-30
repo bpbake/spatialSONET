@@ -24,7 +24,7 @@ n = 1000 #number of neurons in each layer
 num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 sigma_square = 1 #variance of neurons in first layer
-rho = 0.05 #rho*sigma_squre = cov of any pair of neurons in first layer 
+rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer 
 #(rho is the correleation coeff - it's a value between 0 & 1)
 
 alpha_divs = []
@@ -43,10 +43,11 @@ else:
    num_layers = int(input("how many layers? "))
 
 N = n*num_layers
+p=50/N
 
 for index in range(start_index, end_index+1):
 
-	stat_filename = "{0}Stats_N{1}_numLay{2}_rho{3}_{4}.pickle".format(data_dir, N, num_layers, rho, index)
+	stat_filename = "{0}Stats_N{1}_p{2}_numLay{3}_rho{4}_{5}.pickle".format(data_dir, N, p, num_layers, rho, index)
 	with open(stat_filename, "rb") as sf:
 		stats = pickle.load(sf)
 

@@ -60,8 +60,8 @@ for index in range(start_index, end_index+1):
 
 			p = 50/N #constant probability of connection between any two neurons
 			base_P = np.zeros((N, N))
-			for i in range(num_layers-1):
-				base_P[((i+1)*n):((i+2)*n), (i*n):((i+1)*(n))] = np.ones((n,n))
+			for i in range(num_layers):
+				base_P[(((i+1)%num_layers)*n):((((i+1)%num_layers)+1)*n), (i*n):((i+1)*(n))] = np.ones((n,n))
 			P = p*base_P # probability matrix
 
 
@@ -73,13 +73,15 @@ for index in range(start_index, end_index+1):
 			# alpha_conv = 0
 			# alpha_div = 0
 			# alpha_recip = 0
-			print("\nalphas: \nchain {0} \nconv {1} \ndiv {2} \nrecip {3}\n".format(
-				alpha_chain, alpha_conv, alpha_div, alpha_recip))
+			# print("\nalphas: \nchain {0} \nconv {1} \ndiv {2} \nrecip {3}\n".format(
+			# 	alpha_chain, alpha_conv, alpha_div, alpha_recip))
 
 			W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
-			Wsparse = sparse.csr_matrix(W)
-			# plt.matshow(W)
-			# plt.show()
+			W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix... Feed Forward case
+			Wsparse = sparse.csr_matrix(W_lowerTri)
+			# Wsparse = sparse.csr_matrix(W)
+			plt.matshow(W_lowerTri)
+			plt.show()
 
 			W_filename = "{0}W_N{1}_p{2}_numLay{3}_{4}".format(data_dir, N, p, num_layers, index)
 			with open(W_filename+'.pickle', 'wb') as fp:

@@ -100,9 +100,9 @@ S.connect() # no specificications of where connections are made... W will be use
 
 
 # initialize monitors for simulation... Look up in Brian documentation!!!
-transient_statemon = StateMonitor(G, 'v', record=0) # 
+transient_statemon = StateMonitor(G, 'v', record=0) # records voltage of some kind
 transient_spikemon = SpikeMonitor(G) # recording times of spikes
-transient_PRM = PopulationRateMonitor(G) # records voltage (of some kind)
+transient_PRM = PopulationRateMonitor(G) # records "average" firing rate
  
 store() # record state of simulation for future reference
 
@@ -227,5 +227,5 @@ for index in range(start_index, end_index+1):
 
     # save results (pickle new stats dictionary)
     style = "numLay{0}".format(num_layers)
-    ar.save_results(N, p_AVG, index, stats, style, data_dir)
-    ar.clean_results(N, p_AVG, index, style, data_dir)
+    ar.save_results(N, p, index, stats, style, data_dir)
+    ar.clean_results(N, p, index, style, data_dir)
