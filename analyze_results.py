@@ -62,8 +62,10 @@ def clean_results(N, p, i, style, data_dir='matrices/'):
   for key,value in results.items():
         if not isinstance(value,np.ndarray):
             cleanResults[key] = results[key]
-    
-  cleanResults['largest eigenvalue'] = results['largest eigenvalue']
+  try:  
+    cleanResults['largest eigenvalue'] = results['largest eigenvalue']
+  except:
+    pass
 
   save_results(N, p, i, cleanResults, style+"Clean", data_dir)
 

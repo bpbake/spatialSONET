@@ -47,7 +47,7 @@ n = 1000 #number of neurons in each layer
 neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
 
 sigma_square = 1 #variance of neurons in first layer
-rho = 0.05 #rho*sigma_squre = cov of any pair of neurons in first layer
+rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer
 
 if len(sys.argv) >= 4:
    start_index = int(sys.argv[1])
@@ -78,10 +78,16 @@ transienttime = 500*ms # getting the network into place (the start bit of the si
 simulationtime = 2000*ms # the part of the simulation we care about
 
 
-#Set up the Neuron Groups for simulation
+#Set up the Neuron Groups and subgroups for simulation
 G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refract', method='euler') 
 # we had trouble using the variables for threshold and reset in the G setup... could probably be improved
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
+
+layers = []
+for index in range(num_layers):
+    layers.append(G[index*n:(index+1)*n])
+# print(layers)
+# SG=G[0:1000]
 
 # variables that control the PoissonGroup
 ext_rate = 300*Hz # rate of external input (how often input happens)
@@ -103,6 +109,10 @@ S.connect() # no specificications of where connections are made... W will be use
 transient_statemon = StateMonitor(G, 'v', record=0) # records voltage of some kind
 transient_spikemon = SpikeMonitor(G) # recording times of spikes
 transient_PRM = PopulationRateMonitor(G) # records "average" firing rate
+layers_transient_PRM=[]
+for layer in layers:
+    layers_transient_PRM.append(PopulationRateMonitor(layer))
+SG_transient_PRM = PopulationRateMonitor(layers[0])
  
 store() # record state of simulation for future reference
 
@@ -113,7 +123,7 @@ for index in range(start_index, end_index+1):
     
     restore() # set the state back to what it was when the store() command was called
     
-    W_filename = "{0}W_N{1}_p{2}_numLay{3}_43}".format(data_dir, N, p, num_layers, index)
+    W_filename = "{0}W_N{1}_p{2}_numLay{3}_{4}".format(data_dir, N, p, num_layers, index)
     with open(W_filename+'.pickle', 'rb') as wf:
         try:
             Wsparse = pickle.load(wf) # load in W matrix
@@ -158,9 +168,14 @@ for index in range(start_index, end_index+1):
     # reset monitors before run(simulationtime)
     simulation_statemon = StateMonitor(G, 'v', record=0)
     simulation_spikemon = SpikeMonitor(G)
-    simulation_PRM = PopulationRateMonitor(G)   
+    simulation_PRM = PopulationRateMonitor(G) 
+    layers_simulation_PRM=[None]*num_layers
+    for index in range(num_layers):
+        layers_simulation_PRM[index] = PopulationRateMonitor(layers[index])
+        # layers_simulation_PRM.append(hello)  
+    # SG_simulation_PRM = PopulationRateMonitor(layers[0])
     run(simulationtime)
-    
+
     print("\nnumber of spikes in simulation: {0}".format(simulation_spikemon.num_spikes))
 
 
@@ -176,6 +191,16 @@ for index in range(start_index, end_index+1):
     #stats['synchrony'] = synchrony
     stats['PRM rate'] = simulation_PRM.rate/hertz
     stats['PRM time'] = simulation_PRM.t/ms
+    layers_PRM_rate = []
+    layers_PRM_time = []
+    # print(simulation_PRM.rate)
+    # print(layers_simulation_PRM)
+    for PRM in layers_simulation_PRM:
+        # print(PRM.rate)
+        layers_PRM_rate.append(PRM.rate/hertz)
+        layers_PRM_time.append(PRM.t/ms)
+    stats['layers PRM rate'] = layers_PRM_rate
+    stats['layers PRM time'] = layers_PRM_time
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
     stats['average firing rate'] = simulation_spikemon.num_spikes/(N*simulationtime/second)
@@ -194,7 +219,7 @@ for index in range(start_index, end_index+1):
     
     # print the stats for W
     for key,value in sorted(stats.items()):
-        if not isinstance(value,np.ndarray):
+        if not isinstance(value,np.ndarray) and not isinstance(value,list):
             print(key+":{0}".format(value))
     print("\n")
     
@@ -207,23 +232,26 @@ for index in range(start_index, end_index+1):
         # #ylabel('v')
         
           
-        subplot(211)
+        subplot(num_layers+1, 1, 1)
         plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k') # raster plot: y-axis = neuron index, x-axis = time, dot at (t,i) if neuron i fires at time t
         #axis([simulationtime/ms-500, simulationtime/ms, 1, N])
         xlabel('Time (ms)')
         ylabel('Neuron index')
         plt.tight_layout()
         
-        subplot(212)
-        plot(simulation_PRM.t/ms,simulation_PRM.smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
+        for index in range(num_layers):
+            subplot(num_layers+1,1,index+2)
+            plot(layers_simulation_PRM[index].t/ms,layers_simulation_PRM[index].smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
         show()
     except Exception as e:
+        raise e
         print("Error: %s" % e)
 
     #delete monitors so they don't cause restore() to get an error when looped through    
     del simulation_statemon 
     del simulation_spikemon 
     del simulation_PRM 
+    del layers_simulation_PRM
 
     # save results (pickle new stats dictionary)
     style = "numLay{0}".format(num_layers)
