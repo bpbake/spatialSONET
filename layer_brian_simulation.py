@@ -43,7 +43,7 @@ import math
 
 start_scope() # start fresh with magic settings
 
-n = 1000 #number of neurons in each layer
+n = 300 #number of neurons in each layer
 neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
 
 sigma_square = 1 #variance of neurons in first layer
@@ -54,16 +54,16 @@ if len(sys.argv) >= 4:
    end_index = int(sys.argv[2])
    num_layers = int(sys.argv[3])
 else:
-   start_index = int(input("enter starting index: "))
-   end_index = int(input("enter end index: "))
-   num_layers = int(input("how many layers? "))
+   start_index = int(input_orig("enter starting index: "))
+   end_index = int(input_orig("enter end index: "))
+   num_layers = int(input_orig("how many layers? "))
 
-N = n*num_layers
-p = 50/N
+N = n*num_layers # total number neurons in network
+p = 10/n #50/N
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
-tau = 10*ms 
-Er = -60*mV # rest potential (equilibrium voltage)
+tau = 20*ms 
+Er = -63*mV # rest potential (equilibrium voltage)
 tauS = 5*ms # used for inhibitory only (not used in this program)
 Ee = 0*mV  #used for inhibitory only (not used in this program)
 eqs= '''
@@ -90,15 +90,15 @@ for index in range(num_layers):
 # SG=G[0:1000]
 
 # variables that control the PoissonGroup
-ext_rate = 300*Hz # rate of external input (how often input happens)
-ext_mag = 1*mV # how much the voltage gets affected by the external input
+ext_rate = 200*Hz # rate of external input (how often input happens)
+ext_mag = 1.25*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 0.15*mV # coupling strength
+j = 1.25*mV # coupling strength
 # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
@@ -109,10 +109,23 @@ S.connect() # no specificications of where connections are made... W will be use
 transient_statemon = StateMonitor(G, 'v', record=0) # records voltage of some kind
 transient_spikemon = SpikeMonitor(G) # recording times of spikes
 transient_PRM = PopulationRateMonitor(G) # records "average" firing rate
-layers_transient_PRM=[]
-for layer in layers:
-    layers_transient_PRM.append(PopulationRateMonitor(layer))
-SG_transient_PRM = PopulationRateMonitor(layers[0])
+# layers_transient_PRM=[None]*num_layers
+# for index in range(num_layers):
+#     if index == 0:
+#         bye0 = PopulationRateMonitor(layers[index])
+#         layers_transient_PRM[index] = bye0
+#     elif index == 1:
+#         bye1 = PopulationRateMonitor(layers[index])
+#         layers_transient_PRM[index] = bye1
+#     elif index == 2:
+#         bye2 = PopulationRateMonitor(layers[index])
+#         layers_transient_PRM[index] = bye2
+#     elif index == 3:
+#         bye3 = PopulationRateMonitor(layers[index])
+#         layers_transient_PRM[index] = bye3
+# for index in range(num_layers):
+#     layers_transient_PRM[index] = PopulationRateMonitor(layers[index]) #
+# SG_transient_PRM = PopulationRateMonitor(layers[0])
  
 store() # record state of simulation for future reference
 
@@ -169,9 +182,32 @@ for index in range(start_index, end_index+1):
     simulation_statemon = StateMonitor(G, 'v', record=0)
     simulation_spikemon = SpikeMonitor(G)
     simulation_PRM = PopulationRateMonitor(G) 
-    layers_simulation_PRM=[None]*num_layers
-    for index in range(num_layers):
-        layers_simulation_PRM[index] = PopulationRateMonitor(layers[index])
+    layers_simulation_PRM0 = PopulationRateMonitor(layers[0])
+    layers_simulation_PRM1 = PopulationRateMonitor(layers[1])
+    layers_simulation_PRM2 = PopulationRateMonitor(layers[2])
+    layers_simulation_PRM3 = PopulationRateMonitor(layers[3])
+    layers_simulation_PRM4 = PopulationRateMonitor(layers[4])
+    layers_simulation_PRM5 = PopulationRateMonitor(layers[5])
+    layers_simulation_PRM6 = PopulationRateMonitor(layers[6])
+    layers_simulation_PRM7 = PopulationRateMonitor(layers[7])
+    layers_simulation_PRM8 = PopulationRateMonitor(layers[8])
+    layers_simulation_PRM9 = PopulationRateMonitor(layers[9]) 
+    # layers_simulation_PRM=[None]*num_layers
+    # for index in range(num_layers):
+    #     if index == 0:
+    #         hello0 = PopulationRateMonitor(layers[index])
+    #         layers_simulation_PRM[index] = hello0
+    #     elif index == 1:
+    #         hello1 = PopulationRateMonitor(layers[index])
+    #         layers_simulation_PRM[index] = hello1
+    #     elif index == 2:
+    #         hello2 = PopulationRateMonitor(layers[index])
+    #         layers_simulation_PRM[index] = hello2
+    #     elif index == 3:
+    #         hello3 = PopulationRateMonitor(layers[index])
+    #         layers_simulation_PRM[index] = hello3
+        
+        # layers_simulation_PRM[index] = PopulationRateMonitor(layers[index])
         # layers_simulation_PRM.append(hello)  
     # SG_simulation_PRM = PopulationRateMonitor(layers[0])
     run(simulationtime)
@@ -193,12 +229,33 @@ for index in range(start_index, end_index+1):
     stats['PRM time'] = simulation_PRM.t/ms
     layers_PRM_rate = []
     layers_PRM_time = []
-    # print(simulation_PRM.rate)
+    # print(simulation_PRM.rate) # this works
     # print(layers_simulation_PRM)
-    for PRM in layers_simulation_PRM:
-        # print(PRM.rate)
-        layers_PRM_rate.append(PRM.rate/hertz)
-        layers_PRM_time.append(PRM.t/ms)
+    # print(layers_simulation_PRM[0].rate)
+    layers_PRM_rate.append(layers_simulation_PRM0.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM1.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM2.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM3.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM4.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM5.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM6.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM7.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM8.rate/hertz)
+    layers_PRM_rate.append(layers_simulation_PRM9.rate/hertz)
+    layers_PRM_time.append(layers_simulation_PRM0.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM1.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM2.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM3.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM4.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM5.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM6.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM7.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM8.t/ms)
+    layers_PRM_time.append(layers_simulation_PRM9.t/ms)
+    # for PRM in layers_simulation_PRM:
+    #     # print(PRM.rate)
+    #     layers_PRM_rate.append(PRM.rate/hertz)
+    #     layers_PRM_time.append(PRM.t/ms)
     stats['layers PRM rate'] = layers_PRM_rate
     stats['layers PRM time'] = layers_PRM_time
     stats['spikemon times'] = simulation_spikemon.t/ms
@@ -232,17 +289,19 @@ for index in range(start_index, end_index+1):
         # #ylabel('v')
         
           
-        subplot(num_layers+1, 1, 1)
+        subplot(3+1, 1, 1)
         plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k') # raster plot: y-axis = neuron index, x-axis = time, dot at (t,i) if neuron i fires at time t
         #axis([simulationtime/ms-500, simulationtime/ms, 1, N])
         xlabel('Time (ms)')
         ylabel('Neuron index')
-        plt.tight_layout()
+        # plt.tight_layout()
         
         for index in range(num_layers):
-            subplot(num_layers+1,1,index+2)
-            plot(layers_simulation_PRM[index].t/ms,layers_simulation_PRM[index].smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
-        show()
+            if index < 3:
+                subplot(3+1,1,index+2)
+                # plot(layers_simulation_PRM[index].t/ms,layers_simulation_PRM[index].smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
+                plot(layers_PRM_time[num_layers-index-1],layers_PRM_rate[num_layers-index-1]) # smooth curve of how many neurons fire at each time
+        # show()
     except Exception as e:
         raise e
         print("Error: %s" % e)
@@ -251,9 +310,20 @@ for index in range(start_index, end_index+1):
     del simulation_statemon 
     del simulation_spikemon 
     del simulation_PRM 
-    del layers_simulation_PRM
+    del layers_simulation_PRM0
+    del layers_simulation_PRM1
+    del layers_simulation_PRM2
+    del layers_simulation_PRM3
+    del layers_simulation_PRM4
+    del layers_simulation_PRM5
+    del layers_simulation_PRM6
+    del layers_simulation_PRM7
+    del layers_simulation_PRM8
+    del layers_simulation_PRM9
 
     # save results (pickle new stats dictionary)
-    style = "numLay{0}".format(num_layers)
+    style = "numLay{0}_".format(num_layers)
     ar.save_results(N, p, index, stats, style, data_dir)
     ar.clean_results(N, p, index, style, data_dir)
+
+show()

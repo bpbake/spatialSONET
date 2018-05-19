@@ -36,13 +36,13 @@ else:
 
 for index in range(start_index, end_index+1):
 	np.random.seed(index)
-	print("\n\n\ntrial number {0}".format(index))
+	print("\n\n\nindex = {0}".format(index))
 	sys.stdout.flush()
 
 	trying = True
 	while trying:
 		try:
-			n = 1000 #number of neurons in each layer
+			n = 300 #number of neurons in each layer
 			num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 			sigma_square = 1 #variance of neurons in first layer
@@ -58,21 +58,21 @@ for index in range(start_index, end_index+1):
 
 			N = num_layers*n
 
-			p = 50/N #constant probability of connection between any two neurons
+			p = 10/n #constant probability of connection between any two neurons
 			base_P = np.zeros((N, N))
 			for i in range(num_layers):
 				base_P[(((i+1)%num_layers)*n):((((i+1)%num_layers)+1)*n), (i*n):((i+1)*(n))] = np.ones((n,n))
 			P = p*base_P # probability matrix
 
 
-			alpha_recip = np.random.uniform(-0.5, 1)
-			alpha_conv = np.random.uniform(0, 0.5)
-			alpha_div = np.random.uniform(0, 0.5)
+			# alpha_recip = np.random.uniform(-0.5, 1)
+			# alpha_conv = np.random.uniform(0, 0.5)
+			# alpha_div = np.random.uniform(0, 0.5)
 			# alpha_chain = np.random.uniform(-0.4, 0.5)
 			alpha_chain = 0
-			# alpha_conv = 0
-			# alpha_div = 0
-			# alpha_recip = 0
+			alpha_conv = 0
+			alpha_div = 0
+			alpha_recip = 0
 			# print("\nalphas: \nchain {0} \nconv {1} \ndiv {2} \nrecip {3}\n".format(
 			# 	alpha_chain, alpha_conv, alpha_div, alpha_recip))
 
@@ -80,8 +80,8 @@ for index in range(start_index, end_index+1):
 			W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix... Feed Forward case
 			Wsparse = sparse.csr_matrix(W_lowerTri)
 			# Wsparse = sparse.csr_matrix(W)
-			plt.matshow(W_lowerTri)
-			plt.show()
+			# plt.matshow(W_lowerTri)
+			# plt.show()
 
 			W_filename = "{0}W_N{1}_p{2}_numLay{3}_{4}".format(data_dir, N, p, num_layers, index)
 			with open(W_filename+'.pickle', 'wb') as fp:
