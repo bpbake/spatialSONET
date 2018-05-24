@@ -43,7 +43,7 @@ import math
 
 start_scope() # start fresh with magic settings
 
-n = 300 #number of neurons in each layer
+n = 100 #number of neurons in each layer
 neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
 
 sigma_square = 1 #variance of neurons in first layer
@@ -90,7 +90,7 @@ for index in range(num_layers):
 # SG=G[0:1000]
 
 # variables that control the PoissonGroup
-ext_rate = 200*Hz # rate of external input (how often input happens)
+ext_rate = 150*Hz # rate of external input (how often input happens)
 ext_mag = 1.25*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
@@ -163,7 +163,7 @@ for index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes > (transienttime*N/refract*0.5): # if the number of spikes it too large, assume it's saturated
         print("\nnetwork saturated, skipping matrix {0}\n".format(index))
         stats['saturated'] = True # add to the stats dict
-        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,index) 
+        result_filename = "{0}Results_W_N{1}_p{2}_saturated_{3}.pickle".format(data_dir,N,p,index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) #pickle the new stats dict 
         continue # go to next matrix
@@ -171,7 +171,7 @@ for index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes < (2*N): # if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(index))
         stats['not spiking'] = True #add to the stats dict
-        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,index) 
+        result_filename = "{0}Results_W_N{1}_p{2}_noSpike_{3}.pickle".format(data_dir,N,p,index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) # pickle the new stats file
         continue # go to next matrix

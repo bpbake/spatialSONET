@@ -20,11 +20,11 @@ except:
 
 data_dir = "matrices/layer_test/"
 
-n = 1000 #number of neurons in each layer
+n = 100 #number of neurons in each layer
 num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 sigma_square = 1 #variance of neurons in first layer
-rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer 
+rho = 0.15 #rho*sigma_squre = cov of any pair of neurons in first layer 
 #(rho is the correleation coeff - it's a value between 0 & 1)
 
 alpha_divs = []
@@ -43,7 +43,7 @@ else:
    num_layers = int(input("how many layers? "))
 
 N = n*num_layers
-p=50/N
+p=10/n
 
 for index in range(start_index, end_index+1):
 

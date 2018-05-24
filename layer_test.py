@@ -42,11 +42,11 @@ for index in range(start_index, end_index+1):
 	trying = True
 	while trying:
 		try:
-			n = 300 #number of neurons in each layer
+			n = 100 #number of neurons in each layer
 			num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 			sigma_square = 1 #variance of neurons in first layer
-			rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer 
+			rho = 0.15 #rho*sigma_squre = cov of any pair of neurons in first layer 
 			#(rho is the correleation coeff - it's a value between 0 & 1)
 
 			cov_x = (sigma_square*np.identity(n)) + (rho*sigma_square*(np.ones((n,n))-np.identity(n)))
@@ -65,14 +65,14 @@ for index in range(start_index, end_index+1):
 			P = p*base_P # probability matrix
 
 
-			# alpha_recip = np.random.uniform(-0.5, 1)
-			# alpha_conv = np.random.uniform(0, 0.5)
-			# alpha_div = np.random.uniform(0, 0.5)
+			alpha_recip = np.random.uniform(-0.5, 1)
+			alpha_conv = np.random.uniform(0, 0.5)
+			alpha_div = np.random.uniform(0, 0.5)
 			# alpha_chain = np.random.uniform(-0.4, 0.5)
 			alpha_chain = 0
-			alpha_conv = 0
-			alpha_div = 0
-			alpha_recip = 0
+			# alpha_conv = 0
+			# alpha_div = 0
+			# alpha_recip = 0
 			# print("\nalphas: \nchain {0} \nconv {1} \ndiv {2} \nrecip {3}\n".format(
 			# 	alpha_chain, alpha_conv, alpha_div, alpha_recip))
 

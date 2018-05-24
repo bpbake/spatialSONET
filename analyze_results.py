@@ -67,7 +67,7 @@ def clean_results(N, p, i, style, data_dir='matrices/'):
   except:
     pass
 
-  save_results(N, p, i, cleanResults, style+"Clean", data_dir)
+  save_results(N, p, i, cleanResults, style+"Clean_", data_dir)
 
 
 ###############################################################################################################
