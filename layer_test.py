@@ -46,7 +46,7 @@ for index in range(start_index, end_index+1):
 			num_samp = 10000 #number of samples to consider (necessary to be able to calculate cov matrix)
 
 			sigma_square = 1 #variance of neurons in first layer
-			rho = 0.15 #rho*sigma_squre = cov of any pair of neurons in first layer 
+			rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer 
 			#(rho is the correleation coeff - it's a value between 0 & 1)
 
 			cov_x = (sigma_square*np.identity(n)) + (rho*sigma_square*(np.ones((n,n))-np.identity(n)))

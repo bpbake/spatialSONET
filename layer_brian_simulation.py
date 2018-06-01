@@ -5,6 +5,8 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
+import sys
+
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
@@ -12,8 +14,7 @@ Created on Sun Mar  5 14:06:45 2017
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 data_dir = "matrices/layer_test/"
 print("data_dir: "+data_dir)
-
-import sys
+sys.stdout.flush()
 
 try:
    import cPickle as pickle # used to store python data types
@@ -44,7 +45,7 @@ import math
 start_scope() # start fresh with magic settings
 
 n = 100 #number of neurons in each layer
-neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
+neuron_bin_size = 10 # number of neurons in each neuron bin (for analysis of network simulation)
 
 sigma_square = 1 #variance of neurons in first layer
 rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer
@@ -62,8 +63,8 @@ N = n*num_layers # total number neurons in network
 p = 10/n #50/N
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
-tau = 20*ms 
-Er = -63*mV # rest potential (equilibrium voltage)
+tau = 10*ms 
+Er = -60*mV # rest potential (equilibrium voltage)
 tauS = 5*ms # used for inhibitory only (not used in this program)
 Ee = 0*mV  #used for inhibitory only (not used in this program)
 eqs= '''
@@ -83,22 +84,20 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 # we had trouble using the variables for threshold and reset in the G setup... could probably be improved
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
-layers = []
-for index in range(num_layers):
-    layers.append(G[index*n:(index+1)*n])
-# print(layers)
-# SG=G[0:1000]
+# layers = []
+# for index in range(num_layers):
+#     layers.append(G[index*n:(index+1)*n])
 
 # variables that control the PoissonGroup
-ext_rate = 150*Hz # rate of external input (how often input happens)
-ext_mag = 1.25*mV # how much the voltage gets affected by the external input
+ext_rate = 112*Hz # rate of external input (how often input happens)
+ext_mag = 1.5*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 1.25*mV # coupling strength
+j = .5*mV # coupling strength
 # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
@@ -109,23 +108,6 @@ S.connect() # no specificications of where connections are made... W will be use
 transient_statemon = StateMonitor(G, 'v', record=0) # records voltage of some kind
 transient_spikemon = SpikeMonitor(G) # recording times of spikes
 transient_PRM = PopulationRateMonitor(G) # records "average" firing rate
-# layers_transient_PRM=[None]*num_layers
-# for index in range(num_layers):
-#     if index == 0:
-#         bye0 = PopulationRateMonitor(layers[index])
-#         layers_transient_PRM[index] = bye0
-#     elif index == 1:
-#         bye1 = PopulationRateMonitor(layers[index])
-#         layers_transient_PRM[index] = bye1
-#     elif index == 2:
-#         bye2 = PopulationRateMonitor(layers[index])
-#         layers_transient_PRM[index] = bye2
-#     elif index == 3:
-#         bye3 = PopulationRateMonitor(layers[index])
-#         layers_transient_PRM[index] = bye3
-# for index in range(num_layers):
-#     layers_transient_PRM[index] = PopulationRateMonitor(layers[index]) #
-# SG_transient_PRM = PopulationRateMonitor(layers[0])
  
 store() # record state of simulation for future reference
 
@@ -133,6 +115,7 @@ store() # record state of simulation for future reference
 for index in range(start_index, end_index+1):
     
     print("\n\nindex = {0}".format(index))
+    sys.stdout.flush()
     
     restore() # set the state back to what it was when the store() command was called
     
@@ -142,6 +125,7 @@ for index in range(start_index, end_index+1):
             Wsparse = pickle.load(wf) # load in W matrix
         except (EOFError):
             print("unpickling error")
+            sys.stdout.flush()
     W = np.array(Wsparse.todense())
     
     
@@ -151,6 +135,7 @@ for index in range(start_index, end_index+1):
             stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
         except (EOFError):
             print("unpickling error")
+            sys.stdout.flush()
     
     # translate the pickled matrix to be useful with brian, scale to appropriate connection weight (j)
     S.w=W.transpose().flatten()*j
@@ -162,6 +147,7 @@ for index in range(start_index, end_index+1):
     # are the threshold values for these if statements appropriate?
     if transient_spikemon.num_spikes > (transienttime*N/refract*0.5): # if the number of spikes it too large, assume it's saturated
         print("\nnetwork saturated, skipping matrix {0}\n".format(index))
+        sys.stdout.flush()
         stats['saturated'] = True # add to the stats dict
         result_filename = "{0}Results_W_N{1}_p{2}_saturated_{3}.pickle".format(data_dir,N,p,index) 
         with open(result_filename, "wb") as rf:
@@ -170,6 +156,7 @@ for index in range(start_index, end_index+1):
         
     if transient_spikemon.num_spikes < (2*N): # if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(index))
+        sys.stdout.flush()
         stats['not spiking'] = True #add to the stats dict
         result_filename = "{0}Results_W_N{1}_p{2}_noSpike_{3}.pickle".format(data_dir,N,p,index) 
         with open(result_filename, "wb") as rf:
@@ -177,46 +164,30 @@ for index in range(start_index, end_index+1):
         continue # go to next matrix
 
     print("\nnumber of spikes in transient: {0}\n".format(transient_spikemon.num_spikes))
+    sys.stdout.flush()
         
     # reset monitors before run(simulationtime)
     simulation_statemon = StateMonitor(G, 'v', record=0)
     simulation_spikemon = SpikeMonitor(G)
     simulation_PRM = PopulationRateMonitor(G) 
-    layers_simulation_PRM0 = PopulationRateMonitor(layers[0])
-    layers_simulation_PRM1 = PopulationRateMonitor(layers[1])
-    layers_simulation_PRM2 = PopulationRateMonitor(layers[2])
-    layers_simulation_PRM3 = PopulationRateMonitor(layers[3])
-    layers_simulation_PRM4 = PopulationRateMonitor(layers[4])
-    layers_simulation_PRM5 = PopulationRateMonitor(layers[5])
-    layers_simulation_PRM6 = PopulationRateMonitor(layers[6])
-    layers_simulation_PRM7 = PopulationRateMonitor(layers[7])
-    layers_simulation_PRM8 = PopulationRateMonitor(layers[8])
-    layers_simulation_PRM9 = PopulationRateMonitor(layers[9]) 
-    # layers_simulation_PRM=[None]*num_layers
-    # for index in range(num_layers):
-    #     if index == 0:
-    #         hello0 = PopulationRateMonitor(layers[index])
-    #         layers_simulation_PRM[index] = hello0
-    #     elif index == 1:
-    #         hello1 = PopulationRateMonitor(layers[index])
-    #         layers_simulation_PRM[index] = hello1
-    #     elif index == 2:
-    #         hello2 = PopulationRateMonitor(layers[index])
-    #         layers_simulation_PRM[index] = hello2
-    #     elif index == 3:
-    #         hello3 = PopulationRateMonitor(layers[index])
-    #         layers_simulation_PRM[index] = hello3
-        
-        # layers_simulation_PRM[index] = PopulationRateMonitor(layers[index])
-        # layers_simulation_PRM.append(hello)  
-    # SG_simulation_PRM = PopulationRateMonitor(layers[0])
+    # layers_simulation_PRM0 = PopulationRateMonitor(layers[0])
+    # layers_simulation_PRM1 = PopulationRateMonitor(layers[1])
+    # layers_simulation_PRM2 = PopulationRateMonitor(layers[2])
+    # layers_simulation_PRM3 = PopulationRateMonitor(layers[3])
+    # layers_simulation_PRM4 = PopulationRateMonitor(layers[4])
+    # layers_simulation_PRM5 = PopulationRateMonitor(layers[5])
+    # layers_simulation_PRM6 = PopulationRateMonitor(layers[6])
+    # layers_simulation_PRM7 = PopulationRateMonitor(layers[7])
+    # layers_simulation_PRM8 = PopulationRateMonitor(layers[8])
+    # layers_simulation_PRM9 = PopulationRateMonitor(layers[9]) 
+    
     run(simulationtime)
 
     print("\nnumber of spikes in simulation: {0}".format(simulation_spikemon.num_spikes))
+    sys.stdout.flush()
 
 
     #synchrony = analyze_autocor(simulation_PRM.rate) # monotonic measure of synchrony
-    #print("\nExcitatory Synchrony = {0}\n".format(synchrony))
     
     # update the stats dict
     stats['j'] = j
@@ -227,37 +198,32 @@ for index in range(start_index, end_index+1):
     #stats['synchrony'] = synchrony
     stats['PRM rate'] = simulation_PRM.rate/hertz
     stats['PRM time'] = simulation_PRM.t/ms
-    layers_PRM_rate = []
-    layers_PRM_time = []
-    # print(simulation_PRM.rate) # this works
-    # print(layers_simulation_PRM)
-    # print(layers_simulation_PRM[0].rate)
-    layers_PRM_rate.append(layers_simulation_PRM0.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM1.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM2.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM3.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM4.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM5.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM6.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM7.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM8.rate/hertz)
-    layers_PRM_rate.append(layers_simulation_PRM9.rate/hertz)
-    layers_PRM_time.append(layers_simulation_PRM0.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM1.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM2.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM3.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM4.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM5.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM6.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM7.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM8.t/ms)
-    layers_PRM_time.append(layers_simulation_PRM9.t/ms)
-    # for PRM in layers_simulation_PRM:
-    #     # print(PRM.rate)
-    #     layers_PRM_rate.append(PRM.rate/hertz)
-    #     layers_PRM_time.append(PRM.t/ms)
-    stats['layers PRM rate'] = layers_PRM_rate
-    stats['layers PRM time'] = layers_PRM_time
+
+    # layers_PRM_rate = []
+    # layers_PRM_time = []
+    # layers_PRM_rate.append(layers_simulation_PRM0.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM1.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM2.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM3.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM4.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM5.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM6.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM7.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM8.rate/hertz)
+    # layers_PRM_rate.append(layers_simulation_PRM9.rate/hertz)
+    # layers_PRM_time.append(layers_simulation_PRM0.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM1.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM2.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM3.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM4.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM5.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM6.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM7.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM8.t/ms)
+    # layers_PRM_time.append(layers_simulation_PRM9.t/ms)
+    # stats['layers PRM rate'] = layers_PRM_rate
+    # stats['layers PRM time'] = layers_PRM_time
+
     stats['spikemon times'] = simulation_spikemon.t/ms
     stats['spikemon indices'] = simulation_spikemon.i/1
     stats['average firing rate'] = simulation_spikemon.num_spikes/(N*simulationtime/second)
@@ -266,6 +232,7 @@ for index in range(start_index, end_index+1):
     stats['events'] = events
     stats['num events'] = len(events)
     print("\nnumber of events: {0}\n".format(len(events)))
+    sys.stdout.flush()
 
     (event_rate, event_mag, IEIs, excess_kurtosis, skew) = ar.analyze_events(N, events, simulationtime/ms, neuron_bin_size)
     stats['event_rate'] = event_rate
@@ -278,6 +245,7 @@ for index in range(start_index, end_index+1):
     for key,value in sorted(stats.items()):
         if not isinstance(value,np.ndarray) and not isinstance(value,list):
             print(key+":{0}".format(value))
+            sys.stdout.flush()
     print("\n")
     
     try:
@@ -303,23 +271,35 @@ for index in range(start_index, end_index+1):
                 plot(layers_PRM_time[num_layers-index-1],layers_PRM_rate[num_layers-index-1]) # smooth curve of how many neurons fire at each time
         # show()
     except Exception as e:
-        raise e
+        # raise e
         print("Error: %s" % e)
+        sys.stdout.flush()
+
+    try: 
+        # plot the results (without PRM plot)
+        figure(figsize=(20,10))
+        plot(simulation_spikemon.t/ms, simulation_spikemon.i, '.k')
+        xlabel('Time (ms)')
+        ylabel('Neuron index')
+        # show()
+    except Exception as e:
+        print("Error: %s" % e)
+        sys.stdout.flush()
 
     #delete monitors so they don't cause restore() to get an error when looped through    
     del simulation_statemon 
     del simulation_spikemon 
     del simulation_PRM 
-    del layers_simulation_PRM0
-    del layers_simulation_PRM1
-    del layers_simulation_PRM2
-    del layers_simulation_PRM3
-    del layers_simulation_PRM4
-    del layers_simulation_PRM5
-    del layers_simulation_PRM6
-    del layers_simulation_PRM7
-    del layers_simulation_PRM8
-    del layers_simulation_PRM9
+    # del layers_simulation_PRM0
+    # del layers_simulation_PRM1
+    # del layers_simulation_PRM2
+    # del layers_simulation_PRM3
+    # del layers_simulation_PRM4
+    # del layers_simulation_PRM5
+    # del layers_simulation_PRM6
+    # del layers_simulation_PRM7
+    # del layers_simulation_PRM8
+    # del layers_simulation_PRM9
 
     # save results (pickle new stats dictionary)
     style = "numLay{0}_".format(num_layers)
