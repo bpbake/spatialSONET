@@ -104,19 +104,20 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
   import numpy as np
   import math
 
-  time_bin_size = results['PRM time'][1] - results['PRM time'][0] # return this too, to save for future use
-  num_time_bins = len(results['PRM time'])
-  simulation_time = results['PRM time'][num_time_bins-1] - results['PRM time'][0]
+  time_bin_size = 5*(results['PRM time'][1] - results['PRM time'][0]) # return this too, to save for future use
+  num_time_bins = int(math.ceil(len(results['PRM time'])/5))+1
+  simulation_time = results['PRM time'][-1] - results['PRM time'][0]
 
-  subPR = np.zeros((num_neuron_bins, num_time_bins))
+  subPR = np.zeros((num_neuron_bins, num_time_bins)) # subPR is a num_neuron_bin x num_time_bin matrix
 
   for n in range(len(results['spikemon indices'])):
     neuron_bin_index = int(math.floor((results['spikemon indices'][n])/neuron_bin_size))
     time_bin_index = int(np.round((results['spikemon times'][n] - results['spikemon times'][0])
       /time_bin_size))
-    subPR[neuron_bin_index, time_bin_index] += 1
+    subPR[neuron_bin_index, time_bin_index] += 1 
+    # subPR[i,j] = the number of neurons in bin i that fired in time bin j
 
-  scale_factor = np.multiply(neuron_bin_size, time_bin_size)
+  scale_factor = np.multiply(neuron_bin_size, time_bin_size) # subPR will be devided by this to scale appropriately
 
   return(np.true_divide(subPR, scale_factor), time_bin_size, simulation_time)
 
@@ -127,20 +128,22 @@ def get_thresholds(subPR, num_neuron_bins):
   import numpy as np
   import math
 
-  tempThresh = np.zeros(num_neuron_bins)
+  tempThresh = np.zeros(num_neuron_bins) # each neuron bin will have a threshold value
 
   for i in range(num_neuron_bins):
     std = np.std(subPR[i])
     median = np.median(subPR[i])
-    tempThresh[i] = median + (6*std)
+    tempThresh[i] = median + (6*std) # set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
  
   tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
+  # if subPR[i,j] > tempThresh[i], then tempSubPR[i,j] = tempThresh[i], otherwise tempSubPR[i,j] = subPR[i,j]
+  # This is creating a new subPR matrix which replaces the extremely high values in subPR with the tempThresh value for that neuron bin
 
   thresholds = np.zeros(num_neuron_bins)
   for i in range(num_neuron_bins):
     std = np.std(tempSubPR[i])
     median = np.median(tempSubPR[i])
-    thresholds[i] = median + (15*std)
+    thresholds[i] = median + (15*std) # the actual threshold values are computed using the new tempSubPR matrix
 
   return(thresholds.reshape((num_neuron_bins,1)))
 
@@ -151,8 +154,8 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
   import numpy as np
   import math
 
-  above_lower_thresh = np.greater_equal(subPR, thresholds)#_matrix)
-  above_higher_thresh = np.greater_equal(subPR, 3*thresholds)#_matrix)
+  above_lower_thresh = np.greater_equal(subPR, thresholds) # matrix
+  above_higher_thresh = np.greater_equal(subPR, 3*thresholds) # matrix
 
   events_by_bin = [] # a list of event tuples
 

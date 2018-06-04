@@ -45,7 +45,7 @@ import math
 start_scope() # start fresh with magic settings
 
 n = 100 #number of neurons in each layer
-neuron_bin_size = 10 # number of neurons in each neuron bin (for analysis of network simulation)
+neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of network simulation)
 
 sigma_square = 1 #variance of neurons in first layer
 rho = 0 #rho*sigma_squre = cov of any pair of neurons in first layer
@@ -65,10 +65,12 @@ p = 10/n #50/N
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
 tau = 10*ms 
 Er = -60*mV # rest potential (equilibrium voltage)
+tauE = 2*ms # excitatory synaptic time constant
 tauS = 5*ms # used for inhibitory only (not used in this program)
 Ee = 0*mV  #used for inhibitory only (not used in this program)
 eqs= '''
-dv/dt = (-v+Er)/tau: volt
+dv/dt = (-v+Er+s)/tau: volt
+ds/dt = -s/tauE: volt
 ''' # leaky integrate and fire model
 
 vthreshold = -55*mV # if voltage passes this, it counts as a spike
@@ -76,7 +78,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 2000*ms # the part of the simulation we care about
+simulationtime = 2500*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups and subgroups for simulation
@@ -84,23 +86,23 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 # we had trouble using the variables for threshold and reset in the G setup... could probably be improved
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
-# layers = []
-# for index in range(num_layers):
-#     layers.append(G[index*n:(index+1)*n])
+layers = []
+for index in range(num_layers):
+    layers.append(G[index*n:(index+1)*n])
 
 # variables that control the PoissonGroup
-ext_rate = 112*Hz # rate of external input (how often input happens)
-ext_mag = 1.5*mV # how much the voltage gets affected by the external input
+ext_rate = 200*Hz # rate of external input (how often input happens)
+ext_mag = 6.75*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
-Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
+Sp = Synapses(P,G, on_pre="s+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = .5*mV # coupling strength
+j = 3.72951*mV # coupling strength
 # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
-S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
+S = Synapses(G, G,"w:volt",on_pre='s_post+=w') # connects G onto itself.  
 S.connect() # no specificications of where connections are made... W will be used for this later
 
 
@@ -180,6 +182,7 @@ for index in range(start_index, end_index+1):
     # layers_simulation_PRM7 = PopulationRateMonitor(layers[7])
     # layers_simulation_PRM8 = PopulationRateMonitor(layers[8])
     # layers_simulation_PRM9 = PopulationRateMonitor(layers[9]) 
+    layer_simulation_PRM_last = PopulationRateMonitor(layers[num_layers-1])
     
     run(simulationtime)
 
@@ -198,6 +201,8 @@ for index in range(start_index, end_index+1):
     #stats['synchrony'] = synchrony
     stats['PRM rate'] = simulation_PRM.rate/hertz
     stats['PRM time'] = simulation_PRM.t/ms
+    stats['last layer PRM rate'] = layer_simulation_PRM_last.rate/hertz
+    stats['last layer PRM time'] = layer_simulation_PRM_last.t/ms
 
     # layers_PRM_rate = []
     # layers_PRM_time = []
@@ -240,6 +245,11 @@ for index in range(start_index, end_index+1):
     stats['IEIs'] = IEIs 
     stats['IEI excess_kurtosis'] = excess_kurtosis
     stats['IEI skew'] = skew
+
+    # save results (pickle new stats dictionary)
+    style = "numLay{0}_".format(num_layers)
+    ar.save_results(N, p, index, stats, style, data_dir)
+    ar.clean_results(N, p, index, style, data_dir)
     
     # print the stats for W
     for key,value in sorted(stats.items()):
@@ -249,47 +259,44 @@ for index in range(start_index, end_index+1):
     print("\n")
     
     try:
-        # #plot the results of the simulation
+        # plot the results of the simulation
         figure(figsize=(20,10))
-        # #subplot(122)
-        # #plot(simulation_statemon.t/ms, simulation_statemon.v[0]) # plot of voltage of one node vs. time
-        # #xlabel('Time (ms)')
-        # #ylabel('v')
+        try: 
+            numPRMshow = 3
+            for index in range(num_layers):
+                if index < numPRMshow:
+                    subplot(numPRMshow+1,1,index+2)
+                    # plot(layers_simulation_PRM[index].t/ms,layers_simulation_PRM[index].smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
+                    plot(layers_PRM_time[num_layers-index-1],layers_PRM_rate[num_layers-index-1]) # smooth curve of how many neurons fire at each time
         
+        except Exception as e:
+            numPRMshow = 1
+            subplot(numPRMshow+1, 1, 2)
+            plot(layer_simulation_PRM_last.t/ms, layer_simulation_PRM_last.rate/hertz)
+            xlabel('Time (ms)')
+            ylabel('Last layer PRM rate')
+            # plot(simulation_PRM.t/ms, simulation_PRM.rate/hertz)
+            # xlabel('Time (ms)')
+            # ylabel('Network PRM rate')
+
+            # print("Error: %s" %e)
+            # sys.stdout.flush()
           
-        subplot(3+1, 1, 1)
+        subplot(numPRMshow+1, 1, 1)
         plot(simulation_spikemon.t/ms,simulation_spikemon.i, '.k') # raster plot: y-axis = neuron index, x-axis = time, dot at (t,i) if neuron i fires at time t
-        #axis([simulationtime/ms-500, simulationtime/ms, 1, N])
         xlabel('Time (ms)')
         ylabel('Neuron index')
-        # plt.tight_layout()
-        
-        for index in range(num_layers):
-            if index < 3:
-                subplot(3+1,1,index+2)
-                # plot(layers_simulation_PRM[index].t/ms,layers_simulation_PRM[index].smooth_rate(window='flat', width=0.5*ms)/Hz) # smooth curve of how many neurons fire at each time
-                plot(layers_PRM_time[num_layers-index-1],layers_PRM_rate[num_layers-index-1]) # smooth curve of how many neurons fire at each time
+        plt.tight_layout()
         # show()
     except Exception as e:
         # raise e
         print("Error: %s" % e)
-        sys.stdout.flush()
-
-    try: 
-        # plot the results (without PRM plot)
-        figure(figsize=(20,10))
-        plot(simulation_spikemon.t/ms, simulation_spikemon.i, '.k')
-        xlabel('Time (ms)')
-        ylabel('Neuron index')
-        # show()
-    except Exception as e:
-        print("Error: %s" % e)
-        sys.stdout.flush()
 
     #delete monitors so they don't cause restore() to get an error when looped through    
     del simulation_statemon 
     del simulation_spikemon 
     del simulation_PRM 
+    del layer_simulation_PRM_last
     # del layers_simulation_PRM0
     # del layers_simulation_PRM1
     # del layers_simulation_PRM2
