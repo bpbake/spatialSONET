@@ -100,19 +100,21 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
 
 #######################################################################################################
 #######################################################################################################
-def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100):
+def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_units_per_bin=1):
   import numpy as np
   import math
 
-  time_bin_size = 5*(results['PRM time'][1] - results['PRM time'][0]) # return this too, to save for future use
-  num_time_bins = int(math.ceil(len(results['PRM time'])/5))+1
+  time_bin_size = (results['PRM time'][1] - results['PRM time'][0]) # return this too, to save for future use
+  num_time_bins = len(results['PRM time'])
+  # time_bin_size = time_units_per_bin*(results['PRM time'][1] - results['PRM time'][0]) # return this too, to save for future use
+  # num_time_bins = int(math.ceil(len(results['PRM time'])/time_units_per_bin))
   simulation_time = results['PRM time'][-1] - results['PRM time'][0]
 
   subPR = np.zeros((num_neuron_bins, num_time_bins)) # subPR is a num_neuron_bin x num_time_bin matrix
 
   for n in range(len(results['spikemon indices'])):
     neuron_bin_index = int(math.floor((results['spikemon indices'][n])/neuron_bin_size))
-    time_bin_index = int(np.round((results['spikemon times'][n] - results['spikemon times'][0])
+    time_bin_index = int(np.floor((results['spikemon times'][n] - results['spikemon times'][0])
       /time_bin_size))
     subPR[neuron_bin_index, time_bin_index] += 1 
     # subPR[i,j] = the number of neurons in bin i that fired in time bin j

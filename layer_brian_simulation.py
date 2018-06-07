@@ -91,15 +91,15 @@ for index in range(num_layers):
     layers.append(G[index*n:(index+1)*n])
 
 # variables that control the PoissonGroup
-ext_rate = 200*Hz # rate of external input (how often input happens)
-ext_mag = 6.75*mV # how much the voltage gets affected by the external input
+ext_rate = 150*Hz # rate of external input (how often input happens)
+ext_mag = 10*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="s+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 3.72951*mV # coupling strength
+j = 3.8*mV # coupling strength
 # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='s_post+=w') # connects G onto itself.  
