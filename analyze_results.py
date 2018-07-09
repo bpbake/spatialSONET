@@ -100,6 +100,7 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
 
 #######################################################################################################
 #######################################################################################################
+## called by calculate_events
 def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_units_per_bin=1):
   import numpy as np
   import math
@@ -126,6 +127,7 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_uni
 
 
 #######################################################################################################
+## called by calculate_events
 def get_thresholds(subPR, num_neuron_bins):
   import numpy as np
   import math
@@ -151,8 +153,9 @@ def get_thresholds(subPR, num_neuron_bins):
 
 
 #######################################################################################################
+## called by calculate_events
 def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, 
-  consecutive_time = 1, time_spacing = 1, consecutive_bin = 2):
+  consecutive_time = 1, time_spacing = 1, consecutive_bin = 2): 
   import numpy as np
   import math
 
@@ -284,3 +287,43 @@ def analyze_events(N, events, simulation_time=3000, neuron_bin_size=100):
     skew = float('nan')
 
   return(event_rate, event_mag, IEIs, excess_kurtosis, skew)
+
+
+###############################################################################################################
+###############################################################################################################
+def new_measure(N, results, neuron_bin_size=100, num_time_bins=300, simulation_time=3000):
+  import numpy as np
+  import math
+  from scipy import linalg
+
+  num_neuron_bins = math.ceil(N/neuron_bin_size)
+  simulation_time = results['PRM time'][-1] - results['PRM time'][0]
+  time_bin_size = math.ceil(simulation_time/num_time_bins)
+
+  R_spikes = np.zeros((N, num_time_bins))
+  # R_spikes = np.zeros((num_neuron_bins, num_time_bins))
+
+  for n in range(len(results['spikemon indices'])):
+    neuron_index = int(results['spikemon indices'][n])
+    neuron_bin_index = int(math.floor(neuron_index/neuron_bin_size))
+    time_bin_index = int(np.floor((results['spikemon times'][n] - results['spikemon times'][0])/time_bin_size))
+    R_spikes[neuron_index, time_bin_index] = 1
+    # R_spikes[neuron_bin_index, time_bin_index] = 1
+
+  c = 1 # max "speed" of spike wave from neuron layer j to i (number of time bins?)
+  # constant for all i,j pairs?  Maybe need to make c an array (matrix)???
+
+  dist = linalg.toeplitz(np.floor(np.linspace(0,num_neuron_bins,num=N,endpoint=False)).astype(int)) 
+  # dist is an N by N matrix with entry (i,j) being the distance between the layers of neurons i and j
+
+  k = np.multiply(c,dist)
+
+  cov_R=np.zeros((N,N))
+  # MUST Figure out a better way to do this triple loop!!!
+  for i in range(N):
+    for j in range(N):
+      for t in range(num_time_bins):
+        if t+k[i,j] < num_time_bins:
+          cov_R[i,j] += R_spikes[i,t]*R_spikes[j,(t+k[i,j])]
+
+  return np.mean(cov_R)

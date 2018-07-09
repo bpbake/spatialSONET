@@ -27,12 +27,16 @@ import analyze_results as ar
 
 N = 3000 # Number of excitatory neurons
 p_AVG =50/N # average probability of connectivity between neurons
-data_dir = 'matrices/CNS18/'
-style = "FF_L70"
+# data_dir = 'matrices/CNS18/'
+# data_dir = "matrices/N10000_LL70_LR0_ff_alpha_chain_zero/"
+data_dir = "matrices/N3000_LL70_LR0_ff_alpha_div_rand/"
+# style = "FF_L70"
+style = "sssClean"
+# style = "ttLongClean"
 
-reload=False
+reload=True
 
-summary_filename = "{0}Summary_W_N{1}_p{2}_FF_L70.pickle".format(data_dir,N,p_AVG) 
+summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,style) 
 
 
 if reload:
@@ -58,8 +62,8 @@ else:
         ('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
         ('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), ('alpha_div_hat', np.zeros(n_indices)), 
         ('alpha_chain_hat', np.zeros(n_indices)), #('largest eigenvalue', np.zeros(n_indices)), 
-        ('event_rate', np.zeros(n_indices)), 
-        ('j', np.zeros(n_indices)),('ext_rate', np.zeros(n_indices)),('ext_mag', np.zeros(n_indices))])
+        ('event_rate', np.zeros(n_indices)), ('IEI excess_kurtosis', np.zeros(n_indices)),]) 
+        #('j', np.zeros(n_indices)),('ext_rate', np.zeros(n_indices)),('ext_mag', np.zeros(n_indices))])
     
     for w_index in range(start_index, end_index+1):
         
@@ -84,7 +88,8 @@ else:
     with open(summary_filename, "wb") as rf:
         pickle.dump(results, rf)
 
-
+kurtosis_mean = np.nanmean(results['IEI excess_kurtosis'])
+print("mean kurtosis: {0}".format(kurtosis_mean))
 
 # results['event_rate'] = np.maximum(0,results['event_rate'])
 
@@ -99,9 +104,7 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=60)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
-
 plt.figure()
-
 # plt.subplot(221)
 plt.plot(results['alpha_chain_hat'], results['event_rate'], 'o', markersize=30)
 plt.xlabel(r'$\alpha_{chain}$')
@@ -110,16 +113,16 @@ plt.ylabel('event rate')
 
 
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=60)
-plt.rc('xtick', labelsize=50)
-plt.rc('ytick', labelsize=50)
-plt.figure()
-# plt.subplot(222)
-plt.semilogx(results['L_left'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\sigma$')
-plt.ylabel('event rate')
-# plt.tight_layout()
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif', size=60)
+# plt.rc('xtick', labelsize=50)
+# plt.rc('ytick', labelsize=50)
+# plt.figure()
+# # plt.subplot(222)
+# plt.semilogx(results['L_left'], results['event_rate'], 'o', markersize=30)
+# plt.xlabel(r'$\sigma$')
+# plt.ylabel('event rate')
+# # plt.tight_layout()
 
 
 
@@ -128,7 +131,6 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=60)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
-
 plt.figure()
 # plt.subplot(223)
 plt.plot(results['alpha_conv_hat'], results['event_rate'], 'o', markersize=30)
@@ -144,7 +146,6 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=60)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
-
 plt.figure()
 # plt.subplot(224)
 plt.plot(results['alpha_div_hat'], results['event_rate'], 'o', markersize=30)
@@ -159,11 +160,25 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=60)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
-
-
 plt.figure()
 plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=400)
 plt.xlabel(r'$\alpha_{conv}$')
+plt.ylabel(r'$\alpha_{chain}$')
+cb=plt.colorbar()
+cb.set_label('event rate')
+
+
+plt.figure()
+plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['event_rate'],s=400)
+plt.xlabel(r'$\alpha_{div}$')
+plt.ylabel(r'$\alpha_{conv}$')
+cb=plt.colorbar()
+cb.set_label('event rate')
+
+
+plt.figure()
+plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=400)
+plt.xlabel(r'$\alpha_{div}$')
 plt.ylabel(r'$\alpha_{chain}$')
 cb=plt.colorbar()
 cb.set_label('event rate')

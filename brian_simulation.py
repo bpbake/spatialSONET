@@ -7,10 +7,10 @@ Created on Sun Mar  5 14:06:45 2017
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
+data_dir = 'matrices/N3000_LL70_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
-data_dir = 'matrices/CNS18/'
+# data_dir = 'matrices/CNS18/'
 print("data_dir: "+data_dir)
 
 import sys
@@ -63,7 +63,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 2000*ms # the part of the simulation we care about
+simulationtime = 3000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -108,7 +108,7 @@ for w_index in range(start_index, end_index+1):
     
     restore() # set the state back to what it was when the store() command was called
     
-    W_filename = "{0}W_N{1}_p{2}_FF_L{3}_{4}".format(data_dir, N, p_AVG, L, w_index)
+    W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L, w_index)
     with open(W_filename+'.pickle', 'rb') as wf:
         try:
             Wsparse = pickle.load(wf) # load in W matrix
@@ -220,7 +220,8 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    style = "L{0}".format(L)
+    # style = "L{0}".format(L)
+    style = "cnsL"
     ar.save_results(N, p_AVG, w_index, stats, style, data_dir)
     ar.clean_results(N, p_AVG, w_index, style, data_dir)
     # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p_AVG,w_index) 
