@@ -12,7 +12,7 @@ Created on Mon Apr  3 16:41:12 2017
 
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-data_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
+data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/CNS18/'
@@ -77,9 +77,9 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             alpha_div = np.random.uniform(0, 0.5)
             alpha_chain = np.random.uniform(-0.5, 0.5)
             L_left = 70 
-            L_right = 0 
+            # L_right = 0 
             # L_right = float("inf")
-            # L_right = L_left
+            L_right = L_left
             alpha_recip = 0
             # alpha_conv = 0
             # alpha_div = 0
@@ -100,9 +100,9 @@ for w_index in range(start_index, end_index+1): #i=start_index,start_index+1,...
             W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
             print("W has been created \n")
             sys.stdout.flush()
-            W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix... Feed Forward case
-            Wsparse = sparse.csr_matrix(W_lowerTri)
-            # Wsparse = sparse.csr_matrix(W)
+            # W_lowerTri = np.tril(W) # truncates W to make it a lower triangular matrix... Feed Forward case
+            # Wsparse = sparse.csr_matrix(W_lowerTri)
+            Wsparse = sparse.csr_matrix(W)
             
             #save the W as a python pickle file
             W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)

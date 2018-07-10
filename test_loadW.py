@@ -15,22 +15,23 @@ import scipy as sp
 from scipy import sparse
 import math
 
-data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
+data_dir = "matrices/N3000_LL70_LR0_ff_alpha_div_rand/"
+# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff/'
 # data_dir = 'matrices/CNS18/'
 
-N = 10000 #minimum of 1000
+N = 3000 #minimum of 1000
 p_AVG = 50/N
 print("N={0}".format(N))
-L_left=45
+L_left=70
 
 w_index = 1
 
 #read in pickled W matrix
 # W_filename = "{0}W_N{1}_p{2}_L{3}_achain0.3_{4}".format(data_dir, N, p_AVG, L_left, w_index)
-W_filename = "{0}Wsparse_N{1}_p{2}_{3}".format(data_dir, N, p_AVG, w_index)
+W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)
 
 with open(W_filename+".pickle", 'rb') as wf:
     try:
@@ -47,7 +48,7 @@ W = Wsparse.todense()
 
 # reading in pickled stats file:        
 # stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_achain0.3_{4}.pickle".format(data_dir, N, p_AVG, L_left, w_index)
-stat_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir, N, p_AVG, w_index)
+stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L_left, w_index)
 with open(stat_filename, 'rb') as sf:
     try:
         stats = pickle.load(sf)
@@ -74,8 +75,8 @@ plt.rc('ytick', labelsize=50)
 
 plt.figure()
 plt.spy(W, markersize=1)
-plt.xticks(np.arange(0,10001,2000))
-plt.yticks(np.arange(0,10001,2000))
+plt.xticks(np.arange(0,N+1,1000))
+plt.yticks(np.arange(0,N+1,1000))
 plt.show()
     
 # generate statistics of matrix

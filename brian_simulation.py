@@ -7,7 +7,7 @@ Created on Sun Mar  5 14:06:45 2017
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-data_dir = 'matrices/N3000_LL70_LR0_ff_alpha_div_rand/'
+data_dir = 'matrices/N3000_LL70_LR70_sym_alpha_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/CNS18/'
@@ -63,7 +63,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 3000*ms # the part of the simulation we care about
+simulationtime = 5000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -72,7 +72,7 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
-ext_rate = 300*Hz # rate of external input (how often input happens)
+ext_rate = 250*Hz # rate of external input (how often input happens)
 ext_mag = 1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
@@ -80,7 +80,7 @@ Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
 Sp.connect(j='i') # where to connect P and G
 
 
-j = 0.15*mV # coupling strength
+j = 0.18*mV # coupling strength
 # Weight of neuron connection (when neuron j fires, and is connected to neuron i, this is how much voltage is passed from j to i)
 
 S = Synapses(G, G,"w:volt",on_pre='v_post +=w') # connects G onto itself.  
@@ -221,7 +221,7 @@ for w_index in range(start_index, end_index+1):
 
     # save results (pickle new stats dictionary)
     # style = "L{0}".format(L)
-    style = "cnsL"
+    style = "CnsL"
     ar.save_results(N, p_AVG, w_index, stats, style, data_dir)
     ar.clean_results(N, p_AVG, w_index, style, data_dir)
     # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p_AVG,w_index) 
