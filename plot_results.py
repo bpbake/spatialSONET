@@ -64,3 +64,15 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     # plt.tight_layout()
 
     plt.show()
+
+
+
+
+    ### Plot histograms of IEIs:
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=70)
+# plt.rc('ytick', labelsize=70)
+# plt.hist(results['IEIs'],50) #data , number of bins
+# plt.xlabel('Inter-event interval (ms)')
+# plt.ylabel('Count')
+# plt.tight_layout()
