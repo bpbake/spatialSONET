@@ -29,9 +29,9 @@ N = 3000 # Number of excitatory neurons
 p_AVG =50/N # average probability of connectivity between neurons
 # data_dir = 'matrices/CNS18/'
 # data_dir = "matrices/N10000_LL70_LR0_ff_alpha_chain_zero/"
-# data_dir = "matrices/N3000_LL70_LR0_ff_alphas_all_rand/"
-# data_dir = "matrices/N3000_LL70_LR0_ff_alpha_div_rand/"
-data_dir = "matrices/N3000_LL70_LR70_sym_alpha_div_rand/"
+data_dir = "matrices/N3000_LL70_LR0_ff_alphas_all_rand/"
+# data_dir = "matrices/N3000_LL70_LR0_ff_alpha_conv_div_rand/"
+# data_dir = "matrices/N3000_LL70_LR70_sym_alpha_div_rand/"
 # style = "FF_L70"
 style = "CnsClean"
 # style = "ttLongClean"
@@ -103,7 +103,7 @@ print("mean kurtosis: {0}".format(kurtosis_mean))
 
 
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=60)
+plt.rc('font', family='serif', size=100)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure()
@@ -130,7 +130,7 @@ plt.ylabel('event rate')
 
 
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=60)
+plt.rc('font', family='serif', size=100)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure()
@@ -145,7 +145,7 @@ plt.xticks(np.arange(0,0.5,0.1))
 
 
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=60)
+plt.rc('font', family='serif', size=100)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure()
@@ -159,7 +159,7 @@ plt.xticks(np.arange(0,0.5,0.1))
 
 
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=60)
+plt.rc('font', family='serif', size=100)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure()
@@ -167,6 +167,7 @@ plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['ev
 plt.xlabel(r'$\alpha_{conv}$')
 plt.ylabel(r'$\alpha_{chain}$')
 cb=plt.colorbar()
+plt.clim(0,25)
 cb.set_label('event rate')
 
 
@@ -175,6 +176,7 @@ plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['even
 plt.xlabel(r'$\alpha_{div}$')
 plt.ylabel(r'$\alpha_{conv}$')
 cb=plt.colorbar()
+plt.clim(0,25)
 cb.set_label('event rate')
 
 
@@ -183,7 +185,7 @@ plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['eve
 plt.xlabel(r'$\alpha_{div}$')
 plt.ylabel(r'$\alpha_{chain}$')
 cb=plt.colorbar()
-# plt.clim(0,1)
+plt.clim(0,25)
 cb.set_label('event rate')
 
 plt.show()

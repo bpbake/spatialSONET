@@ -7,7 +7,7 @@ Created on Sun Mar  5 14:06:45 2017
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-data_dir = 'matrices/N3000_LL70_LR70_sym_alpha_div_rand/'
+data_dir = 'matrices/N3000_LL70_LR70_sym_alpha_conv_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/CNS18/'
