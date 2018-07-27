@@ -30,13 +30,14 @@ p_AVG =50/N # average probability of connectivity between neurons
 # data_dir = 'matrices/CNS18/'
 # data_dir = "matrices/N10000_LL70_LR0_ff_alpha_chain_zero/"
 # data_dir = "matrices/N3000_LL70_LR70_sym_alpha_div_rand/"
-data_dir = "matrices/N3000_LL70_LR0_ff_alphas_all_rand/"
+data_dir = "matrices/N3000_LL70_LR0_ff_alpha_div_rand/"
 # data_dir = "matrices/N3000_LL70_LR70_sym_alpha_div_rand/"
 # style = "FF_L70"
-style = "CnsClean"
+style = "Irregular120s_Clean"
+# style = "CnsClean"
 # style = "ttLongClean"
 
-reload=True
+reload=False
 
 summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,style) 
 
@@ -167,7 +168,7 @@ plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['ev
 plt.xlabel(r'$\alpha_{conv}$')
 plt.ylabel(r'$\alpha_{chain}$')
 cb=plt.colorbar()
-plt.clim(0,25)
+# plt.clim(0,3)
 cb.set_label('event rate')
 
 
@@ -176,7 +177,7 @@ plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['even
 plt.xlabel(r'$\alpha_{div}$')
 plt.ylabel(r'$\alpha_{conv}$')
 cb=plt.colorbar()
-plt.clim(0,25)
+# plt.clim(0,3)
 cb.set_label('event rate')
 
 
@@ -185,7 +186,7 @@ plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['eve
 plt.xlabel(r'$\alpha_{div}$')
 plt.ylabel(r'$\alpha_{chain}$')
 cb=plt.colorbar()
-plt.clim(0,25)
+# plt.clim(0,3)
 cb.set_label('event rate')
 
 # plt.figure(figsize=())

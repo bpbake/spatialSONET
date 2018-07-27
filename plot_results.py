@@ -76,3 +76,15 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 # plt.xlabel('Inter-event interval (ms)')
 # plt.ylabel('Count')
 # plt.tight_layout()
+
+#### Plot histogram of start_neuron_bin:
+# start_neurons = []
+# for event in results["events"]:
+#   start_neurons.append(event["start_neuron_bin"])
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=70)
+# plt.rc('ytick', labelsize=70)
+# plt.hist(start_neurons,50) #data , number of bins
+# plt.xlabel('starting neuron bin')
+# plt.ylabel('count')
+# plt.suptitle("long irregular")

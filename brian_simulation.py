@@ -7,11 +7,16 @@ Created on Sun Mar  5 14:06:45 2017
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
+data_dir = 'matrices/N3000_LL70_LR0_ff_alpha_div_rand/'
+res_dir = '/var/tmp/N3000_LL70_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/CNS18/'
 print("data_dir: "+data_dir)
+print("results_dir: "+res_dir)
+# Style = "L{0}".format(L)
+Style = "Irregular10m_"
 
 import sys
 
@@ -63,7 +68,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 50000*ms # the part of the simulation we care about
+simulationtime = 600000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -72,8 +77,12 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spike
 
 # variables that control the PoissonGroup
+# Irregular Regime:
 ext_rate = 113*Hz # rate of external input (how often input happens)
 ext_mag = 1.5*mV # how much the voltage gets affected by the external input
+# Regular Regime
+# ext_rate = 250*Hz # rate of external input (how often input happens)
+# ext_mag = 1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G
@@ -135,7 +144,7 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes > (transienttime*N/refract*0.5): # if the number of spikes it too large, assume it's saturated
         print("\nnetwork saturated, skipping matrix {0}\n".format(w_index))
         stats['saturated'] = True # add to the stats dict
-        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) #pickle the new stats dict 
         continue # go to next matrix
@@ -143,7 +152,7 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes < (2*N): # if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(w_index))
         stats['not spiking'] = True #add to the stats dict
-        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
         with open(result_filename, "wb") as rf:
             pickle.dump(stats, rf) # pickle the new stats file
         continue # go to next matrix
@@ -220,10 +229,8 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     # save results (pickle new stats dictionary)
-    # style = "L{0}".format(L)
-    style = "Cns"
-    ar.save_results(N, p_AVG, w_index, stats, style, data_dir)
-    ar.clean_results(N, p_AVG, w_index, style, data_dir)
+    ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
+    ar.clean_results(N, p_AVG, w_index, Style, res_dir)
     # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p_AVG,w_index) 
     # with open(result_filename, "wb") as rf:
     #    pickle.dump(stats, rf)
