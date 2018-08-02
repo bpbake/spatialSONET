@@ -16,7 +16,8 @@ res_dir = '/var/tmp/N3000_LL70_LR0_ff_alpha_div_rand/'
 print("data_dir: "+data_dir)
 print("results_dir: "+res_dir)
 # Style = "L{0}".format(L)
-Style = "Irregular10m_"
+Style = "CnsL"
+print("style: "+Style)
 
 import sys
 
@@ -56,7 +57,7 @@ neuron_bin_size = 100 # number of neurons in each neuron bin (for analysis of ne
 
 # variables and equation for voltage decay back to equilibrium (-60) for firing potential
 tau = 10*ms 
-Er = -60*mV # rest potential (equilibrium voltage)
+Er = -60*mV # rest potential (equilibrium voltage) # mV = millivolt (one thousandth of a volt)
 tauS = 5*ms # used for inhibitory only (not used in this program)
 Ee = 0*mV  #used for inhibitory only (not used in this program)
 eqs= '''
@@ -68,7 +69,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 600000*ms # the part of the simulation we care about
+simulationtime = 5000*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -78,11 +79,11 @@ G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spi
 
 # variables that control the PoissonGroup
 # Irregular Regime:
-ext_rate = 113*Hz # rate of external input (how often input happens)
-ext_mag = 1.5*mV # how much the voltage gets affected by the external input
+# ext_rate = 113*Hz # rate of external input (how often input happens)
+# ext_mag = 1.5*mV # how much the voltage gets affected by the external input
 # Regular Regime
-# ext_rate = 250*Hz # rate of external input (how often input happens)
-# ext_mag = 1*mV # how much the voltage gets affected by the external input
+ext_rate = 250*Hz # rate of external input (how often input happens)
+ext_mag = 1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G

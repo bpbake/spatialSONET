@@ -94,12 +94,16 @@ else:
 kurtosis_mean = np.nanmean(results['IEI excess_kurtosis'])
 print("mean kurtosis: {0}".format(kurtosis_mean))
 
-# results['event_rate'] = np.maximum(0,results['event_rate'])
 
-#inds = inds=results['L_left'] > 200
-#for key in results:
-#    results[key] = results[key][inds]
 
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif', size=80)
+plt.rc('xtick', labelsize=50)
+plt.rc('ytick', labelsize=50)
+plt.figure(figsize=(12,10))
+plt.plot(hist['IeI excess_kurtosis'], 50) # data, number of bins
+plt.xlabel('IEI excess kurtosis')
+plt.ylabel('event rate')
 
 
 
@@ -108,11 +112,9 @@ plt.rc('font', family='serif', size=80)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure(figsize=(12,10))
-# plt.subplot(221)
-plt.plot(results['alpha_chain_hat'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\alpha_{chain}$')
+plt.hist(results['IeI skew'], 50) # data, number of bins
+plt.xlabel('IEI skew')
 plt.ylabel('event rate')
-# plt.tight_layout()
 
 
 
@@ -128,6 +130,17 @@ plt.ylabel('event rate')
 # # plt.tight_layout()
 
 
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif', size=80)
+plt.rc('xtick', labelsize=50)
+plt.rc('ytick', labelsize=50)
+plt.figure(figsize=(12,10))
+plt.plot(results['alpha_chain_hat'], results['event_rate'], 'o', markersize=30)
+plt.xlabel(r'$\hat\alpha_{chain}$')
+plt.ylabel('event rate')
+plt.xticks(np.arange(-0.5,0.5,0.2))
+# plt.tight_layout()
+
 
 
 plt.rc('text', usetex=True)
@@ -135,9 +148,8 @@ plt.rc('font', family='serif', size=80)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure(figsize=(12,10))
-# plt.subplot(223)
 plt.plot(results['alpha_conv_hat'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\alpha_{conv}$')
+plt.xlabel(r'$\hat\alpha_{conv}$')
 plt.ylabel('event rate')
 plt.xticks(np.arange(0,0.5,0.1))
 # plt.tight_layout()
@@ -150,9 +162,8 @@ plt.rc('font', family='serif', size=80)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure(figsize=(12,10))
-# plt.subplot(224)
 plt.plot(results['alpha_div_hat'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\alpha_{div}$')
+plt.xlabel(r'$\hat\alpha_{div}$')
 plt.ylabel('event rate')
 plt.xticks(np.arange(0,0.5,0.1))
 # plt.tight_layout()
@@ -165,8 +176,8 @@ plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure()
 plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=400)
-plt.xlabel(r'$\alpha_{conv}$')
-plt.ylabel(r'$\alpha_{chain}$')
+plt.xlabel(r'$\hat\alpha_{conv}$')
+plt.ylabel(r'$\hat\alpha_{chain}$')
 cb=plt.colorbar()
 # plt.clim(0,3)
 cb.set_label('event rate')
@@ -174,8 +185,8 @@ cb.set_label('event rate')
 
 plt.figure()
 plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['event_rate'],s=400)
-plt.xlabel(r'$\alpha_{div}$')
-plt.ylabel(r'$\alpha_{conv}$')
+plt.xlabel(r'$\hat\alpha_{div}$')
+plt.ylabel(r'$\hat\alpha_{conv}$')
 cb=plt.colorbar()
 # plt.clim(0,3)
 cb.set_label('event rate')
@@ -183,8 +194,8 @@ cb.set_label('event rate')
 
 plt.figure()
 plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=400)
-plt.xlabel(r'$\alpha_{div}$')
-plt.ylabel(r'$\alpha_{chain}$')
+plt.xlabel(r'$\hat\alpha_{div}$')
+plt.ylabel(r'$\hat\alpha_{chain}$')
 cb=plt.colorbar()
 # plt.clim(0,3)
 cb.set_label('event rate')
