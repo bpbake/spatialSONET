@@ -76,11 +76,11 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   import sys
   
   results = load_results(N, p, i, style, data_dir)
-  events, simulation_time = calculate_events(N, results, neuron_bin_size)
-  try:
-    simulation_time = results['simulation_time']
-  except:
-    pass
+  simulation_time = results['simulation_time']
+
+  events = calculate_events(N, results, neuron_bin_size)
+  results['events'] = events
+  results['num events'] = len(events)
 
   event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, simulation_time, neuron_bin_size)
 
@@ -90,13 +90,13 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEI excess_kurtosis'] = excess_kurtosis
   results['IEI skew'] = skew
 
-  save_results(N, p, i, results, data_dir)
+  save_results(N, p, i, results, style, data_dir)
 
-  for k,v in sorted(results.items()):
-    if not isinstance(v,np.ndarray):
-      print(k+":{0}".format(v))
-  print("\n")
-  sys.stdout.flush()
+  # for k,v in sorted(results.items()):
+  #   if not isinstance(v,np.ndarray):
+  #     print(k+":{0}".format(v))
+  # print("\n")
+  # sys.stdout.flush()
 
 #######################################################################################################
 #######################################################################################################
@@ -109,7 +109,8 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_uni
   num_time_bins = len(results['PRM time'])
   # time_bin_size = time_units_per_bin*(results['PRM time'][1] - results['PRM time'][0]) # return this too, to save for future use
   # num_time_bins = int(math.ceil(len(results['PRM time'])/time_units_per_bin))
-  simulation_time = results['PRM time'][-1] - results['PRM time'][0]
+  # simulation_time = results['PRM time'][-1] - results['PRM time'][0]
+  # print("PRM simulation time: {0}".format(simulation_time))
 
   subPR = np.zeros((num_neuron_bins, num_time_bins)) # subPR is a num_neuron_bin x num_time_bin matrix
 
@@ -122,7 +123,7 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_uni
 
   scale_factor = np.multiply(neuron_bin_size, time_bin_size) # subPR will be devided by this to scale appropriately
 
-  return(np.true_divide(subPR, scale_factor), time_bin_size, simulation_time)
+  return(np.true_divide(subPR, scale_factor), time_bin_size)#, simulation_time)
 
 
 
@@ -137,7 +138,13 @@ def get_thresholds(subPR, num_neuron_bins):
   for i in range(num_neuron_bins):
     std = np.std(subPR[i])
     median = np.median(subPR[i])
-    tempThresh[i] = median + (6*std) # set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
+    # tempThresh[i] = median + (5*std) 
+    # set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
+    # tempThresh[i] = np.percentile(subPR[i],90)
+    for temp in range(80, 100, 1):
+      tempThresh[i] = np.percentile(subPR[i],temp)
+      if tempThresh[i] > 0:
+        break
  
   tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
   # if subPR[i,j] > tempThresh[i], then tempSubPR[i,j] = tempThresh[i], otherwise tempSubPR[i,j] = subPR[i,j]
@@ -167,24 +174,26 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
   for i in range(num_neuron_bins):
     count = 0
     success = False
-    for j in range(len(subPR[i])):
-      if above_lower_thresh[i,j]: # add to count (number consecutive)
-        count += 1
+    for j in range(len(subPR[i])): # subPR is a num_neuron_bin x num_time_bin matrix of "population rates"
+      if above_lower_thresh[i,j]: # add to count (number consecutive time bins above thresh)
+        count += 1 # count is the number of time bins that the event takes up (for one neuron bin)
         if count >= consecutive_time or above_higher_thresh[i,j]:
-          success = True
+          success = True # this really is an event... 
+          # keep increasing the time bin until the end of the event
+          # then record this as an event
       else:
         if success: # save time and bin, reset count
           events_by_bin.append((i, i, (j-count)*time_bin_size, (j-1)*time_bin_size))
         count = 0
         success = False
 
-  #return(events_by_bin)
+  # print(events_by_bin)
 
   dtype = [('start_neuron_bin', int), ('end_neuron_bin', int), ('start_time', float), 
     ('end_time', float)] # these are labels for the event tuples
   sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), 
-    order=['start_time', 'start_neuron_bin'])
-  #return(sorted_events_by_bin_array)
+    order=['start_time', 'start_neuron_bin']) # sort events_by_bin by start time (then by start neuron bin)
+  # print(sorted_events_by_bin_array[0:100])
 
   events_list = [] # each entry will be tuple: 
   #  (start_neuron_bin, end_neuron_bin, start_time, end_time)
@@ -193,15 +202,21 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
   for newe in sorted_events_by_bin_array:
     used = False
     for event in events_list:
-      if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+time_spacing)):
-        if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)): 
-          # event is moving forward through neuron bins
+      # if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+(time_spacing*time_bin_size))):
+      if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+time_spacing)): 
+        # if newe starts not before start time of existing event
+        # and if newe starts before end time of existing event, 
+        # then concatinate the events:
+        if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)):
+          # if existing event start neuron bin is before end neuron bin
+          # and if newe start neuron bin is the bin after the existing event end neuron bin,
+          # then event is moving forward through neuron bins
           if used:
             print("error: new event fits with multiple existing events")
           else: # update event in events_list
             event[1] = newe['end_neuron_bin'] # new end_neuron_bin
             event[3] = newe['end_time']
-            used = True
+            used = True # newe has been added to the event list (concatinated with an existing event)
             break
 
         elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): 
@@ -211,14 +226,14 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
           else: # update event in events_list
             event[1] = newe['end_neuron_bin'] # new end_neuron_bin
             event[3] = newe['end_time']
-            used = True
+            used = True # newe has now been added to the event list (concatinated with an existing event)
             break
 
     if not used: # if it doesn't work with any current event in events_list, add it to the list
       events_list.append(newe)
       events_list.append(newe.copy()) # add twice because it could travel in both directions
       # starting_events_list.append(newe) # record info about first event in chain
-      used = True
+      used = True # newe has now been added to the event list
 
   final_events_list = []
   for event in events_list: 
@@ -247,15 +262,15 @@ def calculate_events(N, results, neuron_bin_size=100):
 
   num_neuron_bins = math.ceil(N/neuron_bin_size)
 
-  subPR, time_bin_size, simulation_time = create_subPR(results, neuron_bin_size, num_neuron_bins)
+  subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
   thresholds = get_thresholds(subPR, num_neuron_bins)
   events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
 
-  return(events, simulation_time) # a numpy array of tuples
+  return(events) # a numpy array of tuples
 
 
 ###############################################################################################################
-def analyze_events(N, events, simulation_time=3000, neuron_bin_size=100):
+def analyze_events(N, events, simulation_time, neuron_bin_size=100):
   import numpy as np
   from scipy import stats
 

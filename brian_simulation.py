@@ -8,16 +8,17 @@ Created on Sun Mar  5 14:06:45 2017
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
 # data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
-data_dir = 'matrices/N3000_LL70_LR0_ff_alpha_div_rand/'
-res_dir = '/var/tmp/N3000_LL70_LR0_ff_alpha_div_rand/'
+data_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
+res_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
+# res_dir = '/var/tmp/N3000_LL70_LR0_ff_alpha_conv_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/CNS18/'
 print("data_dir: "+data_dir)
 print("results_dir: "+res_dir)
 # Style = "L{0}".format(L)
-Style = "CnsL"
-print("style: "+Style)
+Style = "Regular5s_"
+print("Style: "+Style)
 
 import sys
 
@@ -185,7 +186,7 @@ for w_index in range(start_index, end_index+1):
     stats['spikemon indices'] = simulation_spikemon.i/1
     stats['average firing rate'] = simulation_spikemon.num_spikes/(N*simulationtime/second)
 
-    events, simulation_time = ar.calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
+    events = ar.calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
     stats['events'] = events
     stats['num events'] = len(events)
     print("\nnumber of events: {0}\n".format(len(events)))

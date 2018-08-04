@@ -22,6 +22,8 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     for k,v in sorted(results.items()):
         if not isinstance(v,np.ndarray):
             print(k+":{0}".format(v))
+        if k=="events":
+            print(k+"{0}".format(v[0:10]))
     print("\n")
 
 
