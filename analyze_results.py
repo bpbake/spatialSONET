@@ -183,21 +183,24 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
           # then record this as an event
       else:
         if success: # save time and bin, reset count
-          events_by_bin.append((i, i, (j-count)*time_bin_size, (j-1)*time_bin_size))
+          events_by_bin.append((i, i, (j-count)*time_bin_size, (j-1)*time_bin_size, None))
+          # append event tuple: (start_neuron_bin, end_neuron_bin, start_time, end_time, direction)
         count = 0
         success = False
 
   # print(events_by_bin)
 
   dtype = [('start_neuron_bin', int), ('end_neuron_bin', int), ('start_time', float), 
-    ('end_time', float)] # these are labels for the event tuples
+    ('end_time', float), ('direction', str)] # these are labels for the event tuples
   sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), 
     order=['start_time', 'start_neuron_bin']) # sort events_by_bin by start time (then by start neuron bin)
   # print(sorted_events_by_bin_array[0:100])
 
   events_list = [] # each entry will be tuple: 
-  #  (start_neuron_bin, end_neuron_bin, start_time, end_time)
+  #  (start_neuron_bin, end_neuron_bin, start_time, end_time, direction)
   # starting_events_list = []
+
+  num_events = 0
 
   for newe in sorted_events_by_bin_array:
     used = False
@@ -207,42 +210,62 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
         # if newe starts not before start time of existing event
         # and if newe starts before end time of existing event, 
         # then concatinate the events:
-        if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)):
+
+        # if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)): 
+        elif (event[4] is 'up') and ((newe['start_neuron_bin'] == (event[1]+1)) or 
+          ((newe['start_neuron_bin']==0) and (event[1]==num_neuron_bins-1))):
           # if existing event start neuron bin is before end neuron bin
           # and if newe start neuron bin is the bin after the existing event end neuron bin,
-          # then event is moving forward through neuron bins
+          # then event is moving forward through neuron bins (perhaps wrap-around)
           if used:
             print("error: new event fits with multiple existing events")
           else: # update event in events_list
             event[1] = newe['end_neuron_bin'] # new end_neuron_bin
             event[3] = newe['end_time']
+            # event[4] = 'up'
             used = True # newe has been added to the event list (concatinated with an existing event)
             break
 
-        elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): 
-          # event is moving backwards through neuron bins
+        # elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): 
+        elif (event[4] is 'down') and ((newe['start_neuron_bin'] == (event[1]-1)) or 
+          ((newe['start_neuron_bin']==num_neuron_bins-1) and (event[1]==0))): 
+          # event is moving backwards through neuron bins (maybe wrap-around)
           if used:
             print("error: new event fits with multiple existing events")
           else: # update event in events_list
             event[1] = newe['end_neuron_bin'] # new end_neuron_bin
             event[3] = newe['end_time']
+            # event[4] = 'down'
             used = True # newe has now been added to the event list (concatinated with an existing event)
             break
 
     if not used: # if it doesn't work with any current event in events_list, add it to the list
+      newe['direction'] = 'up'
       events_list.append(newe)
-      events_list.append(newe.copy()) # add twice because it could travel in both directions
+      copy_newe = newe.copy()
+      copy_newe['direction'] = 'down'
+      events_list.append(copy_newe) # add twice because it could travel in both directions
+      num_events += 1 # but it's only one event, so add only once
       # starting_events_list.append(newe) # record info about first event in chain
       used = True # newe has now been added to the event list
 
+  sorted_events_list = np.sort(np.array(events_list, dtype=dtype), order=['start_time', 'start_neuron_bin'])
+
   final_events_list = []
-  for event in events_list: 
+  prev_start_bin = None
+  prev_start_time = None
+  for event in sorted_events_list: 
     # now remove all events that cover fewer than a certain number (consecutive_bin) of neuron bins
-    if abs(event[1] - event[0]) >= consecutive_bin:
-      final_events_list.append(event)
+    if abs(event['start_neuron_bin'] - event['end_neuron_bin']) >= consecutive_bin:
+      final_events_list.append(event) 
+    elif (event['start_neuron_bin'] == prev_start_bin) and  (event['start_time'] == prev_start_time):
+      num_events -= 1
+      # if both directions of an event are not long enough, then we removed the entire event
+    prev_start_bin = event['start_neuron_bin']
+    prev_start_time = event['start_time']
 
   events = np.array(final_events_list, dtype=dtype)
-  return(events)
+  return(events, num_events)
 
 
 ####################################################################################################### 
@@ -264,17 +287,17 @@ def calculate_events(N, results, neuron_bin_size=100):
 
   subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
   thresholds = get_thresholds(subPR, num_neuron_bins)
-  events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
+  events, num_events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
 
-  return(events) # a numpy array of tuples
+  return(events, num_events) # a numpy array of tuples
 
 
 ###############################################################################################################
-def analyze_events(N, events, simulation_time, neuron_bin_size=100):
+def analyze_events(N, events, num_events, simulation_time, neuron_bin_size=100):
   import numpy as np
   from scipy import stats
 
-  event_rate = (len(events)/simulation_time)*1000 # number of events per second (simulation time units: ms)
+  event_rate = (num_events/simulation_time)*1000 # number of events per second (simulation time units: ms)
 
   events_length = 0 # will be the total number of neurons that are included in all events
 

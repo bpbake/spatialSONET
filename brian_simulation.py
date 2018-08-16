@@ -64,6 +64,7 @@ Ee = 0*mV  #used for inhibitory only (not used in this program)
 eqs= '''
 dv/dt = (-v+Er)/tau: volt
 ''' # leaky integrate and fire model
+# dt = .05*ms # time step in simulation (default: 0.1*ms)
 
 vthreshold = -55*mV # if voltage passes this, it counts as a spike
 vreset = -65*mV # reset voltage
@@ -143,20 +144,42 @@ for w_index in range(start_index, end_index+1):
     
     # if the setup yeilded either of these problems (too many spikes or not enough), we go to next iteration of loop (next W)
     # are the threshold values for these if statements appropriate?
+    saturated = False
     if transient_spikemon.num_spikes > (transienttime*N/refract*0.5): # if the number of spikes it too large, assume it's saturated
         print("\nnetwork saturated, skipping matrix {0}\n".format(w_index))
-        stats['saturated'] = True # add to the stats dict
-        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
-        with open(result_filename, "wb") as rf:
-            pickle.dump(stats, rf) #pickle the new stats dict 
+        saturated = True
+        stats['saturated'] = saturated # add to the stats dict
+        ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
+        ar.clean_results(N, p_AVG, w_index, Style, res_dir)
+        # result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
+        # with open(result_filename, "wb") as rf:
+        #     pickle.dump(stats, rf) #pickle the new stats dict 
         continue # go to next matrix
+    transient_trains = transient_spikemon.spike_trains()
+    for neuron_index in range(N):
+        if len(transient_trains[neuron_index]) > (0.5*transienttime/refrac):
+            print("\nneuron {0} saturated, skipping matrix {1}\n".format(neuron_index, w_index))
+            saturated = True
+            stats['saturated'] = saturated # add to the stats dict
+            ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
+            ar.clean_results(N, p_AVG, w_index, Style, res_dir)
+            # result_filename = "{0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(res_dir,N,p_AVG,Style,w_indes)
+            # # result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
+            # with open(result_filename, "wb") as rf:
+            #     pickle.dump(stats, rf) #pickle the new stats dict 
+            break # break out of neuron_index loop
+    if saturated: 
+        continue # go to next matrix
+
         
     if transient_spikemon.num_spikes < (2*N): # if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(w_index))
         stats['not spiking'] = True #add to the stats dict
-        result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
-        with open(result_filename, "wb") as rf:
-            pickle.dump(stats, rf) # pickle the new stats file
+        ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
+        ar.clean_results(N, p_AVG, w_index, Style, res_dir)
+        # result_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(res_dir,N,p_AVG,w_index) 
+        # with open(result_filename, "wb") as rf:
+        #     pickle.dump(stats, rf) # pickle the new stats file
         continue # go to next matrix
 
     print("\nnumber of spikes in transient: {0}\n".format(transient_spikemon.num_spikes))
@@ -186,12 +209,12 @@ for w_index in range(start_index, end_index+1):
     stats['spikemon indices'] = simulation_spikemon.i/1
     stats['average firing rate'] = simulation_spikemon.num_spikes/(N*simulationtime/second)
 
-    events = ar.calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
+    (events, num_events) = ar.calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
     stats['events'] = events
-    stats['num events'] = len(events)
-    print("\nnumber of events: {0}\n".format(len(events)))
+    stats['num events'] = num_events
+    print("\nnumber of events: {0}\n".format(num_events))
 
-    (event_rate, event_mag, IEIs, excess_kurtosis, skew) = ar.analyze_events(N, events, simulationtime/ms, neuron_bin_size)
+    (event_rate, event_mag, IEIs, excess_kurtosis, skew) = ar.analyze_events(N, events, num_events, simulationtime/ms, neuron_bin_size)
     stats['event_rate'] = event_rate
     stats['event_mag'] = event_mag
     stats['IEIs'] = IEIs 
