@@ -161,7 +161,7 @@ def get_thresholds(subPR, num_neuron_bins):
 
 #######################################################################################################
 ## called by calculate_events
-def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size, 
+def get_events(N, subPR, thresholds, num_neuron_bins=1, time_bin_size=.1, 
   consecutive_time = 1, time_spacing = 1, consecutive_bin = 2): 
   import numpy as np
   import math
@@ -195,6 +195,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
   sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), 
     order=['start_time', 'start_neuron_bin']) # sort events_by_bin by start time (then by start neuron bin)
   # print(sorted_events_by_bin_array[0:100])
+  print("dtype: {0}".format(dtype))
 
   events_list = [] # each entry will be tuple: 
   #  (start_neuron_bin, end_neuron_bin, start_time, end_time, direction)
@@ -212,8 +213,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
         # then concatinate the events:
 
         # if (event[0] <= event[1]) and (newe['start_neuron_bin'] == (event[1]+1)): 
-        elif (event[4] is 'up') and ((newe['start_neuron_bin'] == (event[1]+1)) or 
-          ((newe['start_neuron_bin']==0) and (event[1]==num_neuron_bins-1))):
+        if (event[4] is 'up') and ((newe['start_neuron_bin'] == (event[1]+1)) or ((newe['start_neuron_bin']==0) and (event[1]==num_neuron_bins-1))):
           # if existing event start neuron bin is before end neuron bin
           # and if newe start neuron bin is the bin after the existing event end neuron bin,
           # then event is moving forward through neuron bins (perhaps wrap-around)
@@ -227,8 +227,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
             break
 
         # elif (event[0] >= event[1]) and (newe['start_neuron_bin'] == (event[1]-1)): 
-        elif (event[4] is 'down') and ((newe['start_neuron_bin'] == (event[1]-1)) or 
-          ((newe['start_neuron_bin']==num_neuron_bins-1) and (event[1]==0))): 
+        elif (event[4] is 'down') and ((newe['start_neuron_bin'] == (event[1]-1)) or ((newe['start_neuron_bin']==num_neuron_bins-1) and (event[1]==0))): 
           # event is moving backwards through neuron bins (maybe wrap-around)
           if used:
             print("error: new event fits with multiple existing events")
@@ -242,14 +241,19 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
     if not used: # if it doesn't work with any current event in events_list, add it to the list
       newe['direction'] = 'up'
       events_list.append(newe)
+      print("newe: {0}".format(newe))
       copy_newe = newe.copy()
       copy_newe['direction'] = 'down'
       events_list.append(copy_newe) # add twice because it could travel in both directions
+      print("newe.copy: {0}".format(copy_newe))
       num_events += 1 # but it's only one event, so add only once
       # starting_events_list.append(newe) # record info about first event in chain
       used = True # newe has now been added to the event list
 
+  print("events list created: {0}".format(events_list))
+
   sorted_events_list = np.sort(np.array(events_list, dtype=dtype), order=['start_time', 'start_neuron_bin'])
+  print("events list sorted, but needs to be cleaned by event length")
 
   final_events_list = []
   prev_start_bin = None
@@ -261,6 +265,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size,
     elif (event['start_neuron_bin'] == prev_start_bin) and  (event['start_time'] == prev_start_time):
       num_events -= 1
       # if both directions of an event are not long enough, then we removed the entire event
+      # this will work because the events are sorted by start_time then by start_neuron_bin
     prev_start_bin = event['start_neuron_bin']
     prev_start_time = event['start_time']
 
@@ -288,6 +293,7 @@ def calculate_events(N, results, neuron_bin_size=100):
   subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
   thresholds = get_thresholds(subPR, num_neuron_bins)
   events, num_events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
+  print("events calculated")
 
   return(events, num_events) # a numpy array of tuples
 

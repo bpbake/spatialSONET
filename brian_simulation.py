@@ -157,7 +157,7 @@ for w_index in range(start_index, end_index+1):
         continue # go to next matrix
     transient_trains = transient_spikemon.spike_trains()
     for neuron_index in range(N):
-        if len(transient_trains[neuron_index]) > (0.5*transienttime/refrac):
+        if len(transient_trains[neuron_index]) > (0.5*transienttime/refract):
             print("\nneuron {0} saturated, skipping matrix {1}\n".format(neuron_index, w_index))
             saturated = True
             stats['saturated'] = saturated # add to the stats dict
