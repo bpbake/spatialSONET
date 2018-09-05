@@ -7,13 +7,14 @@ Created on Sun Mar  5 14:06:45 2017
 
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-# data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
-data_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
-res_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
+data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
+# res_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alpha_conv_div_rand/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
 # data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/CNS18/'
+res_dir = data_dir
 print("data_dir: "+data_dir)
 print("results_dir: "+res_dir)
 # Style = "L{0}".format(L)
@@ -71,7 +72,7 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 5000*ms # the part of the simulation we care about
+simulationtime = 50*ms # the part of the simulation we care about
 
 
 #Set up the Neuron Groups for simulation
@@ -212,7 +213,7 @@ for w_index in range(start_index, end_index+1):
     (events, num_events) = ar.calculate_events(N, stats, neuron_bin_size) # numpy array of tuples representing events
     stats['events'] = events
     stats['num events'] = num_events
-    print("\nnumber of events: {0}\n".format(num_events))
+    # print("\nnumber of events: {0}\n".format(num_events))
 
     (event_rate, event_mag, IEIs, excess_kurtosis, skew) = ar.analyze_events(N, events, num_events, simulationtime/ms, neuron_bin_size)
     stats['event_rate'] = event_rate
@@ -225,6 +226,8 @@ for w_index in range(start_index, end_index+1):
     for key,value in sorted(stats.items()):
         if not isinstance(value,np.ndarray):
             print(key+":{0}".format(value))
+        if key=="events":
+            print(key+"{0}".format(value[0:10]))
     print("\n")
     
     try:

@@ -55,6 +55,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     #plt.xticks([])
     plt.ylabel('Neuron index')
     # plt.tight_layout()
+    plt.grid(True)
     
     # plt.subplot(212)
     # ind1=np.min(np.where(results['PRM time']>mintime))
