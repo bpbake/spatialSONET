@@ -189,7 +189,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins=1, time_bin_size=.1,
         if success: # save time and bin, reset count
           count_below_thresh += 1
           if count_below_thresh > time_spacing:
-            events_by_bin.append((i, i, (start_time_bin)*time_bin_size, (j-count_below_thresh)*time_bin_size, "blank"))
+            events_by_bin.append((i, i, (start_time_bin)*time_bin_size, (j-count_below_thresh)*time_bin_size, "blank", 1))
             success = False
             # append event tuple: (start_neuron_bin, end_neuron_bin, start_time, end_time#, direction)
         if not success: # not an else case... because we want this to be triggered if it ran the last line
@@ -199,63 +199,118 @@ def get_events(N, subPR, thresholds, num_neuron_bins=1, time_bin_size=.1,
   # print(events_by_bin)
 
   dtype = [('start_neuron_bin', 'i4'), ('end_neuron_bin', 'i4'), ('start_time', 'f8'), 
-    ('end_time', 'f8'), ('direction', 'U10')] # these are labels for the event tuples
-  sorted_events_by_bin_array = np.sort(np.array(events_by_bin, dtype=dtype), 
-    order=['start_time', 'start_neuron_bin']) # sort events_by_bin by start time (then by start neuron bin)
-  print("sorted_events_by_bin_array[0:50] = {0}".format(sorted_events_by_bin_array[0:50]))
+    ('end_time', 'f8'), ('direction', 'U10'), ('event_size', 'i4')] # these are labels for the event tuples
+  events_structured = np.array(events_by_bin, dtype=dtype)
+  sorted_events_by_bin = np.sort(events_structured, order='start_time') # sort events_by_bin by start time 
+  print("\nsorted_events_by_bin[0:20] = {0}\n".format(sorted_events_by_bin[0:20]))
   print("dtype: {0}".format(dtype))
 
-  events_list = [] # each entry will be tuple: 
-  #  (start_neuron_bin, end_neuron_bin, start_time, end_time, direction)
-  # starting_events_list = []
+  events_list_up = [] # each entry will be tuple: 
+  #  (start_neuron_bin, end_neuron_bin, start_time, end_time, direction, event_size)
+  # will catch bi-directional events
+  events_list_down = [] # only down events
 
   num_events = 0
 
-  for newe in sorted_events_by_bin_array:
-    used = False
-    for event_ind in range(len(events_list)):
-      event=events_list[event_ind]
-      # if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+(time_spacing*time_bin_size))):
-      if (newe['start_time'] >= event[2]-time_spacing) and (newe['start_time'] <= (event[3]+time_spacing)): 
-        # if newe starts not before start time of existing event
-        # and if newe starts before end time of existing event, 
-        # then concatinate the events:
+  while sorted_events_by_bin not empty: # fix this check
+    event = sorted_events_by_bin[0]
+    laste = event
+    found = True
 
-        if (event[4] == 'up') 
-        and (((newe['start_neuron_bin'] > event[0]) 
-        and (newe['start_neuron_bin'] <= event[1]+bin_spacing)) 
-        or ((newe['start_neuron_bin']==0) and (event[1]==num_neuron_bins-1))):  # FIX THIS WRAP-AROUND CONDITION
-          # if newe start neuron bin is after existing event start neuron bin
-          # and if newe start neuron bin is the bin before the existing event end neuron bin + buffer
-          if used:
-            print("error: new event fits with multiple existing events")
-          else: # update event in events_list
-            s_bin = min
-            events_list[event_ind] = (event[0], newe['end_neuron_bin'], event[2], newe['end_time'], event[4])
-            used = True # newe has been added to the event list (concatinated with an existing event)
+    while found:
+      found = False
+      for index in range(len(sorted_events_by_bin)):
+        newe = sorted_events_by_bin[index]
+        if (newe["start_neuron_bin"] == laste["start_neuron_bin"]+1): # make wrap around okay
+          if #too early, 
+            continue
+          elif # too late,
             break
+          else:
+            # update event
+            if newe['end_time'] < event['end_time']: # fix this update!
+              # event['end_time'] = newe['end_time']
+              # event['end_neuron_bin'] = newe['end_neuron_bin']  
+            elif #
+            laste = newe
+            sorted_events_by_bin = np.delete(sorted_events_by_bin,index,0)
+            found = True
+            break
+    # exited while found loop
+    events_list_up.append(event)
+
+    # REPEAT events_list_down with remaining sorted_events_by_bin (still includes first event of the event
+    event = sorted_events_by_bin[0]
+    laste = event
+    found = True
+
+    while found:
+      found = False
+      for index in range(len(sorted_events_by_bin)):
+        newe = sorted_events_by_bin[index]
+        if (newe["start_neuron_bin"] == laste["start_neuron_bin"]-1): # make wrap around okay
+          if #too early, 
+            continue
+          elif # too late,
+            break
+          else:
+            # update event
+            if newe['end_time'] < event['end_time']: # fix this update
+              # event['end_time'] = newe['end_time']
+              # event['end_neuron_bin'] = newe['end_neuron_bin']
+            elif #
+            laste = newe
+            sorted_events_by_bin = np.delete(sorted_events_by_bin,index,0)
+            found = True
+            break
+    events_list_down.append(event)
+    sorted_events_by_bin = np.delete(sorted_events_by_bin,0,0)
+
+  # for newe in sorted_events_by_bin:
+  #   used = False
+  #   for event_ind in range(len(events_list)):
+  #     event=events_list[event_ind]
+  #     # if (newe['start_time'] >= event[2]) and (newe['start_time'] <= (event[3]+(time_spacing*time_bin_size))):
+  #     if (newe['start_time'] >= event[2]-time_spacing) and (newe['start_time'] <= (event[3]+time_spacing)): 
+  #       # if newe starts not before start time of existing event
+  #       # and if newe starts before end time of existing event, 
+  #       # then concatinate the events:
+
+  #       if (event[4] == 'up') 
+  #       and (((newe['start_neuron_bin'] > event[0]) 
+  #       and (newe['start_neuron_bin'] <= event[1]+bin_spacing)) 
+  #       or ((newe['start_neuron_bin']==0) and (event[1]==num_neuron_bins-1))):  # FIX THIS WRAP-AROUND CONDITION
+  #         # if newe start neuron bin is after existing event start neuron bin
+  #         # and if newe start neuron bin is the bin before the existing event end neuron bin + buffer
+  #         if used:
+  #           print("error: new event fits with multiple existing events")
+  #         else: # update event in events_list
+  #           s_bin = min
+  #           events_list[event_ind] = (event[0], newe['end_neuron_bin'], event[2], newe['end_time'], event[4])
+  #           used = True # newe has been added to the event list (concatinated with an existing event)
+  #           break
  
-        elif (event[4] == 'down') 
-        and (((newe['start_neuron_bin'] < event[0]) 
-        and (newe['start_neuron_bin'] >= (event[1]-bin_spacing)%num_neuron_bins))
-        or ((newe['start_neuron_bin']==num_neuron_bins-1) and (event[1]==0))): # FIX THIS WRAP-AROUND CONDITION
-          # event is moving backwards through neuron bins (maybe wrap-around)
-          if used:
-            print("error: new event fits with multiple existing events")
-          else: # update event in events_list
-            events_list[event_ind] = (event[0], newe['end_neuron_bin'], event[2], newe['end_time'], event[4])
-            used = True # newe has now been added to the event list (concatinated with an existing event)
-            break
-        # else:
-          # print("event times match, but not consecutive neuron bins")
+  #       elif (event[4] == 'down') 
+  #       and (((newe['start_neuron_bin'] < event[0]) 
+  #       and (newe['start_neuron_bin'] >= (event[1]-bin_spacing)%num_neuron_bins))
+  #       or ((newe['start_neuron_bin']==num_neuron_bins-1) and (event[1]==0))): # FIX THIS WRAP-AROUND CONDITION
+  #         # event is moving backwards through neuron bins (maybe wrap-around)
+  #         if used:
+  #           print("error: new event fits with multiple existing events")
+  #         else: # update event in events_list
+  #           events_list[event_ind] = (event[0], newe['end_neuron_bin'], event[2], newe['end_time'], event[4])
+  #           used = True # newe has now been added to the event list (concatinated with an existing event)
+  #           break
+  #       # else:
+  #         # print("event times match, but not consecutive neuron bins")
 
-    if not used: # if it doesn't work with any current event in events_list, add it to the list
-      newe_up = (newe['start_neuron_bin'], newe['end_neuron_bin'], newe['start_time'], newe['end_time'],'up')
-      events_list.append(newe_up)
-      newe_down = (newe['start_neuron_bin'], newe['end_neuron_bin'], newe['start_time'], newe['end_time'],'down')
-      events_list.append(newe_down) # add twice because it could travel in both directions
-      num_events += 1 # but it's only one event, so add only once
-      used = True # newe has now been added to the event list
+  #   if not used: # if it doesn't work with any current event in events_list, add it to the list
+  #     newe_up = (newe['start_neuron_bin'], newe['end_neuron_bin'], newe['start_time'], newe['end_time'],'up')
+  #     events_list.append(newe_up)
+  #     newe_down = (newe['start_neuron_bin'], newe['end_neuron_bin'], newe['start_time'], newe['end_time'],'down')
+  #     events_list.append(newe_down) # add twice because it could travel in both directions
+  #     num_events += 1 # but it's only one event, so add only once
+  #     used = True # newe has now been added to the event list
 
   print("events list created: {0}".format(events_list[0:20]))
 
