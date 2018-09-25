@@ -21,7 +21,7 @@ def create_P(N, L_left, L_right, p_AVG):
     print("creating P")
     sys.stdout.flush()
     
-    threshold = 1e100
+    threshold = 1e100 # this is so extreme, that it's not actually doing anything
     
     p = np.zeros(N)
     # p= first row of the matrix P, when i=1
@@ -42,7 +42,7 @@ def create_P(N, L_left, L_right, p_AVG):
             #v = min((N-i)/L_left, i/L_right)
             v = min(math.pow((N-i), 2)/(2*math.pow(L_left,2)), math.pow(i, 2)/(2*math.pow(L_right,2)))
             
-        if v <= threshold:
+        if v <= threshold: # threshold may be so extreme, that this will always be true whenever below is nonzero (in float)
             p[i] = math.exp(-v)
     
     p_avg_current = (1/(N-1))*np.sum(p) #current average value for p

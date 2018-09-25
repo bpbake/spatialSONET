@@ -45,7 +45,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     maxtime=results['simulation_time']+mintime
     # plt.subplot(211)
 
-    # plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
+    plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=.5)
