@@ -20,10 +20,10 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 
     print('Matrix {0}, style {1}'.format(i, style))
     for k,v in sorted(results.items()):
-        if not isinstance(v,np.ndarray):
+        if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
             print(k+":{0}".format(v))
         if k=="events":
-            print(k+"{0}".format(v[0:10]))
+            print(k+"{0}".format(v[0:20]))
     print("\n")
 
 

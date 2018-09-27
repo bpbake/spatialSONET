@@ -18,7 +18,8 @@ res_dir = data_dir
 print("data_dir: "+data_dir)
 print("results_dir: "+res_dir)
 # Style = "L{0}".format(L)
-Style = "Regular5s_"
+# Style = "Regular5s_"
+Style = "Irregular50s_"
 print("Style: "+Style)
 
 import sys
@@ -72,8 +73,9 @@ vreset = -65*mV # reset voltage
 refract = 1*ms # "cool down" time between spikes (after a spike, it can't spike again for this amount of time)
 
 transienttime = 500*ms # getting the network into place (the start bit of the simulation)
-simulationtime = 50*ms # the part of the simulation we care about
-
+# the part of the simulation we care about
+simulationtime = 5000*ms # Regular
+simulationtime = 50000*ms # Irregular
 
 #Set up the Neuron Groups for simulation
 G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refract', method='euler') 
@@ -82,11 +84,11 @@ G.v='vreset+(vthreshold-vreset)*rand()' # sets voltage dip below reset after spi
 
 # variables that control the PoissonGroup
 # Irregular Regime:
-# ext_rate = 113*Hz # rate of external input (how often input happens)
-# ext_mag = 1.5*mV # how much the voltage gets affected by the external input
+ext_rate = 113*Hz # rate of external input (how often input happens)
+ext_mag = 1.5*mV # how much the voltage gets affected by the external input
 # Regular Regime
-ext_rate = 250*Hz # rate of external input (how often input happens)
-ext_mag = 1*mV # how much the voltage gets affected by the external input
+# ext_rate = 250*Hz # rate of external input (how often input happens)
+# ext_mag = 1*mV # how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) # adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") # synapes P onto G

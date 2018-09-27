@@ -82,7 +82,7 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['events'] = events
   results['num events'] = len(events)
 
-  event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, simulation_time, neuron_bin_size)
+  event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, num_events, simulation_time, neuron_bin_size)
 
   results['event_rate'] = event_rate
   results['event_mag'] = event_mag
@@ -91,12 +91,14 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEI skew'] = skew
 
   save_results(N, p, i, results, style, data_dir)
+  clean_results(N, p, i, style, data_dir)
 
-  # for k,v in sorted(results.items()):
-  #   if not isinstance(v,np.ndarray):
-  #     print(k+":{0}".format(v))
-  # print("\n")
-  # sys.stdout.flush()
+  for k,v in sorted(results.items()):
+    if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
+        print(k+":{0}".format(v))
+    if k=="events":
+        print(k+"{0}".format(v[0:20]))
+  sys.stdout.flush()
 
 #######################################################################################################
 #######################################################################################################
@@ -234,7 +236,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
             break
 
     # exited while found loop for up events
-    if event['event_size'] >= consecutive_bin:
+    if event['event_size'] > consecutive_bin:
       events_list_up.append(event)
 
     # Repeat for events_list_down with remaining sorted_events_by_bin (still includes first event of each up event)
@@ -242,12 +244,13 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
     laste = event
     found = True
     event['direction'] = "down"
+    event['event_size'] = 1
 
     while found:
       found = False
       for index in range(1,len(sorted_events_by_bin)):
         newe = sorted_events_by_bin[index]
-        if (newe["start_neuron_bin"] == ((laste["start_neuron_bin"]-1)%num_neuron_bins)): # make wrap around okay
+        if (newe["start_neuron_bin"] == ((laste["start_neuron_bin"]-1)%num_neuron_bins)): # mod to make wrap around okay
           if newe["end_time"] < (laste["start_time"]-event_time_buffer): #too early
             continue
           elif newe["start_time"] > (laste["end_time"]+event_time_buffer): # too late
@@ -264,7 +267,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
             found = True
             break
     # exited while found loop for down events
-    if event['event_size'] >= consecutive_bin:
+    if event['event_size'] > consecutive_bin:
       events_list_down.append(event)
     sorted_events_by_bin = np.delete(sorted_events_by_bin,0,0)
 
@@ -278,7 +281,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
   final_events_list = events_list_up + events_list_down
 
   events = np.sort(np.array(final_events_list, dtype=dtype), order=['start_time', 'start_neuron_bin'])
-  print("real final events[0:20] = {0}".format(events[0:20]))
+  # print("\nfinal events list[0:20] = {0}".format(events[0:20]))
   return(events, num_events)
 
 
