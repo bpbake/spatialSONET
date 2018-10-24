@@ -30,16 +30,15 @@ p_AVG =50/N # average probability of connectivity between neurons
 # data_dir = 'matrices/CNS18/'
 # data_dir = "matrices/N10000_LL70_LR0_ff_alpha_chain_zero/"
 # data_dir = "matrices/N3000_LL70_LR70_sym_alpha_div_rand/"
-# data_dir = "matrices/N3000_LL70_LR0_ff_alphas_all_rand/"
-data_dir = "matrices/N3000_LL70_LR70_sym_alphas_all_rand/"
-# Style = "FF_L70"
-# Style = "Regular120s_Clean"
-# Style = "CnsLClean" #Cns = Irregular, CnsL = Regular
-Style = "Regular5s_Clean_"
-# Style = "ttLongClean"
+data_dir = "matrices/N3000_LL70_LR0_ff_alphas_all_rand/"
+# data_dir = "matrices/N3000_LL70_LR70_sym_alpha_conv_div_rand/"
 
-# reload=False
-reload=True
+#Cns = Irregular50s, CnsL = Regular5s
+Style = "Regular5s_Clean_"
+# Style = "Irregular50s_Clean_"
+
+reload=False
+# reload=True
 
 summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,Style) 
 
@@ -213,7 +212,7 @@ plt.xticks(np.arange(0,0.5,0.1))
 
 
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=100)
+plt.rc('font', family='serif', size=80)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure(figsize=(12,10))

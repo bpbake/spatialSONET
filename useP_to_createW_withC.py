@@ -63,7 +63,7 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
         BB[0,0] = math.sqrt(D[0])
         BB[1,1] = math.sqrt(D[1])
     else:
-        raise MyException("Some eigenvalues in D are negative.") #If eigen value is smaller (more negative) than -1e-12, then we claim to have a problem
+        raise MyException("Some eigenvalues in D are negative.") #If eigen value is smaller (more negative) than -1e-12, then problem
     
     AA = np.matmul(np.matmul(V,BB), np.linalg.inv(V)) 
     c = AA[0,0]/np.sqrt(m)

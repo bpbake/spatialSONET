@@ -45,7 +45,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     maxtime=results['simulation_time']+mintime
     # plt.subplot(211)
 
-    plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
+    # plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=.5)
@@ -72,6 +72,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 
 
     ### Plot histograms of IEIs:
+# plt.figure()
 # plt.rc('font', family='serif', size=80)
 # plt.rc('xtick', labelsize=70)
 # plt.rc('ytick', labelsize=70)
@@ -79,6 +80,9 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 # plt.xlabel('Inter-event interval (ms)')
 # plt.ylabel('Count')
 # plt.tight_layout()
+
+    # plt.show()
+
 
 #### Plot histogram of start_neuron_bin:
 # start_neurons = []

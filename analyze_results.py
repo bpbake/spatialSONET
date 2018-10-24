@@ -80,7 +80,7 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
 
   events, num_events = calculate_events(N, results, neuron_bin_size)
   results['events'] = events
-  results['num events'] = len(events)
+  results['num events'] = num_events
 
   event_rate, event_mag, IEIs, excess_kurtosis, skew = analyze_events(N, events, num_events, simulation_time, neuron_bin_size)
 
@@ -149,7 +149,9 @@ def get_thresholds(subPR, num_neuron_bins):
         break
  
   tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
-  # if subPR[i,j] > tempThresh[i], then tempSubPR[i,j] = tempThresh[i], otherwise tempSubPR[i,j] = subPR[i,j]
+  # if subPR[i,j] > tempThresh[i], 
+      # then tempSubPR[i,j] = tempThresh[i], 
+      # otherwise tempSubPR[i,j] = subPR[i,j]
   # This is creating a new subPR matrix which replaces the extremely high values in subPR with the tempThresh value for that neuron bin
 
   thresholds = np.zeros(num_neuron_bins)
