@@ -25,11 +25,18 @@ Python code that utilizes Brian to simulate on networks of excitatory neurons wi
 ## Requirements
 * Python 3.6 or later
 * C compiler
-* cython, Python to C compiler
-* [Brian 2](https://brian2.readthedocs.io/en/stable/index.html) simulator for spiking neural networks (not needed for network generation)
+* cython (Python package that utilizes C)
+* [Brian](https://brian2.readthedocs.io/en/stable/index.html) simulator for spiking neural networks (not needed for network generation)
 
 ## Usage Notes
 ### Generating Networks
+Scripts needed:
+* create_P.py
+* useP_to_createW_withC.py
+* produceW.pyx \- must be compiled into produceW.c (use the command below)
+* generate_Ws.py \- use this to create multiple adjacency matrices with same parameters (optional)
+
+Usage details:  
 To generate an adjacency matrix for a single network in a Python program, first process the produceW.pyx cython code to create the produceW.c file (this file usually needs to be generated on each machine where it will be used).  To do this, try 
 ```python setup.py build_ext --inplace```
 in the command line.
