@@ -5,19 +5,12 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_zero/'
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_div_half/'
-data_dir = 'matrices/N3000_LL70_LR70_sym_alphas_all_rand/'
-# data_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
-# res_dir = 'matrices/N3000_LL70_LR0_ff_alphas_all_rand/'
-# res_dir = '/var/tmp/N3000_LL70_LR0_ff_alpha_conv_div_rand/'
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alpha_chain_zero/'
-# data_dir = 'matrices/N10000_LL70_LR0_ff_alphas_all_rand/'
-# data_dir = 'matrices/CNS18/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
+data_dir = 'matrices/N10000_LL100_LR0_ff_alphas_all_rand/'
+# res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
 res_dir = data_dir
 print("data_dir: "+data_dir)
 print("results_dir: "+res_dir)
-# Style = "L{0}".format(L)
 # Style = "Regular5s_"
 Style = "Irregular50s_"
 print("Style: "+Style)
@@ -25,21 +18,23 @@ print("Style: "+Style)
 import sys
 
 try:
-   import cPickle as pickle # used to store python data types
+   import cPickle as pickle ## used to store python data types
 except:
    import pickle
-#import dill #pickle works fine
+#import dill ## pickle works fine
 
-#from analyze import analyze_autocor # used to analyze synchrony of networks
+#from analyze import analyze_autocor ## used to analyze synchrony of networks
+## we use our synchronous event detection algorithm instead:
 import analyze_results as ar
 
 try:
-    del input # brian overwrites this, we want to reset it to the python default
+    del input ## brian overwrites this, we want to reset it to the python default
 except:
     pass
-input_orig = input # rename the python default for input (brian will overwrite it when imported)
+input_orig = input ## rename the python default for input (brian will overwrite it when imported)
 
-from brian2 import * #scary, but there are so many things that we need from brian2 for simulation that it would be a pain to import them all individually
+from brian2 import * ## scary, but there are so many things that we need from brian2 for simulation 
+## it would be a pain to import them all individually
 
 
 import numpy as np
@@ -50,9 +45,8 @@ from scipy import sparse
 import matplotlib.pyplot as plt
 import math
 
-start_scope() # start fresh with magic settings
+start_scope() ## start fresh with magic settings
 
-# alpha_chain = 0.3
 L = 70
 N = 3000 # Number of excitatory neurons
 p_AVG = 50/N # average probability of connectivity between neurons
