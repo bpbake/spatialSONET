@@ -11,7 +11,7 @@ Second order statistics are prescribed based on frequencies of four types of two
 * divergent motifs (two nodes each receving a connection from a third node: o <- o -> o)
 * chain motifs (three nodes connected in sequence: o -> o -> o)
 
-One-dimensional spatial structure is controlled by left and right parameters L\_left and L\_right where the probability of node _j_ connecting to node _i_ is approximately Gaussian with mean standard deviation L\_left if _j_>_i_ and L\_right if _j_<_i_ .
+One-dimensional spatial structure is controlled by left and right parameters L\_left and L\_right where the probability of node _j_ connecting to node _i_ is approximately Gaussian with standard deviation L\_left if _j_>_i_ and L\_right if _j_<_i_ .
 <!--((_i_-_j_)^2)/2(L\_left)^2 or ((_i_-_j_)^2)/2(L\_right)^2, whichever is positive-->
 
 For homogenous spatial structure as in the [SONET project](https://github.com/dqnykamp/sonets "SONET Github") by Zhao et al., let L\_left = L\_right = inf.
