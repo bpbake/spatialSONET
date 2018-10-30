@@ -24,8 +24,8 @@ Python code that utilizes Brian to simulate on networks of excitatory neurons wi
 
 ## Requirements
 * Python 3.6 or later
-* C compiler
 * cython (Python package that utilizes C)
+* C compiler
 * [Brian](https://brian2.readthedocs.io/en/stable/index.html) simulator for spiking neural networks (not needed for network generation)
 
 ## Usage Notes
@@ -51,7 +51,7 @@ Then, to generate a single adjacency matrix use the `create_W` function in useP_
 ```python
 W = create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain)
 ```
-W is the adjacency matrix for the network where W_ij=1 if there is a connection from node j to node i and is zero otherwise.  The parameter P is the probability matrix from create_P (above).
+W is the adjacency matrix for the network where W_ij=1 if there is a connection from node j to node i and is zero otherwise.  The parameter P is the probability matrix from create_P (above).  This create_W function operates under the assumption that the sum of each column of P is the same (i.e., each neuron has the same out-degree distribution), which our create_P function satisfies.
 
 The alphas specify the probability of a motif W_ij and W_kl according to P(W_ij=1 and W_kl =1) = P_ij\*P_kl(1+alpha) where alpha reperesent the appropriate motif parameter, as follows.  If i, j, and k represent distinct nodes, then alpha=alpha_recip for the motifs W_ij and W_ji, alpha=alpha_conv for the motifs are W_ij and W_ik, alpha=alpha_div for the motifs W_ij and W_kj, and alpha=alpha_chain for the motifs W_ij and W_jk, as described below.  The alphas can be interpreted as specifying the motif frequency or the covariance between edges in the motif.  
 
