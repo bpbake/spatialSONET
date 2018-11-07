@@ -47,7 +47,7 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
 
     ## Generate the matrix of thresholds.  If Z_ij > M_theta(i,j) then W_ij = 1 
     ## this will be used much later (when we call C)       
-    M_theta = math.sqrt(2)*special.erfinv(1 - (2*P))
+    M_theta = math.sqrt(2)*special.erfinv(1 - (2*P)) ## component-wise computation
     print("M_theta has been created. Line 51")
     sys.stdout.flush()
     

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 """
 Created on Sun Mar  5 14:06:45 2017
 
@@ -6,17 +6,16 @@ Created on Sun Mar  5 14:06:45 2017
 """
 
 try:
-   import cPickle as pickle # used to store python data types
+   import cPickle as pickle ## used to store python data types
 except:
    import pickle
-#import dill #pickle works fine
 
 
 try:
-    del input # brian overwrites this, we want to reset it to the python default
+    del input ## brian overwrites this, we want to reset it to the python default
 except:
     pass
-input_orig = input # rename the python default for input (brian will overwrite it when imported)
+input_orig = input ## rename the python default for input (brian will overwrite it when imported)
 
 import numpy as np
 np.set_printoptions(threshold=np.nan)
@@ -25,20 +24,17 @@ import matplotlib.pyplot as plt
 
 import analyze_results as ar
 
-N = 3000 # Number of excitatory neurons
-p_AVG =50/N # average probability of connectivity between neurons
-# data_dir = 'matrices/CNS18/'
-# data_dir = "matrices/N10000_LL70_LR0_ff_alpha_chain_zero/"
-# data_dir = "matrices/N3000_LL70_LR70_sym_alpha_div_rand/"
-data_dir = "matrices/N3000_LL70_LR0_ff_alphas_all_rand/"
-# data_dir = "matrices/N3000_LL70_LR70_sym_alpha_conv_div_rand/"
+N = 3000 ## Number of excitatory neurons
+p_AVG =50/N ## average probability of connectivity between neurons
 
-#Cns = Irregular50s, CnsL = Regular5s
+data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
+
 Style = "Regular5s_Clean_"
 # Style = "Irregular50s_Clean_"
 
-reload=False
-# reload=True
+# reload=False
+reload=True
 
 summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,Style) 
 
@@ -48,7 +44,7 @@ if reload:
         results = pickle.load(rf)
 
 else:
-    ######Load in matrices one at a time and simulate!
+    ## Load in matrices one at a time and simulate!
     import sys
     if len(sys.argv) >= 3:
        start_index = int(sys.argv[1])
@@ -66,13 +62,14 @@ else:
         ('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
         ('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), ('alpha_div_hat', np.zeros(n_indices)), 
         ('alpha_chain_hat', np.zeros(n_indices)), #('largest eigenvalue', np.zeros(n_indices)), 
-        ('event_rate', np.zeros(n_indices)), ('IEI excess_kurtosis', np.zeros(n_indices)), ('IEI skew', np.zeros(n_indices)),]) 
+        ('average firing rate', np.zeros(n_indices)), ('event_rate', np.zeros(n_indices)), 
+        ('IEI excess_kurtosis', np.zeros(n_indices)), ('IEI skew', np.zeros(n_indices)),]) 
         #('j', np.zeros(n_indices)),('ext_rate', np.zeros(n_indices)),('ext_mag', np.zeros(n_indices))])
     actual_index = -1
 
     for w_index in range(start_index, end_index+1):
-            
-        print("w_index = {0}".format(w_index))
+        if w_index%30 == 0:    
+            print("w_index = {0}".format(w_index))
 
         try:
             samp_results = ar.load_results(N, p_AVG, w_index, Style, data_dir)
@@ -80,9 +77,14 @@ else:
             print("couldn't load {0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p_AVG,Style,w_index))
             continue
 
-        if samp_results['average firing rate'] > 100:
-            print("skipped network {0} because average firing rate {1} > 100".format(w_index, samp_results['average firing rate']))
-            continue
+        try:
+            if samp_results['average firing rate'] > 100:
+                print("skipped index {0} because average firing rate {1} > 100".format(w_index, samp_results['average firing rate']))
+                continue
+        except:
+            if samp_results['saturated']:
+                print("skipped index {0} because saturated".format(w_index))
+                continue
         # print("average firing rate is {0}".format(samp_results['average firing rate']))
         # refractory = 1
         # spike_indices = samp_results['spikemon indices']
@@ -105,9 +107,10 @@ else:
             results[key][actual_index]=samp_results[key]
 
         if samp_results["alpha_chain_hat"]>=0 and samp_results["event_rate"]<=200 and samp_results["alpha_conv_hat"]>=0.3:
-            print("\nindex {0} has \nlow event_rate {1} \nand high alpha_chain {2}\n".format(w_index, samp_results["event_rate"], samp_results["alpha_chain_hat"]))
+            print("\nindex {0} has \nlow event_rate {1} \nand high alpha_chain {2}\n".format(
+                w_index, samp_results["event_rate"], samp_results["alpha_chain_hat"]))
 
-        # EXCLUSIONS 
+        ## EXCLUSIONS 
         # if w_index not in [23,27,39,42,71,77,95]: #for Regular sym_alphas_all_rand
         # if w_index not in [23,27,39]: #for Irregular sym_alphas_all_rand
         # if w_index not in [8]:
@@ -123,12 +126,12 @@ else:
 
         #     if samp_results["alpha_chain_hat"]>=0 and samp_results["event_rate"]<=100:
         #         print("\nindex {0} has \nlow event_rate {1} \nand high alpha_chain {2}\n".format(w_index, samp_results["event_rate"], samp_results["alpha_chain_hat"]))
-        # END EXCLUSIONS
+        ## END EXCLUSIONS
 
 
     for key in results:
         results[key].resize(actual_index+1, refcheck=False)
-    # save results (pickle new stats dictionary)
+    ## save results (pickle new stats summary dictionary for future plots)
     with open(summary_filename, "wb") as rf:
         pickle.dump(results, rf)
 
@@ -180,7 +183,7 @@ plt.plot(results['alpha_chain_hat'], results['event_rate'], 'o', markersize=30)
 plt.xlabel(r'$\alpha_{chain}$')
 plt.ylabel('event rate')
 plt.xticks(np.arange(-0.5,0.5,0.2))
-# plt.tight_layout()
+plt.tight_layout()
 
 
 
@@ -193,7 +196,7 @@ plt.plot(results['alpha_conv_hat'], results['event_rate'], 'o', markersize=30)
 plt.xlabel(r'$\alpha_{conv}$')
 plt.ylabel('event rate')
 plt.xticks(np.arange(0,0.5,0.1))
-# plt.tight_layout()
+plt.tight_layout()
 
 
 
@@ -207,7 +210,7 @@ plt.plot(results['alpha_div_hat'], results['event_rate'], 'o', markersize=30)
 plt.xlabel(r'$\alpha_{div}$')
 plt.ylabel('event rate')
 plt.xticks(np.arange(0,0.5,0.1))
-# plt.tight_layout()
+plt.tight_layout()
 
 
 
