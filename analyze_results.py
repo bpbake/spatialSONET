@@ -147,7 +147,7 @@ def get_thresholds(subPR, num_neuron_bins):
     std = np.std(subPR[i])
     median = np.median(subPR[i])
     # tempThresh[i] = median + (5*std) 
-    # set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
+    ## set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
     # tempThresh[i] = np.percentile(subPR[i],90)
     for temp in range(80, 100, 1):
       tempThresh[i] = np.percentile(subPR[i],temp)
