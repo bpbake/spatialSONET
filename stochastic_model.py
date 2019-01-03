@@ -14,10 +14,11 @@ def stochastic_model(W, N, tmax):
 	coupling_strength = 0.01
 	ext_input = 0.001 ## constant rate of external input
 	death = 1 ## constant "death rate" (rate at which active neurons become inactive)
-	nodes = np.arange(1,N+1).flatten()
+	nodes = np.arange(1,N+1)
 
 	times = []
 	neurons = []
+	active_neurons = [] ## neurons are labeled 1 through N
 
 	active_N = np.zeros(N) ## active_N[i] = 1 if node i is active(fired)
 
@@ -34,11 +35,45 @@ def stochastic_model(W, N, tmax):
 		times.append(t) ## update the list of times
 
 		## determine which neuron flipped_rate
-		probabilities = np.true_divide(rate_vector, total_rate).flatten()
-		N_flip = int(np.random.choice(nodes, 1, p=probabilities))
+		probabilities = np.true_divide(rate_vector, total_rate)
+		N_flip = np.random.choice(nodes, p=probabilities)
 
 		## update neurons list and active neuron vector
 		neurons.append(N_flip)
 		active_N[N_flip-1] = 1-active_N[N_flip-1]
+		active_neurons.append(np.copy(active_N))
 
-	return(times,neurons)
+	active_neurons = np.asarray(active_neurons)
+	return(times,neurons,active_neurons)
+
+
+def stochastic_plot(N, tmax, times, neurons):
+	import matplotlib.pyplot as plt
+	import numpy as np
+
+	fired_neurons = []
+	on_times = []
+	off_times = []
+
+	states = np.zeros((N,2))
+ 
+	for i in range(len(times)):
+		n = neurons[i]
+		if states[n-1,0] == 0:
+			states[n-1,0] = 1
+			states[n-1,1] = times[i]
+		else:
+			fired_neurons.append(n)
+			on_times.append(states[n-1,1])
+			off_times.append(times[i])
+
+			states[n-1,0] = 0
+
+	for n in range(1,N+1):
+		if states[n-1,0]==1:
+			fired_neurons.append(n)
+			on_times.append(states[n-1,1])
+			off_times.append(tmax)
+
+	plt.hlines(fired_neurons, on_times, off_times)
+	plt.show()
