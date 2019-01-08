@@ -11,14 +11,14 @@ def stochastic_model(W, N, tmax):
 	import numpy as np	
 
 	t = 0
-	coupling_strength = 0.01
-	ext_input = 0.001 ## constant rate of external input
+	coupling_strength = 0.05
+	ext_input = 0.0001 ## constant rate of external input
 	death = 1 ## constant "death rate" (rate at which active neurons become inactive)
 	nodes = np.arange(1,N+1)
 
 	times = []
 	neurons = []
-	active_neurons = [] ## neurons are labeled 1 through N
+	# active_neurons = [] ## neurons are labeled 1 through N
 
 	active_N = np.zeros(N) ## active_N[i] = 1 if node i is active(fired)
 
@@ -41,10 +41,11 @@ def stochastic_model(W, N, tmax):
 		## update neurons list and active neuron vector
 		neurons.append(N_flip)
 		active_N[N_flip-1] = 1-active_N[N_flip-1]
-		active_neurons.append(np.copy(active_N))
+		# active_neurons.append(np.copy(active_N))
 
-	active_neurons = np.asarray(active_neurons)
-	return(times,neurons,active_neurons)
+	# active_neurons = np.asarray(active_neurons)
+	# return(times,neurons,active_neurons)
+	return(times,neurons)
 
 
 def stochastic_plot(N, tmax, times, neurons):
