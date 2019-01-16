@@ -44,7 +44,8 @@ N = 1000 ## Number of excitatory neurons
 p_AVG = 50/N ## average probability of connectivity between neurons
 w_index = 1
 L_left = float("inf")
-tmax = 500
+tmax = 50
+nswitch = 25000
 
 
 W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)
@@ -63,7 +64,11 @@ with open(stats_filename, 'rb') as statf:
 		print("unpickling stats error")
 
 # (times,neurons,active_neurons) = sm.stochastic_model(W, N, tmax)
-(times,neurons) = sm.stochastic_model(W, N, tmax)
+(times,neurons,time80percent) = sm.stochastic_model(W, N, nswitch, tmax)
+print("number of switches: {0}".format(len(times)))
+print("time of 80%% of switches: {0}".format(time80percent))
+print("last time: {0}".format(times[-1]))
+tmax = times[-1]
 
 stats['times'] = times
 stats['fired_neurons'] = neurons
