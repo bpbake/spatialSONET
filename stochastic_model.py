@@ -85,12 +85,12 @@ def stochastic_model(W, N, nswitch=25000):
 	return(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times)
 
 
-def stochastic_plot(N, fired_neurons, on_times, off_times):
+def stochastic_plot(N, fired_neurons, on_times, off_times, tmax):
 	import matplotlib.pyplot as plt
 
 	plt.xlim(0, tmax+5)
-	plt.ylim(0,N)
+	# plt.ylim(-5,N+5)
 	plt.hlines(fired_neurons, on_times, off_times)
-	plt.show()
+	# plt.show()
 
 # def active_neuron_plot(num_active_neurons, plateau, threshold, time_bin_size, tmax):

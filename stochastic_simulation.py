@@ -77,21 +77,26 @@ with open(stats_filename, 'rb') as statf:
 time_bin_size = 1/N
 event = False
 event_times = []
+num_sim = 10
 
-for sim in range(1):
+for sim in range(num_sim):
+	sim_start = time.time()
+	print("\n\nSimulation {0}\n".format(sim))
 	(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times) = sm.stochastic_model(W, N, nswitch)
 	print("number of switches: {0}".format(len(times)))
 	print("time of 80%% of switches: {0}".format(time80percent))
 	print("last time: {0}".format(times[-1]))
 	print("tmax: {0}".format(tmax))
 	sys.stdout.flush()
-	# tmax = times[-1]
-
-	on_times = np.asarray(on_times)
-	off_times = np.asarray(off_times)
 
 	now_time = time.time()
-	print("\nfinished with stochastic simulation.  \nruntime: {0}\n".format(now_time-start))
+	print("\nfinished with stochastic simulation.  \nruntime: {0}\n".format(now_time-sim_start))
+
+
+	## Plot simulation
+	plt.figure()
+	plt.suptitle("rastor plot of simulation {0}".format(sim))
+	sm.stochastic_plot(N, fired_neurons, on_times, off_times, tmax)
 
 
 	## Now make a list of active neurons at beginning of each time bin
@@ -106,7 +111,7 @@ for sim in range(1):
 		num_active = len(on_times[np.where(on_times <= t)]) - len(off_times[np.where(off_times <= t)]) ## the number switched on before time t - number that switched off before time t)
 		active_count.append(num_active)
 
-	print("\nfinished calculating num active neurons per time bin. \nruntime: {0}".format(time.time()-start))
+	print("\nfinished calculating num active neurons per time bin. \nruntime: {0}".format(time.time()-sim_start))
 	print("time spent calculating num active neurons: {0}\n".format(time.time()-now_time))
 	now_time = time.time()
 	sys.stdout.flush()
@@ -114,6 +119,8 @@ for sim in range(1):
 
 	## plot num active neurons vs time
 	time_bins = time_bin_size*np.arange(num_time_bins)
+	plt.figure()
+	plt.suptitle("number active neurons in simulation {0}".format(sim))
 	plt.plot(time_bins, active_count, "b-")
 
 
@@ -124,24 +131,20 @@ for sim in range(1):
 	plt.plot(time_bins, plateau*np.ones(num_time_bins), "r-")
 	plt.plot(time_bins, threshold*np.ones(num_time_bins), "r-")
 	print("plateau = {0}".format(plateau))
-	print("\nready to plot num active neurons vs. time.  \nruntime: {0}\n".format(time.time()-start))
+	print("\nready to plot num active neurons vs. time.  \nruntime: {0}\n".format(time.time()-sim_start))
 	sys.stdout.flush()
 
 	# if plateau > (.1*N):
 	# 	event=True
 	# else:
 	# 	break
+	if plateau < (.1*N):
+		print("\n\nsimulation {0} may not have an event\n\n".format(sim))
 
+
+	## event time = first time num active neurons > threshold
 	print("now calculating event time")
 	sys.stdout.flush()
-	## event time = first time num active neurons > threshold
-	# event_time = 0
-	# for i in range(num_time_bins):
-	# 	c = active_count[i]
-	# 	if c >= threshold:
-	# 		event_time = i*time_bin_size
-	# 		break
-
 	active_count = np.asarray(active_count)
 	event_time_bin = float(np.argwhere(active_count >= threshold)[0])
 	event_time = time_bin_size*event_time_bin
@@ -153,9 +156,9 @@ for sim in range(1):
 	print("event time: {0}".format(event_time))
 
 
-print("total runtime: {0}".format(time.time()-start))
+print("total runtime for {0} simulations: {1}".format(num_sim, time.time()-start))
 
-plt.show()
+# plt.show()
 sys.stdout.flush()
 
 
