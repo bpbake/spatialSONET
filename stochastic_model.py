@@ -7,10 +7,11 @@ Created on Tues Dec 4 10:11 2018
 
 ## Simulation of a stochastic process
 
-def stochastic_model(W, N, nswitch=25000, tmax=100):
+def stochastic_model(W, N, nswitch=25000):
 	import numpy as np	
 
 	t = 0
+	tmax = 0 ## the time of the last switch
 	coupling_strength = 0.03
 	ext_input = 0.00005 ## constant rate of external input
 	death = 1 ## constant "death rate" (rate at which active neurons become inactive)
@@ -63,7 +64,15 @@ def stochastic_model(W, N, nswitch=25000, tmax=100):
 		if i <= (.8*nswitch):
 			time80percent = t ## time when 80% of switches have occurred
 
-	return(times,neurons,time80percent)
+		tmax = t ## update tmax to be the time of the last switch.
+
+	for n in range(1,N+1):
+		if states[n-1,0]==1:
+			fired_neurons.append(n)
+			on_times.append(states[n-1,1])
+			off_times.append(tmax)
+
+	return(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times)
 
 
 def stochastic_plot(N, fired_neurons, on_times, off_times):
