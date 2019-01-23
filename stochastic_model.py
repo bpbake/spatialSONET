@@ -18,12 +18,16 @@ def stochastic_model(W, N, nswitch=25000, tmax=100):
 
 	times = []
 	neurons = []
-	# active_neurons = [] ## neurons are labeled 1 through N
 
-	active_N = np.zeros(N) ## active_N[i] = 1 if node i is active(fired)
+	active_N = np.zeros(N) ## active_N[i] = 1 if node i is active
 
 	time20percent = 0
 
+	fired_neurons = []
+	on_times = []
+	off_times = []
+
+	states = np.zeros((N,2))
 
 	for i in range(nswitch):
 		## calculate the current total rate
@@ -38,33 +42,14 @@ def stochastic_model(W, N, nswitch=25000, tmax=100):
 
 		## determine which neuron flipped_rate
 		probabilities = np.true_divide(rate_vector, total_rate)
-		N_flip = np.random.choice(nodes, p=probabilities)
+		n = np.random.choice(nodes, p=probabilities)
 
 		## update neurons list and active neuron vector
-		neurons.append(N_flip)
-		active_N[N_flip-1] = 1-active_N[N_flip-1]
-		# active_neurons.append(np.copy(active_N))
-
-		if i <= (.8*nswitch):
-			time80percent = t ## time when 80% of switches have occurred
-
-	# active_neurons = np.asarray(active_neurons)
-	# return(times,neurons,active_neurons)
-	return(times,neurons,time80percent)
+		neurons.append(n)
+		active_N[n-1] = 1-active_N[n-1]
 
 
-def stochastic_plot(N, tmax, times, neurons):
-	import matplotlib.pyplot as plt
-	import numpy as np
-
-	fired_neurons = []
-	on_times = []
-	off_times = []
-
-	states = np.zeros((N,2))
- 
-	for i in range(len(times)):
-		n = neurons[i]
+		## update lists
 		if states[n-1,0] == 0:
 			states[n-1,0] = 1
 			states[n-1,1] = times[i]
@@ -75,12 +60,18 @@ def stochastic_plot(N, tmax, times, neurons):
 
 			states[n-1,0] = 0
 
-	for n in range(1,N+1):
-		if states[n-1,0]==1:
-			fired_neurons.append(n)
-			on_times.append(states[n-1,1])
-			off_times.append(tmax)
+		if i <= (.8*nswitch):
+			time80percent = t ## time when 80% of switches have occurred
+
+	return(times,neurons,time80percent)
+
+
+def stochastic_plot(N, fired_neurons, on_times, off_times):
+	import matplotlib.pyplot as plt
 
 	plt.xlim(0, tmax+5)
+	plt.ylim(0,N)
 	plt.hlines(fired_neurons, on_times, off_times)
 	plt.show()
+
+# def active_neuron_plot(num_active_neurons, plateau, threshold, time_bin_size, tmax):
