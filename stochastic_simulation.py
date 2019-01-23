@@ -74,7 +74,7 @@ with open(stats_filename, 'rb') as statf:
 
 
 
-time_bin_size = 10/N
+time_bin_size = 1/N
 event = False
 event_times = []
 
@@ -103,13 +103,8 @@ for sim in range(1):
 	
 	for time_bin_index in range(num_time_bins):
 		t = time_bin_size*time_bin_index
-		# num_active = sum(i <= t for i in on_times) - sum(i <= t for i in off_times) ## the number switched on before time t - number that switched off before time t)
 		num_active = len(on_times[np.where(on_times <= t)]) - len(off_times[np.where(off_times <= t)]) ## the number switched on before time t - number that switched off before time t)
 		active_count.append(num_active)
-
-		if time_bin_index%100 == 0:
-			print("bin {0} of {1}".format(time_bin_index, num_time_bins))
-			sys.stdout.flush()
 
 	print("\nfinished calculating num active neurons per time bin. \nruntime: {0}".format(time.time()-start))
 	print("time spent calculating num active neurons: {0}\n".format(time.time()-now_time))
@@ -132,8 +127,6 @@ for sim in range(1):
 	print("\nready to plot num active neurons vs. time.  \nruntime: {0}\n".format(time.time()-start))
 	sys.stdout.flush()
 
-	plt.show()
-
 	# if plateau > (.1*N):
 	# 	event=True
 	# else:
@@ -142,19 +135,28 @@ for sim in range(1):
 	print("now calculating event time")
 	sys.stdout.flush()
 	## event time = first time num active neurons > threshold
-	event_time = 0
-	for i in range(num_time_bins):
-		c = active_count[i]
-		while c < threshold:
-			event_time = i*time_bin_size
+	# event_time = 0
+	# for i in range(num_time_bins):
+	# 	c = active_count[i]
+	# 	if c >= threshold:
+	# 		event_time = i*time_bin_size
+	# 		break
 
-	if event==False:
-		event_time = float(nan)
+	active_count = np.asarray(active_count)
+	event_time_bin = float(np.argwhere(active_count >= threshold)[0])
+	event_time = time_bin_size*event_time_bin
+
+	# if event==False:
+	# 	event_time = float(nan)
 
 	event_times.append(event_time)
+	print("event time: {0}".format(event_time))
+
 
 print("total runtime: {0}".format(time.time()-start))
 
+plt.show()
+sys.stdout.flush()
 
 
 # stats['times'] = times
