@@ -155,4 +155,93 @@ def event_times_hist_plot(N, p, i, coupling_strength, data_dir="matrices/", bins
 ##
 ##
 #######################################################################################
-def 
+def mean_event_time_plot(N, p, coupling_strength, indices, data_dir="matrices/", reload = False):
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import pickle
+
+	stoch_summary_filename = "{0}Stochastic_Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,coupling_strength)
+
+	if reload:
+		with open(stoch_summary_filename, "rb") as rf:
+			results = pickle.load(rf)
+	
+	else: 
+		n_indices = len(indices)
+
+		results = dict([('N', N*np.ones(n_indices)), ('L_left', np.zeros(n_indices)), ('L_right', np.zeros(n_indices)), 
+			('p_AVG', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
+			('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
+			('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), 
+			('alpha_div_hat', np.zeros(n_indices)), ('alpha_chain_hat', np.zeros(n_indices)),
+			('mean_event_time', np.zeros(n_indices)), ('median_event_time', np.zeros(n_indices)), 
+			('std_event_time', np.zeros(n_indices)), ('num_sim', np.zeros(n_indices))])
+			# ('average firing rate', np.zeros(n_indices)), ('event_rate', np.zeros(n_indices)), 
+			# ('IEI excess_kurtosis', np.zeros(n_indices)), ('IEI skew', np.zeros(n_indices))])
+
+		for i in range(n_indices):
+			index = indices[i]
+			stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, index, coupling_strength)
+			with open(stochastic_filename+".pickle", "rb") as stochf:
+				stoch_stats = pickle.load(stochf)
+
+			for key in results:
+				try:
+					results[key][i]=stoch_stats[key]
+				except:
+					print('No {0} in stochastic simulation {1}.  Value is set to zero'.format(key, i))
+
+		with open(stoch_summary_filename, "wb") as rf:
+			pickle.dump(results, rf)
+
+
+
+	plt.rc('text', usetex=True)
+	plt.rc('font', family='serif', size=80)
+	plt.rc('xtick', labelsize=50)
+	plt.rc('ytick', labelsize=50)
+
+
+	plt.figure()
+	plt.plot(results['alpha_conv_hat'], results['mean_event_time'], 'o', markersize=30)
+	plt.xlabel(r'$\alpha_{conv}$')
+	plt.ylabel('mean event time')
+	plt.xticks(np.arange(0,0.5,0.1))
+
+	plt.figure()
+	plt.plot(results['alpha_div_hat'], results['mean_event_time'], 'o', markersize=30)
+	plt.xlabel(r'$\alpha_{div}$')
+	plt.ylabel('mean event time')
+	plt.xticks(np.arange(0,0.5,0.1))
+
+	plt.figure()
+	plt.plot(results['alpha_chain_hat'], results['mean_event_time'], 'o', markersize=30)
+	plt.xlabel(r'$\alpha_{chain}$')
+	plt.ylabel('mean event time')
+	plt.xticks(np.arange(0,0.5,0.1))
+
+
+	plt.figure()
+	plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['mean_event_time'],s=500)
+	plt.xlabel(r'$\alpha_{conv}$')
+	plt.xticks(np.arange(0,0.5,0.1))
+	plt.ylabel(r'$\alpha_{chain}$')
+	cb=plt.colorbar()
+	cb.set_label('mean event time')
+
+	plt.figure()
+	plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['mean_event_time'],s=500)
+	plt.xlabel(r'$\alpha_{div}$')
+	plt.ylabel(r'$\alpha_{conv}$')
+	cb=plt.colorbar()
+	cb.set_label('mean event time')
+
+
+	plt.figure()
+	plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['mean_event_time'],s=500)
+	plt.xlabel(r'$\alpha_{div}$')
+	plt.ylabel(r'$\alpha_{chain}$')
+	cb=plt.colorbar()
+	cb.set_label('mean event time')
+
+	plt.show()

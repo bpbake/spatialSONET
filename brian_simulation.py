@@ -4,10 +4,10 @@ Created on Sun Mar  5 14:06:45 2017
 
 @author: rhino
 """
-
+data_dir = 'matrices/N1000_Linf_recurr_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
-data_dir = 'matrices/N3000_erdos_renyi/'
+# data_dir = 'matrices/N3000_erdos_renyi/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
 res_dir = data_dir
 print("data_dir: "+data_dir)
