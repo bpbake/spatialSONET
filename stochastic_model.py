@@ -7,12 +7,16 @@ Created on Tues Dec 4 10:11 2018
 
 ## Simulation of a stochastic process
 
-def stochastic_model(W, N, nswitch=25000):
+#######################################################################################
+##
+##
+#######################################################################################
+def stochastic_model(W, N, coupling_strength, nswitch=25000):
 	import numpy as np	
 
 	t = 0
 	tmax = 0 ## the time of the last switch
-	coupling_strength = 0.03
+	# coupling_strength = 0.03
 	ext_input = 0.00005 ## constant rate of external input
 	death = 1 ## constant "death rate" (rate at which active neurons become inactive)
 	nodes = np.arange(1,N+1)
@@ -85,7 +89,12 @@ def stochastic_model(W, N, nswitch=25000):
 	return(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times)
 
 
-def stochastic_plot(N, fired_neurons, on_times, off_times, tmax):
+
+#######################################################################################
+##
+##
+#######################################################################################
+def stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax):
 	import matplotlib.pyplot as plt
 
 	plt.xlim(0, tmax+5)
@@ -93,4 +102,57 @@ def stochastic_plot(N, fired_neurons, on_times, off_times, tmax):
 	plt.hlines(fired_neurons, on_times, off_times)
 	# plt.show()
 
-# def active_neuron_plot(num_active_neurons, plateau, threshold, time_bin_size, tmax):
+
+
+#######################################################################################
+##
+##
+#######################################################################################
+def num_active_plot(sim_index, active_count, plateau, threshold, time_bin_size, tmax):
+	import math
+	import numpy as np
+
+	num_time_bins = math.ceil(tmax/time_bin_size)
+	time_bins = time_bin_size*np.arange(num_time_bins)
+
+	## plot num active neurons vs time
+	plt.figure()
+	plt.suptitle("number active neurons in simulation index {0}".format(sim_index))
+	plt.plot(time_bins, active_count, "b-")
+	plt.plot(time_bins, plateau*np.ones(num_time_bins), "r-")
+	plt.plot(time_bins, threshold*np.ones(num_time_bins), "r-")
+	plt.show()
+
+
+
+#######################################################################################
+##
+##
+#######################################################################################
+def event_times_hist_plot(N, p, i, coupling_strength, data_dir="matrices/", bins=50):
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import pickle
+
+	stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, i, coupling_strength)
+	with open(stochastic_filename+".pickle", "rb") as stochf:
+		stats = pickle.load(stochf)
+	
+	print("alpha_div: {0}".format(stats['alpha_div_hat']))
+	print("coupling strength: {0}".format(coupling_strength))
+	print("number of simulations: {0}".format(stats['num_sim']))
+	print("mean event time: {0}".format(stats["mean_event_time"]))
+	print("median event time: {0}".format(stats["median_event_time"]))
+	print("std event time: {0}".format(stats["std_event_time"]))
+
+	plt.hist(stats["event_times"],bins)
+	plt.show()
+
+
+
+
+#######################################################################################
+##
+##
+#######################################################################################
+def 
