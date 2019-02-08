@@ -196,52 +196,52 @@ def mean_event_time_plot(N, p, coupling_strength, indices, data_dir="matrices/",
 
 
 
-	plt.rc('text', usetex=True)
-	plt.rc('font', family='serif', size=80)
-	plt.rc('xtick', labelsize=50)
-	plt.rc('ytick', labelsize=50)
+	# plt.rc('text', usetex=True)
+	# plt.rc('font', family='serif', size=80)
+	# plt.rc('xtick', labelsize=50)
+	# plt.rc('ytick', labelsize=50)
 
 
 	plt.figure()
-	plt.plot(results['alpha_conv_hat'], results['mean_event_time'], 'o', markersize=30)
+	plt.plot(results['alpha_conv_hat'], np.divide(np.ones(n_indices),results['mean_event_time']), 'o', markersize=30)
 	plt.xlabel(r'$\alpha_{conv}$')
-	plt.ylabel('mean event time')
+	plt.ylabel('mean event frequency')
 	plt.xticks(np.arange(0,0.5,0.1))
 
 	plt.figure()
-	plt.plot(results['alpha_div_hat'], results['mean_event_time'], 'o', markersize=30)
+	plt.plot(results['alpha_div_hat'], np.divide(np.ones(n_indices),results['mean_event_time']), 'o', markersize=30)
 	plt.xlabel(r'$\alpha_{div}$')
-	plt.ylabel('mean event time')
+	plt.ylabel('mean event frequency')
 	plt.xticks(np.arange(0,0.5,0.1))
 
 	plt.figure()
-	plt.plot(results['alpha_chain_hat'], results['mean_event_time'], 'o', markersize=30)
+	plt.plot(results['alpha_chain_hat'], np.divide(np.ones(n_indices),results['mean_event_time']), 'o', markersize=30)
 	plt.xlabel(r'$\alpha_{chain}$')
-	plt.ylabel('mean event time')
+	plt.ylabel('mean event frequency')
 	plt.xticks(np.arange(0,0.5,0.1))
 
 
 	plt.figure()
-	plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['mean_event_time'],s=500)
+	plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=np.divide(np.ones(n_indices),results['mean_event_time']),s=500)
 	plt.xlabel(r'$\alpha_{conv}$')
 	plt.xticks(np.arange(0,0.5,0.1))
 	plt.ylabel(r'$\alpha_{chain}$')
 	cb=plt.colorbar()
-	cb.set_label('mean event time')
+	cb.set_label('mean event frequency')
 
 	plt.figure()
-	plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['mean_event_time'],s=500)
+	plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=np.divide(np.ones(n_indices),results['mean_event_time']),s=500)
 	plt.xlabel(r'$\alpha_{div}$')
 	plt.ylabel(r'$\alpha_{conv}$')
 	cb=plt.colorbar()
-	cb.set_label('mean event time')
+	cb.set_label('mean event frequency')
 
 
 	plt.figure()
-	plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['mean_event_time'],s=500)
+	plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=np.divide(np.ones(n_indices),results['mean_event_time']),s=500)
 	plt.xlabel(r'$\alpha_{div}$')
 	plt.ylabel(r'$\alpha_{chain}$')
 	cb=plt.colorbar()
-	cb.set_label('mean event time')
+	cb.set_label('mean event frequency')
 
 	plt.show()

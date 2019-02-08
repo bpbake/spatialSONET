@@ -28,9 +28,9 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 
 
     # matplotlib.rcParams.update({'font.size': 60})
-    plt.rc('font', family='serif', size=60)
-    plt.rc('xtick', labelsize=50)
-    plt.rc('ytick', labelsize=50)
+    # plt.rc('font', family='serif', size=60)
+    # plt.rc('xtick', labelsize=50)
+    # plt.rc('ytick', labelsize=50)
 
     # #plot the results of the simulation
     # plt.figure(figsize=(20,7))
@@ -45,7 +45,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     maxtime=results['simulation_time']+mintime
     # plt.subplot(211)
 
-    # plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
+    plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=.5)

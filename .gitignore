@@ -67,3 +67,4 @@ _outfile*
 # other files to ignore
 twoD_distance_matrix.py
 #layer_test.py
+*.ipynb

@@ -4,14 +4,15 @@ Created on Sun Mar  5 14:06:45 2017
 
 @author: rhino
 """
-data_dir = 'matrices/N1000_Linf_recurr_alpha_div_rand/'
+# data_dir = 'matrices/N1000_Linf_recurr_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
+data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_conv_div_rand/'
 res_dir = data_dir
 print("data_dir: "+data_dir)
-print("results_dir: "+res_dir)
+# print("results_dir: "+res_dir)
 # Style = "Regular5s_"
 Style = "Irregular50s_"
 print("Style: "+Style)
@@ -50,7 +51,7 @@ start_scope() ## start fresh with magic settings
 
 L_left = 100 ## spatial parameter ff
 # L_left = 50 ## spatial parameter recurrent
-N = 3000 ## Number of excitatory neurons
+N = 1000 ## Number of excitatory neurons
 p_AVG = 50/N ## average probability of connectivity between neurons
 neuron_bin_size = 100 ## number of neurons in each neuron bin (for analysis of network simulation)
 
@@ -118,7 +119,7 @@ for w_index in range(start_index, end_index+1):
     print("\n\nw_index = {0}".format(w_index))
     
     restore() ## set the state back to what it was when the store() command was called
-    
+
     W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)
     with open(W_filename+'.pickle', 'rb') as wf:
         try:

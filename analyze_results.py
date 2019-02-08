@@ -96,8 +96,8 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEI excess_kurtosis'] = excess_kurtosis
   results['IEI skew'] = skew
 
-  save_results(N, p, i, results, style, data_dir)
-  clean_results(N, p, i, style, data_dir)
+  save_results(N, p, i, results, style+"Test", data_dir)
+  clean_results(N, p, i, style+"Test", data_dir)
 
   for k,v in sorted(results.items()):
     if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
@@ -148,11 +148,12 @@ def get_thresholds(subPR, num_neuron_bins):
     median = np.median(subPR[i])
     # tempThresh[i] = median + (5*std) 
     ## set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
-    # tempThresh[i] = np.percentile(subPR[i],90)
-    for temp in range(80, 100, 1):
-      tempThresh[i] = np.percentile(subPR[i],temp)
-      if tempThresh[i] > 0:
-        break
+    tempThresh[i] = np.percentile(subPR[i],95)
+    # for temp in range(80, 100, 1):
+    #   tempThresh[i] = np.percentile(subPR[i],temp)
+    #   if tempThresh[i] > 0:
+    #     print("percentile of temp thresh for neuron bin {0} is {1}".format(i,temp))
+    #     break
  
   tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
   # if subPR[i,j] > tempThresh[i], 
