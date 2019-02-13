@@ -146,9 +146,8 @@ def get_thresholds(subPR, num_neuron_bins):
   for i in range(num_neuron_bins):
     std = np.std(subPR[i])
     median = np.median(subPR[i])
-    # tempThresh[i] = median + (5*std) 
-    ## set the tempThresh to be 6 standard deviations above the median subPR value for each neuron bin
-    tempThresh[i] = np.percentile(subPR[i],95)
+    tempThresh[i] = np.percentile(subPR[i],95) ## 95 is an ARBITRARY PARAMETER... 
+    ## LATER: change this again to see how sensitive the results are to this choice
     # for temp in range(80, 100, 1):
     #   tempThresh[i] = np.percentile(subPR[i],temp)
     #   if tempThresh[i] > 0:
@@ -156,16 +155,16 @@ def get_thresholds(subPR, num_neuron_bins):
     #     break
  
   tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
-  # if subPR[i,j] > tempThresh[i], 
-      # then tempSubPR[i,j] = tempThresh[i], 
-      # otherwise tempSubPR[i,j] = subPR[i,j]
-  ## This is creating a new subPR matrix which replaces the extremely high values in subPR with the tempThresh value for that neuron bin
+  ## This is creating a new subPR matrix which replaces the extremely high values in subPR 
+  ## with the tempThresh value for that neuron bin, so the variance isn't crazy high
 
   thresholds = np.zeros(num_neuron_bins)
   for i in range(num_neuron_bins):
     std = np.std(tempSubPR[i])
     median = np.median(tempSubPR[i])
-    thresholds[i] = median + (15*std) ## the actual threshold values are computed using the new tempSubPR matrix
+    thresholds[i] = median + (15*std) ## 15 is an ARBITRARY PARAMETER... 
+    ## LATER: change this again to see how sensitive the results are to this choice
+    ## the actual threshold values are computed using the new tempSubPR matrix
 
   return(thresholds.reshape((num_neuron_bins,1)))
 
@@ -178,7 +177,8 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
   import math
 
   above_lower_thresh = np.greater_equal(subPR, thresholds) ## matrix
-  above_higher_thresh = np.greater_equal(subPR, 3*thresholds) ## matrix
+  above_higher_thresh = np.greater_equal(subPR, 3*thresholds) ## 3 is an ARBITRARY PARAMETER... 
+  ## LATER: change this again to see how sensitive the results are to this choice
 
   events_by_bin = [] ## a list of event tuples
 
