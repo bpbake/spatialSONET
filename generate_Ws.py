@@ -14,7 +14,7 @@ Created on Mon Apr  3 16:41:12 2017
 
 ## Define a directory for adjacency matrices (saved as python pickle files)
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
-data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
+data_dir = 'matrices/N1000_LL50_LR50_recurr_alpha_div_rand/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = 'matrices/N1000_Linf_recurr_alphas_all_rand/'
 # data_dir = "matrices/"
@@ -76,10 +76,10 @@ for w_index in range(start_index, end_index+1):
             ## Define the L_left, L_right, and alpha values here:
             # L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
             # L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
-            L_left = 100 
+            L_left = 50 
             # L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
-            L_right = 0 
-            # L_right = L_left ## for symmetric/recurrent networks
+            # L_right = 0 
+            L_right = L_left ## for symmetric/recurrent networks
 
             # alpha_recip = np.random.uniform(-0.5, 1)
             # alpha_conv = np.random.uniform(0, 0.5)
