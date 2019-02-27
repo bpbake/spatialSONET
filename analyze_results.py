@@ -96,8 +96,8 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEI excess_kurtosis'] = excess_kurtosis
   results['IEI skew'] = skew
 
-  save_results(N, p, i, results, style, data_dir)
-  clean_results(N, p, i, style, data_dir)
+  save_results(N, p, i, results, style+"Test_", data_dir)
+  clean_results(N, p, i, style+"Test_", data_dir)
 
   for k,v in sorted(results.items()):
     if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
@@ -137,28 +137,32 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_uni
 
 #######################################################################################################
 ## called by calculate_events
-def get_thresholds(subPR, num_neuron_bins):
+def get_thresholds(subPR, num_neuron_bins, time_bin_size, neuron_bin_size=100):
   import numpy as np
   import math
+  # import matplotlib.pyplot as plt
 
-  tempThresh = np.zeros(num_neuron_bins) ## each neuron bin will have a threshold value
+  # tempThresh = np.zeros(num_neuron_bins) ## each neuron bin will have a threshold value
 
-  for i in range(num_neuron_bins):
-    std = np.std(subPR[i])
-    median = np.median(subPR[i])
-    # tempThresh[i] = np.percentile(subPR[i],95) ## 95 is an ARBITRARY PARAMETER... 
-    # print("95 percentile")
-    ## LATER: change this again to see how sensitive the results are to this choice
-    for temp in range(80, 100, 1):
-      tempThresh[i] = np.percentile(subPR[i],temp)
-      if tempThresh[i] > 0:
-    #     print("percentile of temp thresh for neuron bin {0} is {1}".format(i,temp))
-        break
- 
-  tempSubPR = np.minimum(subPR, tempThresh.reshape((num_neuron_bins,1)))
+  # for i in range(num_neuron_bins):
+  #   std = np.std(subPR[i])
+  #   median = np.median(subPR[i])
+  #   # tempThresh[i] = np.percentile(subPR[i],95) ## 95 is an ARBITRARY PARAMETER... 
+  #   # print("95 percentile")
+  #   ## LATER: change this again to see how sensitive the results are to this choice
+  #   for temp in range(60000, 100000, 1):
+  #     tempThresh[i] = np.percentile(subPR[i],temp/1000)
+  #     if tempThresh[i] > 0:
+  #       print("percentile of temp thresh for neuron bin {0} is {1}\ntempThresh={2}".format(i,temp/1000,tempThresh[i]))
+  #       break
+
+  tempSubPR = np.minimum(subPR, (1/time_bin_size/neuron_bin_size))#tempThresh.reshape((num_neuron_bins,1)))
   ## This is creating a new subPR matrix which replaces the extremely high values in subPR 
   ## with the tempThresh value for that neuron bin, so the variance isn't crazy high
+  ## This tempSubPR is now Bernoulli, 
+  ## now no need to calculate tempSubPR, just use the number of non-zero subPR time bins (per neuron bin)
 
+  ## Since Bernoulli, determining the threshold for each neuron bin is much easier that before
   thresholds = np.zeros(num_neuron_bins)
   for i in range(num_neuron_bins):
     std = np.std(tempSubPR[i])
@@ -313,7 +317,7 @@ def calculate_events(N, results, neuron_bin_size=100):
   num_neuron_bins = math.ceil(N/neuron_bin_size)
 
   subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
-  thresholds = get_thresholds(subPR, num_neuron_bins)
+  thresholds = get_thresholds(subPR, num_neuron_bins, time_bin_size, neuron_bin_size)
   events, num_events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
   print("events calculated")
 
