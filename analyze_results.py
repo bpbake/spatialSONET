@@ -110,28 +110,24 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
 #######################################################################################################
 ## called by calculate_events
 def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_units_per_bin=1):
+  ## subPR is a matrix of the average firing rate per neuron bin
   import numpy as np
   import math
 
-  time_bin_size = (results['PRM time'][1] - results['PRM time'][0]) ## return this too, to save for future use
+  time_bin_size = (results['PRM time'][1] - results['PRM time'][0]) ## return this too, for future use
   num_time_bins = len(results['PRM time'])
-  # time_bin_size = time_units_per_bin*(results['PRM time'][1] - results['PRM time'][0]) ## return this too, to save for future use
-  # num_time_bins = int(math.ceil(len(results['PRM time'])/time_units_per_bin))
-  # simulation_time = results['PRM time'][-1] - results['PRM time'][0]
-  # print("PRM simulation time: {0}".format(simulation_time))
 
   subPR = np.zeros((num_neuron_bins, num_time_bins)) ## subPR is a num_neuron_bin x num_time_bin matrix
 
   for n in range(len(results['spikemon indices'])):
     neuron_bin_index = int(math.floor((results['spikemon indices'][n])/neuron_bin_size))
-    time_bin_index = int(np.floor((results['spikemon times'][n] - results['spikemon times'][0])
-      /time_bin_size))
+    time_bin_index = int(np.floor((results['spikemon times'][n] - results['spikemon times'][0])/time_bin_size))
     subPR[neuron_bin_index, time_bin_index] += 1 
-    # subPR[i,j] = the number of neurons in bin i that fired in time bin j
+    ## subPR[i,j] = the number of neurons in bin i that fired in time bin j
 
   scale_factor = np.multiply(neuron_bin_size, time_bin_size) ## subPR will be devided by this to scale appropriately
 
-  return(np.true_divide(subPR, scale_factor), time_bin_size)#, simulation_time)
+  return(np.true_divide(subPR, scale_factor), time_bin_size)
 
 
 
@@ -140,34 +136,17 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_uni
 def get_thresholds(subPR, num_neuron_bins, time_bin_size, neuron_bin_size=100):
   import numpy as np
   import math
-  # import matplotlib.pyplot as plt
 
-  # tempThresh = np.zeros(num_neuron_bins) ## each neuron bin will have a threshold value
+  subPR_thresh = 1/(time_bin_size*neuron_bin_size)
 
-  # for i in range(num_neuron_bins):
-  #   std = np.std(subPR[i])
-  #   median = np.median(subPR[i])
-  #   # tempThresh[i] = np.percentile(subPR[i],95) ## 95 is an ARBITRARY PARAMETER... 
-  #   # print("95 percentile")
-  #   ## LATER: change this again to see how sensitive the results are to this choice
-  #   for temp in range(60000, 100000, 1):
-  #     tempThresh[i] = np.percentile(subPR[i],temp/1000)
-  #     if tempThresh[i] > 0:
-  #       print("percentile of temp thresh for neuron bin {0} is {1}\ntempThresh={2}".format(i,temp/1000,tempThresh[i]))
-  #       break
-
-  tempSubPR = np.minimum(subPR, (1/time_bin_size/neuron_bin_size))#tempThresh.reshape((num_neuron_bins,1)))
-  ## This is creating a new subPR matrix which replaces the extremely high values in subPR 
-  ## with the tempThresh value for that neuron bin, so the variance isn't crazy high
-  ## This tempSubPR is now Bernoulli, 
-  ## now no need to calculate tempSubPR, just use the number of non-zero subPR time bins (per neuron bin)
-
-  ## Since Bernoulli, determining the threshold for each neuron bin is much easier that before
   thresholds = np.zeros(num_neuron_bins)
   for i in range(num_neuron_bins):
-    std = np.std(tempSubPR[i])
-    median = np.median(tempSubPR[i])
-    thresholds[i] = median + (15*std) ## 15 is an ARBITRARY PARAMETER... 
+    p = np.true_divide(np.greater_equal(subPR[i], subPR_thresh).sum(),num_time_bins)
+    ## p is the fraction of time bins that have at least one neuron firing
+
+    std = np.sqrt(p*(1-p)) ## the std of Bernoulli RV with probability p (a neuron fired or not)
+
+    thresholds[i] = (15*std)/(time_bin_size*neuron_bin_size) ## 15 is an ARBITRARY PARAMETER... 
     ## LATER: change this again to see how sensitive the results are to this choice
     ## the actual threshold values are computed using the new tempSubPR matrix
 
@@ -299,7 +278,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
   return(events, num_events)
 
 
-#########################################################################
+#######################################################################################################
 ## Inputs for the calculate_events function:
 ##   N: number of neurons in the network
 ##   results: a python dictionary containing "PRM time", "spikemon times", "spikemon indices"
@@ -309,7 +288,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
 ##
 ## Returns a numpy array/list of event "objects" as tuples:
 ##   (start_neuron_bin, end_neuron_bin, start_time, end_time)
-#########################################################################
+########################################################################################################
 def calculate_events(N, results, neuron_bin_size=100):
   import numpy as np
   import math
@@ -324,7 +303,7 @@ def calculate_events(N, results, neuron_bin_size=100):
   return(events, num_events) ## a numpy array of tuples, integer
 
 
-###############################################################################################################
+#########################################################################################################
 def analyze_events(N, events, num_events, simulation_time, neuron_bin_size=100):
   import numpy as np
   from scipy import stats
@@ -357,45 +336,3 @@ def analyze_events(N, events, num_events, simulation_time, neuron_bin_size=100):
     skew = np.float64('nan')
 
   return(event_rate, event_mag, IEIs, excess_kurtosis, skew)
-
-
-
-###############################################################################################################
-## New Measure function is not currently being implemented.  It has not been completed/debugged.
-###############################################################################################################
-def new_measure(N, results, neuron_bin_size=100, num_time_bins=300, simulation_time=3000):
-  import numpy as np
-  import math
-  from scipy import linalg
-
-  num_neuron_bins = math.ceil(N/neuron_bin_size)
-  simulation_time = results['PRM time'][-1] - results['PRM time'][0]
-  time_bin_size = math.ceil(simulation_time/num_time_bins)
-
-  R_spikes = np.zeros((N, num_time_bins))
-  # R_spikes = np.zeros((num_neuron_bins, num_time_bins))
-
-  for n in range(len(results['spikemon indices'])):
-    neuron_index = int(results['spikemon indices'][n])
-    neuron_bin_index = int(math.floor(neuron_index/neuron_bin_size))
-    time_bin_index = int(np.floor((results['spikemon times'][n] - results['spikemon times'][0])/time_bin_size))
-    R_spikes[neuron_index, time_bin_index] = 1
-    # R_spikes[neuron_bin_index, time_bin_index] = 1
-
-  c = 1 ## max "speed" of spike wave from neuron layer j to i (number of time bins?)
-  ## constant for all i,j pairs?  Maybe need to make c an array (matrix)???
-
-  dist = linalg.toeplitz(np.floor(np.linspace(0,num_neuron_bins,num=N,endpoint=False)).astype(int)) 
-  ## dist is an N by N matrix with entry (i,j) being the distance between the layers of neurons i and j
-
-  k = np.multiply(c,dist)
-
-  cov_R=np.zeros((N,N))
-  ## MUST Figure out a better way to do this triple loop!!!
-  for i in range(N):
-    for j in range(N):
-      for t in range(num_time_bins):
-        if t+k[i,j] < num_time_bins:
-          cov_R[i,j] += R_spikes[i,t]*R_spikes[j,(t+k[i,j])]
-
-  return np.mean(cov_R)
