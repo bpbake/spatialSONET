@@ -96,8 +96,8 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEI excess_kurtosis'] = excess_kurtosis
   results['IEI skew'] = skew
 
-  save_results(N, p, i, results, style+"Test_", data_dir)
-  clean_results(N, p, i, style+"Test_", data_dir)
+  save_results(N, p, i, results, style+"New_", data_dir)
+  clean_results(N, p, i, style+"New_", data_dir)
 
   for k,v in sorted(results.items()):
     if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
@@ -127,13 +127,13 @@ def create_subPR(results, neuron_bin_size=100, num_neuron_bins=100): #, time_uni
 
   scale_factor = np.multiply(neuron_bin_size, time_bin_size) ## subPR will be devided by this to scale appropriately
 
-  return(np.true_divide(subPR, scale_factor), time_bin_size)
+  return(np.true_divide(subPR, scale_factor), time_bin_size, num_time_bins)
 
 
 
 #######################################################################################################
 ## called by calculate_events
-def get_thresholds(subPR, num_neuron_bins, time_bin_size, neuron_bin_size=100):
+def get_thresholds(subPR, num_neuron_bins, num_time_bins, time_bin_size, neuron_bin_size=100):
   import numpy as np
   import math
 
@@ -295,8 +295,8 @@ def calculate_events(N, results, neuron_bin_size=100):
 
   num_neuron_bins = math.ceil(N/neuron_bin_size)
 
-  subPR, time_bin_size = create_subPR(results, neuron_bin_size, num_neuron_bins)
-  thresholds = get_thresholds(subPR, num_neuron_bins, time_bin_size, neuron_bin_size)
+  subPR, time_bin_size, num_time_bins = create_subPR(results, neuron_bin_size, num_neuron_bins)
+  thresholds = get_thresholds(subPR, num_neuron_bins, num_time_bins, time_bin_size, neuron_bin_size)
   events, num_events = get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size) 
   print("events calculated")
 
