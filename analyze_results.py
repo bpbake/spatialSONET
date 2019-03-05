@@ -184,7 +184,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
         if success: ## save time and bin, reset count
           count_below_thresh += 1
           if count_below_thresh > time_spacing:
-            events_by_bin.append((i, i, (start_time_bin)*time_bin_size, (j-count_below_thresh)*time_bin_size, "blank", 1))
+            events_by_bin.append((i, i, (start_time_bin)*time_bin_size, (j-count_below_thresh)*time_bin_size, None, 1))
             success = False
             ## append event tuple: (start_neuron_bin, end_neuron_bin, start_time, end_time, direction, event_size)
         if not success: ## not an else case... because we want this to be triggered if it ran the last line
