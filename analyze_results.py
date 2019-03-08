@@ -197,11 +197,14 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
   # print("\nsorted_events_by_bin[0:20] = {0}\n".format(sorted_events_by_bin[0:20]))
   # print("dtype: {0}".format(dtype))
 
+
+  ## Now we concatenate events by neuron bins to get the final list of events ----------------
   events_list_up = [] ## will catch bi-directional events, but label them as "up"
   events_list_down = [] ## only down events
   ## each entry will be tuple: (start_neuron_bin, end_neuron_bin, start_time, end_time, direction, event_size)
 
   while len(sorted_events_by_bin) != 0: ## not empty
+    ## First we go UP --------------
     event = sorted_events_by_bin[0]
     laste = event
     found = True
@@ -211,7 +214,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
       found = False
       for index in range(1,len(sorted_events_by_bin)):
         newe = sorted_events_by_bin[index]
-        if (newe["start_neuron_bin"] == ((laste["start_neuron_bin"]+1)%num_neuron_bins)): # mod to make wrap-around ok
+        if (newe["start_neuron_bin"] == ((laste["start_neuron_bin"]+1)%num_neuron_bins)): # mod to make up wrap-around ok
           if newe["end_time"] < (laste["start_time"]-event_time_buffer): ## too early
             continue
           elif newe["start_time"] > (laste["end_time"]+event_time_buffer): ## too late
@@ -232,6 +235,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
     if event['event_size'] > consecutive_bin:
       events_list_up.append(event)
 
+    ## Now we go DOWN --------------
     ## Repeat for events_list_down with remaining sorted_events_by_bin (still includes first event of each up event)
     event = sorted_events_by_bin[0]
     laste = event
@@ -243,7 +247,7 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
       found = False
       for index in range(1,len(sorted_events_by_bin)):
         newe = sorted_events_by_bin[index]
-        if (newe["start_neuron_bin"] == ((laste["start_neuron_bin"]-1)%num_neuron_bins)): ## mod to make wrap around okay
+        if (newe["start_neuron_bin"] == ((laste["start_neuron_bin"]-1)%num_neuron_bins)): ## mod to make down wrap around okay
           if newe["end_time"] < (laste["start_time"]-event_time_buffer): ## too early
             continue
           elif newe["start_time"] > (laste["end_time"]+event_time_buffer): ## too late
