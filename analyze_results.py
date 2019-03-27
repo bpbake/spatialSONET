@@ -141,10 +141,10 @@ def get_thresholds(subPR, num_neuron_bins, num_time_bins, time_bin_size, neuron_
 
   thresholds = np.zeros(num_neuron_bins)
   for i in range(num_neuron_bins):
-    p = np.true_divide(np.greater_equal(subPR[i], subPR_thresh).sum(),num_time_bins)
-    ## p is the fraction of time bins that have at least one neuron firing
+    beta = np.true_divide(np.greater_equal(subPR[i], subPR_thresh).sum(),num_time_bins)
+    ## beta is the fraction of time bins that have at least one neuron firing
 
-    std = np.sqrt(p*(1-p)) ## the std of Bernoulli RV with probability p (a neuron fired or not)
+    std = np.sqrt(beta*(1-beta)) ## the std of Bernoulli RV with probability beta (a neuron fired or not)
 
     thresholds[i] = (15*std)/(time_bin_size*neuron_bin_size) ## 15 is an ARBITRARY PARAMETER... 
     ## LATER: change this again to see how sensitive the results are to this choice
@@ -194,8 +194,6 @@ def get_events(N, subPR, thresholds, num_neuron_bins, time_bin_size=.1,
   dtype = [('start_neuron_bin', 'i4'), ('end_neuron_bin', 'i4'), ('start_time', 'f8'), 
     ('end_time', 'f8'), ('direction', 'U10'), ('event_size', 'i4')] ## these are the labels for the event tuples
   sorted_events_by_bin = np.sort(np.array(events_by_bin, dtype=dtype), order=['start_time','start_neuron_bin'])
-  # print("\nsorted_events_by_bin[0:20] = {0}\n".format(sorted_events_by_bin[0:20]))
-  # print("dtype: {0}".format(dtype))
 
 
   ## Now we concatenate events by neuron bins to get the final list of events ----------------

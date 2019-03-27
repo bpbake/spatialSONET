@@ -24,21 +24,22 @@ import matplotlib.pyplot as plt
 
 import analyze_results as ar
 
-N = 1000 ## Number of excitatory neurons
+N = 3000 ## Number of excitatory neurons
 p_AVG =50/N ## average probability of connectivity between neurons
 
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/N1000_LL50_LR50_recurr_alphas_all_rand/'
-data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
+# data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 print("data_dir: "+data_dir)
 
-# Style = "Regular5s_New_Clean_"
+# Style = "Regular5s_Clean_"
 Style = "Irregular50s_Clean_"
 print("Style: "+Style)
 
-# reload=False
-reload=True
+reload=False
+# reload=True
 
 summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,Style) 
 
