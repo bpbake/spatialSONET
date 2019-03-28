@@ -34,8 +34,8 @@ p_AVG =50/N ## average probability of connectivity between neurons
 data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 print("data_dir: "+data_dir)
 
-# Style = "Regular5s_Clean_"
-Style = "Irregular50s_Clean_"
+Style = "Regular5s_Clean_"
+# Style = "Irregular50s_Clean_"
 print("Style: "+Style)
 
 reload=False

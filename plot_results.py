@@ -43,7 +43,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
       
     mintime=500
     maxtime=results['simulation_time']+mintime
-    # plt.subplot(211)
+    plt.subplot(211)
 
     plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
 
@@ -54,17 +54,21 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     plt.xlabel('Time (ms)')
     #plt.xticks([])
     plt.ylabel('Neuron index')
+    # plt.xlim(10000,15000)
     # plt.tight_layout()
-    plt.grid(True)
+    # plt.grid(True)
     
-    # plt.subplot(212)
-    # ind1=np.min(np.where(results['PRM time']>mintime))
-    # ind2=np.max(np.where(results['PRM time']<maxtime))
-    # plt.plot(results['PRM time'][ind1:ind2],results['PRM rate'][ind1:ind2])
-    # plt.xlabel('Time (ms)')
-    # plt.ylabel('Population rate (Hz)')
-    # #axis([1500, 2000, 0, ceil(max(results['PRM rate'])/100)*100])
-    # plt.tight_layout()
+    sigma = 100
+    gaussian_kernel = np.exp(-((np.arange(-4*sigma, 4*sigma+1, 1))**2)/(2*sigma))
+    gaussian_kernel = gaussian_kernel/np.sum(gaussian_kernel)
+    # print(gaussian_kernel)
+    plt.subplot(212)
+    ind1=np.min(np.where(results['PRM time']>mintime))
+    ind2=np.max(np.where(results['PRM time']<maxtime))
+    plt.plot(results['PRM time'][ind1:ind2],np.convolve(results['PRM rate'][ind1:ind2],gaussian_kernel,mode="same"))
+    plt.xlabel('Time (ms)')
+    plt.ylabel('Population rate (Hz)')
+    # plt.xlim(10000,15000)
 
     plt.show()
 

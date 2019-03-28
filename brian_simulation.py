@@ -87,8 +87,10 @@ G.v='vreset+(vthreshold-vreset)*rand()' ## sets voltage dip below reset after sp
 # ext_rate = 250*Hz ## rate of external input (how often input happens)
 # ext_mag = 1*mV ## how much the voltage gets affected by the external input
 ## Irregular Regime:
+# ext_rate = 113*Hz ## rate of external input (how often input happens)
+# ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
 ext_rate = 110*Hz ## rate of external input (how often input happens)
-ext_mag = 1.75*mV ## how much the voltage gets affected by the external input
+ext_mag = 1.65*mV ## how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) ## adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") ## synapes P onto G
