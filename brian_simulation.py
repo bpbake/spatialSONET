@@ -5,19 +5,28 @@ Created on Sun Mar  5 14:06:45 2017
 @author: rhino
 """
 # data_dir = 'matrices/N1000_Linf_recurr_alpha_div_rand/'
-# data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
+# data_dir = 'matrices/N1000_LL50_LR50_recurr_alphas_all_rand/'
+# data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
+
+# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_conv_div_rand/'
+data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
-# data_dir = 'matrices/N1000_LL50_LR50_recurr_alphas_all_rand/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
-# data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
+
 res_dir = data_dir
 print("data_dir: "+data_dir)
 # print("results_dir: "+res_dir)
-# Style = "Regular5s_"
-Style = "Irregular50s_"
+Style = "Regular5s_"
+# Style = "Irregular50s_"
 print("Style: "+Style)
+
+L_left = 100 ## spatial parameter ff
+# L_left = 50 ## spatial parameter recurrent
+# L_left = float("inf") ## spatial parameter for homogeneous
+N = 3000 ## Number of excitatory neurons
+p = 50/N ## average probability of connectivity between neurons
+neuron_bin_size = 100 ## number of neurons in each neuron bin (for analysis of network simulation)
 
 import sys
 
@@ -51,13 +60,6 @@ import math
 
 start_scope() ## start fresh with magic settings
 
-# L_left = 100 ## spatial parameter ff
-# L_left = 50 ## spatial parameter recurrent
-L_left = float("inf") ## spatial parameter for homogeneous
-N = 3000 ## Number of excitatory neurons
-p_AVG = 50/N ## average probability of connectivity between neurons
-neuron_bin_size = 100 ## number of neurons in each neuron bin (for analysis of network simulation)
-
 ## variables and equation for voltage decay back to equilibrium (-60) for firing potential
 tau = 10*ms 
 Er = -60*mV ## rest potential (equilibrium voltage) ## mV = millivolt (one thousandth of a volt)
@@ -74,8 +76,8 @@ refract = 1*ms ## "cool down" time between spikes (after a spike, it can't spike
 
 transienttime = 500*ms ## getting the network into place (the start bit of the simulation)
 ## the part of the simulation we care about
-# simulationtime = 5000*ms ## Regular
-simulationtime = 50000*ms ## Irregular
+simulationtime = 5000*ms ## Regular
+# simulationtime = 50000*ms ## Irregular
 
 ## Set up the Neuron Groups for simulation
 G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refract', method='euler') 
@@ -84,13 +86,11 @@ G.v='vreset+(vthreshold-vreset)*rand()' ## sets voltage dip below reset after sp
 
 ## variables that control the PoissonGroup
 ## Regular Regime
-# ext_rate = 250*Hz ## rate of external input (how often input happens)
-# ext_mag = 1*mV ## how much the voltage gets affected by the external input
+ext_rate = 250*Hz ## rate of external input (how often input happens)
+ext_mag = 1*mV ## how much the voltage gets affected by the external input
 ## Irregular Regime:
-# ext_rate = 113*Hz ## rate of external input (how often input happens)
-# ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
-ext_rate = 110*Hz ## rate of external input (how often input happens)
-ext_mag = 1.65*mV ## how much the voltage gets affected by the external input
+# ext_rate = 110*Hz ## rate of external input (how often input happens)
+# ext_mag = 1.65*mV ## how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) ## adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") ## synapes P onto G
@@ -126,7 +126,7 @@ for w_index in range(start_index, end_index+1):
     
     restore() ## set the state back to what it was when the store() command was called
 
-    W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)
+    W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p, L_left, w_index)
     with open(W_filename+'.pickle', 'rb') as wf:
         try:
             Wsparse = pickle.load(wf) ## load in W matrix
@@ -135,7 +135,7 @@ for w_index in range(start_index, end_index+1):
     W = np.array(Wsparse.todense())
     
     
-    stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L_left, w_index)
+    stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L_left, w_index)
     with open(stat_filename, 'rb') as sf:
         try:
             stats = pickle.load(sf) ## load in the stats for the W matrix (L_left, p_hat, alpha values, alpha_hat values)
@@ -156,8 +156,8 @@ for w_index in range(start_index, end_index+1):
         print("\nnetwork saturated, skipping matrix {0}\n".format(w_index))
         saturated = True
         stats['saturated'] = saturated ## add to the stats dict
-        ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
-        ar.clean_results(N, p_AVG, w_index, Style, res_dir) 
+        ar.save_results(N, p, w_index, stats, Style, res_dir)
+        ar.clean_results(N, p, w_index, Style, res_dir) 
         continue ## go to next matrix
 
     transient_trains = transient_spikemon.spike_trains()
@@ -166,8 +166,8 @@ for w_index in range(start_index, end_index+1):
             print("\nneuron {0} saturated, skipping matrix {1}\n".format(neuron_index, w_index))
             saturated = True
             stats['saturated'] = saturated ## add to the stats dict
-            ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
-            ar.clean_results(N, p_AVG, w_index, Style, res_dir)
+            ar.save_results(N, p, w_index, stats, Style, res_dir)
+            ar.clean_results(N, p, w_index, Style, res_dir)
             break ## break out of neuron_index loop
     if saturated: 
         continue ## go to next matrix
@@ -175,8 +175,8 @@ for w_index in range(start_index, end_index+1):
     if transient_spikemon.num_spikes < (2*N): ## if the number of spikes is too small, we assume it's not spiking
         print("\nnetwork not spiking, skipping matrix {0}\n".format(w_index))
         stats['not spiking'] = True ## add to the stats dict
-        ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
-        ar.clean_results(N, p_AVG, w_index, Style, res_dir)
+        ar.save_results(N, p, w_index, stats, Style, res_dir)
+        ar.clean_results(N, p, w_index, Style, res_dir)
         continue ## go to next matrix
 
     print("\nnumber of spikes in transient: {0}\n".format(transient_spikemon.num_spikes))
@@ -255,8 +255,8 @@ for w_index in range(start_index, end_index+1):
     del simulation_PRM 
 
     ## save results (pickle new stats dictionary)
-    ar.save_results(N, p_AVG, w_index, stats, Style, res_dir)
-    ar.clean_results(N, p_AVG, w_index, Style, res_dir)
-    # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+    ar.save_results(N, p, w_index, stats, Style, res_dir)
+    ar.clean_results(N, p, w_index, Style, res_dir)
+    # result_filename = "{0}Results_W_N{1}_p{2}_tLong{3}.pickle".format(data_dir,N,p,w_index) 
     # with open(result_filename, "wb") as rf:
     #    pickle.dump(stats, rf)

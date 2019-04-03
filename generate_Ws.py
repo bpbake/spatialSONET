@@ -15,10 +15,11 @@ Created on Mon Apr  3 16:41:12 2017
 ## Define a directory for adjacency matrices (saved as python pickle files)
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
 # data_dir = 'matrices/N1000_LL50_LR50_recurr_alpha_div_rand/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_rand/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_rand/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = 'matrices/N1000_Linf_recurr_alphas_all_rand/'
 # data_dir = "matrices/"
+data_dir = 'matrices/test/'
 print("data_dir: {0}".format(data_dir))
 
 import os
@@ -52,7 +53,7 @@ input_orig = input
 
 
 N = 3000 ## Number of excitatory neurons
-p_AVG = 50/N ## average probability of connectivity between neurons
+p = 50/N ## average probability of connectivity between neurons
 
 ## what indices do you want to use for these matrices:
 if len(sys.argv) >= 3:
@@ -77,19 +78,19 @@ for w_index in range(start_index, end_index+1):
             ## Define the L_left, L_right, and alpha values here:
             # L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
             # L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
-            # L_left = 50 
-            L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
-            # L_right = 0 
-            L_right = L_left ## for symmetric/recurrent networks
+            L_left = 500 
+            # L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
+            L_right = 0 
+            # L_right = L_left ## for symmetric/recurrent networks
 
             # alpha_recip = np.random.uniform(-0.5, 1)
-            alpha_conv = np.random.uniform(0, 0.5)
-            alpha_div = np.random.uniform(0, 0.5)
-            alpha_chain = np.random.uniform(-0.5, 0.5)
+            # alpha_conv = np.random.uniform(0, 0.5)
+            # alpha_div = np.random.uniform(0, 0.5)
+            # alpha_chain = np.random.uniform(-0.5, 0.5)
             alpha_recip = 0
-            # alpha_conv = 0
-            # alpha_div = 0
-            # alpha_chain = 0
+            alpha_conv = 0.5
+            alpha_div = 0.5
+            alpha_chain = 0.5
 
             # print('alpha_recip={0}'.format(alpha_recip))
             # print('alpha_conv={0}'.format(alpha_conv))
@@ -98,7 +99,7 @@ for w_index in range(start_index, end_index+1):
             
 
             ## call the function in create_P.py to create the matrix of connection probabilities
-            P = create_P(N, L_left, L_right, p_AVG)
+            P = create_P(N, L_left, L_right, p)
             print("P has been created \n")
             sys.stdout.flush()
             
@@ -111,12 +112,12 @@ for w_index in range(start_index, end_index+1):
             Wsparse = sparse.csr_matrix(W)
 
             ## truncate W to make it a lower triangular matrix (used in the Feed Forward case)
-            # W_lowerTri = np.tril(W) 
-            # Wsparse = sparse.csr_matrix(W_lowerTri) 
+            W_lowerTri = np.tril(W) 
+            Wsparse = sparse.csr_matrix(W_lowerTri) 
             
 
             ## save the adjacency matrix W as a python pickle file
-            W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)
+            W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p, L_left, w_index)
             with open(W_filename+'.pickle', 'wb') as fp:
                 pickle.dump(Wsparse, fp)
             print("W has been pickled.")
@@ -151,13 +152,13 @@ for w_index in range(start_index, end_index+1):
             
 
             ## create a python dictionary of the stats and save as python pickle file
-            stats = dict([('N', N), ('L_left', L_left), ('L_right', L_right), ('p_AVG', p_AVG),  
+            stats = dict([('N', N), ('L_left', L_left), ('L_right', L_right), ('p', p),  
                 ('alpha_recip', alpha_recip), ('alpha_conv', alpha_conv), ('alpha_div', alpha_div), 
                 ('alpha_chain', alpha_chain), ('p_hat', p_hat), ('alpha_recip_hat', alpha_recip_hat), 
                 ('alpha_conv_hat', alpha_conv_hat), ('alpha_div_hat', alpha_div_hat), ('alpha_chain_hat', alpha_chain_hat), 
                 ('largest eigenvalue', max_eigenval)])
             
-            stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L_left, w_index) 
+            stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L_left, w_index) 
             with open(stat_filename, "wb") as f:
                 pickle.dump(stats, f)
 

@@ -170,7 +170,7 @@ def mean_event_time_plot(N, p, coupling_strength, indices, data_dir="matrices/",
 		n_indices = len(indices)
 
 		results = dict([('N', N*np.ones(n_indices)), ('L_left', np.zeros(n_indices)), ('L_right', np.zeros(n_indices)), 
-			('p_AVG', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
+			('p', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
 			('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
 			('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), 
 			('alpha_div_hat', np.zeros(n_indices)), ('alpha_chain_hat', np.zeros(n_indices)),

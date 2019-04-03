@@ -48,7 +48,7 @@ import matplotlib.pyplot as plt
 
 
 N = 1000 ## Number of excitatory neurons
-p_AVG = 50/N ## average probability of connectivity between neurons
+p = 50/N ## average probability of connectivity between neurons
 # w_index = 4
 L_left = float("inf")
 
@@ -72,7 +72,7 @@ for w_index in range(start_index, end_index+1):
 
 	print("\n\n\nNow running simulations on network {0}\n\n".format(w_index))
 
-	W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p_AVG, L_left, w_index)
+	W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p, L_left, w_index)
 	with open(W_filename+'.pickle', 'rb') as wf:
 	    try:
 	        Wsparse = pickle.load(wf) ## load in W matrix
@@ -81,8 +81,8 @@ for w_index in range(start_index, end_index+1):
 	        sys.stdout.flush()
 	W = np.array(Wsparse.todense())
 
-	stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p_AVG, w_index, coupling_strength)
-	stats_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p_AVG, L_left, w_index)
+	stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, w_index, coupling_strength)
+	stats_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L_left, w_index)
 	try:
 		with open(stochastic_filename, 'rb') as stochf:
 			try:
@@ -208,6 +208,6 @@ for w_index in range(start_index, end_index+1):
 
 
 
-	# stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p_AVG, w_index, coupling_strength)
+	# stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, w_index, coupling_strength)
 	with open(stochastic_filename+".pickle", "wb") as stochf:
 			pickle.dump(stats, stochf)

@@ -8,26 +8,22 @@ try:
    import cPickle as pickle
 except:
    import pickle
-   
-import matplotlib.pyplot as plt
-import numpy as np
-import math
 
 
-def loadW(N,p,i, data_dir='matrices/') :
+def loadW(N,p,i,L, data_dir='matrices/') :
 
 
    #read in pickled W matrix
-   W_filename = "{0}Wsparse_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,i)
+   W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L, i)
 
    with open(W_filename, 'rb') as wf:
        try:
-           W = pickle.load(wf)
+           Wsparse = pickle.load(wf)
        except (EOFError):
            print("unpickling error")
 
    # reading in pickled stats file:        
-   stat_filename = "{0}Stats_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,i)
+   stat_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L, i)
    with open(stat_filename, 'rb') as sf:
        try:
            stats = pickle.load(sf)
@@ -37,4 +33,4 @@ def loadW(N,p,i, data_dir='matrices/') :
    for k,v in sorted(stats.items()):
        print(k+":{0}".format(v))
    
-   return W    
+   return(Wsparse, stats)  

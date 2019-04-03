@@ -25,13 +25,11 @@ import matplotlib.pyplot as plt
 import analyze_results as ar
 
 N = 3000 ## Number of excitatory neurons
-p_AVG =50/N ## average probability of connectivity between neurons
+p =50/N ## average probability of connectivity between neurons
 
-# data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
-# data_dir = 'matrices/N1000_LL50_LR50_recurr_alphas_all_rand/'
-# data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_conv_div_rand/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_rand/'
 print("data_dir: "+data_dir)
 
 Style = "Regular5s_Clean_"
@@ -41,7 +39,7 @@ print("Style: "+Style)
 reload=False
 # reload=True
 
-summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,Style) 
+summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,Style) 
 
 
 if reload:
@@ -63,7 +61,7 @@ else:
     
 
     results = dict([('N', np.zeros(n_indices)), ('L_left', np.zeros(n_indices)), ('L_right', np.zeros(n_indices)), 
-        ('p_AVG', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
+        ('p', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
         ('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
         ('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), ('alpha_div_hat', np.zeros(n_indices)), 
         ('alpha_chain_hat', np.zeros(n_indices)), #('largest eigenvalue', np.zeros(n_indices)), 
@@ -72,22 +70,25 @@ else:
         #('j', np.zeros(n_indices)),('ext_rate', np.zeros(n_indices)),('ext_mag', np.zeros(n_indices))])
     actual_index = -1
 
+    skipped = 0
     for w_index in range(start_index, end_index+1):
         if w_index%30 == 0:    
             print("w_index = {0}".format(w_index))
 
         try:
-            samp_results = ar.load_results(N, p_AVG, w_index, Style, data_dir)
+            samp_results = ar.load_results(N, p, w_index, Style, data_dir)
         except:
-            print("couldn't load {0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p_AVG,Style,w_index))
+            print("couldn't load {0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p,Style,w_index))
             continue
 
         try:
             if samp_results['average firing rate'] > 100:
+                skipped += 1
                 print("skipped index {0} because average firing rate {1} > 100".format(w_index, samp_results['average firing rate']))
                 continue
         except:
             if samp_results['saturated']:
+                skipped += 1
                 print("skipped index {0} because saturated".format(w_index))
                 continue
         # print("average firing rate is {0}".format(samp_results['average firing rate']))
@@ -98,7 +99,7 @@ else:
         #     print("skipped network {0} because a neuron was firing too much".format(w_index))
         #     continue
         
-        # results_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p_AVG,w_index) 
+        # results_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,w_index) 
         # with open(results_filename, 'rb') as sf:
         #     try:
         #         stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
@@ -122,7 +123,7 @@ else:
             
         #     print("w_index = {0}".format(w_index))
 
-        #     samp_results = ar.load_results(N, p_AVG, w_index, Style, data_dir)
+        #     samp_results = ar.load_results(N, p, w_index, Style, data_dir)
             
         #     ind = w_index-start_index
             
@@ -139,6 +140,8 @@ else:
     ## save results (pickle new stats summary dictionary for future plots)
     with open(summary_filename, "wb") as rf:
         pickle.dump(results, rf)
+
+print("{0} networks were skipped due to saturation or high average firing rate".format(skipped))
 
 kurtosis_mean = np.nanmean(results['IEI excess_kurtosis'])
 print("mean kurtosis: {0}".format(kurtosis_mean))
