@@ -54,6 +54,7 @@ build
 papers
 CNS18
 SIAM_LS18
+*.zip
 
 # emacs backup files
 *~

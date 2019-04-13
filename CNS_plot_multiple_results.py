@@ -27,19 +27,19 @@ import analyze_results as ar
 N = 3000 ## Number of excitatory neurons
 p =50/N ## average probability of connectivity between neurons
 
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
-# data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_conv_div_rand/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
+data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 print("data_dir: "+data_dir)
 
-Style = "Regular5s_Clean_"
-# Style = "Irregular50s_Clean_"
-print("Style: "+Style)
+# style = "Regular5s_Clean_"
+style = "Irregular50s_Clean_"
+print("style: "+style)
 
-reload=False
-# reload=True
+# reload=False
+reload=True
 
-summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,Style) 
+summary_filename = "{0}Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,style) 
 
 
 if reload:
@@ -47,7 +47,7 @@ if reload:
         results = pickle.load(rf)
 
 else:
-    ## Load in matrices one at a time and simulate!
+    ## Load in matrices one at a time
     import sys
     if len(sys.argv) >= 3:
        start_index = int(sys.argv[1])
@@ -59,9 +59,8 @@ else:
     n_indices = end_index-start_index+1
     
     
-
     results = dict([('N', np.zeros(n_indices)), ('L_left', np.zeros(n_indices)), ('L_right', np.zeros(n_indices)), 
-        ('p', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
+        ('p_AVG', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
         ('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
         ('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), ('alpha_div_hat', np.zeros(n_indices)), 
         ('alpha_chain_hat', np.zeros(n_indices)), #('largest eigenvalue', np.zeros(n_indices)), 
@@ -76,9 +75,9 @@ else:
             print("w_index = {0}".format(w_index))
 
         try:
-            samp_results = ar.load_results(N, p, w_index, Style, data_dir)
+            samp_results = ar.load_results(N, p, w_index, style, data_dir)
         except:
-            print("couldn't load {0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p,Style,w_index))
+            print("couldn't load {0}Results_W_N{1}_p{2}_{3}{4}.pickle".format(data_dir,N,p,style,w_index))
             continue
 
         try:
@@ -91,23 +90,8 @@ else:
                 skipped += 1
                 print("skipped index {0} because saturated".format(w_index))
                 continue
-        # print("average firing rate is {0}".format(samp_results['average firing rate']))
-        # refractory = 1
-        # spike_indices = samp_results['spikemon indices']
-        # unique, counts = np.unique(spike_indices, return_counts=True)
-        # if np.maximum(counts) > (samp_results['simulation_time']/refractory*0.5):
-        #     print("skipped network {0} because a neuron was firing too much".format(w_index))
-        #     continue
-        
-        # results_filename = "{0}Results_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,w_index) 
-        # with open(results_filename, 'rb') as sf:
-        #     try:
-        #         stats = pickle.load(sf) # load in the stats for the W matrix (L, p_hat, alpha values, alpha_hat values)
-        #     except (EOFError):
-        #         print("unpickling error")
         
         actual_index += 1
-        # ind = w_index-start_index
         
         for key in results:
             results[key][actual_index]=samp_results[key]
@@ -116,35 +100,25 @@ else:
             print("\nindex {0} has \nlow event_rate {1} \nand high alpha_chain {2}\n".format(
                 w_index, samp_results["event_rate"], samp_results["alpha_chain_hat"]))
 
-        ## EXCLUSIONS 
-        # if w_index not in [23,27,39,42,71,77,95]: #for Regular sym_alphas_all_rand
-        # if w_index not in [23,27,39]: #for Irregular sym_alphas_all_rand
-        # if w_index not in [8]:
-            
-        #     print("w_index = {0}".format(w_index))
-
-        #     samp_results = ar.load_results(N, p, w_index, Style, data_dir)
-            
-        #     ind = w_index-start_index
-            
-        #     for key in results:
-        #         results[key][ind]=samp_results[key]
-
-        #     if samp_results["alpha_chain_hat"]>=0 and samp_results["event_rate"]<=100:
-        #         print("\nindex {0} has \nlow event_rate {1} \nand high alpha_chain {2}\n".format(w_index, samp_results["event_rate"], samp_results["alpha_chain_hat"]))
-        ## END EXCLUSIONS
+        # if samp_results["alpha_conv_hat"]>=0.4 and samp_results["event_rate"]<=150:
+        #     print("\nhigh-heel situation! \nindex {0} has \nlow event_rate {1} \nand high alpha_conv {2}\n".format(
+        #         w_index, samp_results["event_rate"], samp_results["alpha_conv_hat"]))
 
 
     for key in results:
         results[key].resize(actual_index+1, refcheck=False)
+
+    results["skipped"] = skipped
     ## save results (pickle new stats summary dictionary for future plots)
     with open(summary_filename, "wb") as rf:
         pickle.dump(results, rf)
+    
 
-print("{0} networks were skipped due to saturation or high average firing rate".format(skipped))
+
+print("\n{0} networks were skipped due to saturation or high average firing rate".format(results['skipped']))
 
 kurtosis_mean = np.nanmean(results['IEI excess_kurtosis'])
-print("mean kurtosis: {0}".format(kurtosis_mean))
+print("\nmean kurtosis: {0}".format(kurtosis_mean))
 
 
 
@@ -182,77 +156,127 @@ print("mean kurtosis: {0}".format(kurtosis_mean))
 # # plt.tight_layout()
 
 
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=50)
+# plt.rc('ytick', labelsize=50)
+# plt.figure(figsize=(12,10))
+# # plt.suptitle('style: {0}, data_dir: {1}'.format(style, data_dir))
+# plt.plot(results['alpha_chain_hat'], results['event_rate'], 'o', markersize=30)
+# plt.xlabel(r'$\hat\alpha_{\mathrm{chain}}$')
+# plt.ylabel('event rate')
+# plt.xticks(np.arange(-0.4,0.6,0.2))
+# plt.xlim(left=-0.45)
+# plt.yticks(np.arange(0,170,50))
+# plt.ylim(-15,180)
+# plt.tight_layout()
+# mng = plt.get_current_fig_manager()
+# mng.window.showMaximized()
+
+
+
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=50)
+# plt.rc('ytick', labelsize=50)
+# plt.figure(figsize=(12,10))
+# # plt.suptitle('style: {0}, data_dir: {1}'.format(style, data_dir))
+# plt.plot(results['alpha_conv_hat'], results['event_rate'], 'o', markersize=30)
+# plt.xlabel(r'$\hat\alpha_{\mathrm{conv}}$')
+# plt.ylabel('event rate')
+# plt.xticks(np.arange(0.1,0.6,0.1))
+# # plt.xlim(left=0.02)
+# plt.yticks(np.arange(0,170,50))
+# plt.ylim(-15,180)
+# plt.tight_layout()
+# mng = plt.get_current_fig_manager()
+# mng.window.showMaximized()
+
+
+
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=80)
 plt.rc('xtick', labelsize=50)
 plt.rc('ytick', labelsize=50)
 plt.figure(figsize=(12,10))
-plt.plot(results['alpha_chain_hat'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\alpha_{chain}$')
-plt.ylabel('event rate')
-plt.xticks(np.arange(-0.5,0.5,0.2))
-plt.tight_layout()
-
-
-
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=80)
-plt.rc('xtick', labelsize=50)
-plt.rc('ytick', labelsize=50)
-plt.figure(figsize=(12,10))
-plt.plot(results['alpha_conv_hat'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\alpha_{conv}$')
-plt.ylabel('event rate')
-plt.xticks(np.arange(0,0.5,0.1))
-plt.tight_layout()
-
-
-
-
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=80)
-plt.rc('xtick', labelsize=50)
-plt.rc('ytick', labelsize=50)
-plt.figure(figsize=(12,10))
+# plt.suptitle('style: {0}, data_dir: {1}'.format(style, data_dir))
 plt.plot(results['alpha_div_hat'], results['event_rate'], 'o', markersize=30)
-plt.xlabel(r'$\alpha_{div}$')
+plt.xlabel(r'$\hat\alpha_{\mathrm{div}}$')
 plt.ylabel('event rate')
-plt.xticks(np.arange(0,0.5,0.1))
+plt.xticks(np.arange(0.1,0.6,0.1))
+plt.xlim(left=0.02)
+plt.yticks(np.arange(10,31,10))
+plt.ylim(5,35)
 plt.tight_layout()
+mng = plt.get_current_fig_manager()
+mng.window.showMaximized()
 
 
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=80)
-plt.rc('xtick', labelsize=50)
-plt.rc('ytick', labelsize=50)
-plt.figure(figsize=(12,10))
-plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=500)
-plt.xlabel(r'$\alpha_{conv}$')
-plt.xticks(np.arange(0,0.5,0.1))
-plt.ylabel(r'$\alpha_{chain}$')
-# plt.yticks(np.arange(-0.5,0.5,0.2))
-cb=plt.colorbar()
-# plt.clim(0,3)
-cb.set_label('event rate')
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=50)
+# plt.rc('ytick', labelsize=50)
+# plt.figure(figsize=(12,10))
+# # plt.suptitle('style: {0}, data_dir: {1}'.format(style, data_dir))
+# plt.scatter(results['alpha_conv_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=500)
+# plt.xlabel(r'$\hat\alpha_{\mathrm{conv}}$')
+# plt.xticks(np.arange(0.1,0.6,0.1))
+# # plt.xlim(left=0.02)
+# plt.ylabel(r'$\hat\alpha_{\mathrm{chain}}$')
+# plt.yticks(np.arange(-0.4,0.6,0.2))
+# plt.ylim(bottom=-0.45)
+# plt.clim(0,150)
+# cb=plt.colorbar()
+# cb.set_label('event rate')
+# plt.tight_layout()
+# mng = plt.get_current_fig_manager()
+# mng.window.showMaximized()
 
 
-plt.figure()
-plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['event_rate'],s=400)
-plt.xlabel(r'$\alpha_{div}$')
-plt.ylabel(r'$\alpha_{conv}$')
-cb=plt.colorbar()
-# plt.clim(0,3)
-cb.set_label('event rate')
+
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=50)
+# plt.rc('ytick', labelsize=50)
+# plt.figure(figsize=(12,10))
+# # plt.suptitle('style: {0}, data_dir: {1}'.format(style, data_dir))
+# plt.scatter(results['alpha_div_hat'], results['alpha_conv_hat'], c=results['event_rate'],s=400)
+# plt.xlabel(r'$\hat\alpha_{\mathrm{div}}$')
+# plt.xticks(np.arange(0.1,0.6,0.1))
+# # plt.xlim(left=0.02)
+# plt.ylabel(r'$\hat\alpha_{\mathrm{conv}}$')
+# plt.yticks(np.arange(0.1,0.6,0.1))
+# # plt.ylim(bottom=0.02)
+# plt.clim(0,150)
+# cb=plt.colorbar()
+# cb.set_label('event rate')
+# plt.tight_layout()
+# mng = plt.get_current_fig_manager()
+# mng.window.showMaximized()
 
 
-plt.figure()
-plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=400)
-plt.xlabel(r'$\alpha_{div}$')
-plt.ylabel(r'$\alpha_{chain}$')
-cb=plt.colorbar()
-# plt.clim(0,3)
-cb.set_label('event rate')
+
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif', size=80)
+# plt.rc('xtick', labelsize=50)
+# plt.rc('ytick', labelsize=50)
+# plt.figure(figsize=(12,10))
+# # plt.suptitle('style: {0}, data_dir: {1}'.format(style, data_dir))
+# plt.scatter(results['alpha_div_hat'], results['alpha_chain_hat'], c=results['event_rate'],s=400)
+# plt.xlabel(r'$\hat\alpha_{\mathrm{div}}$')
+# plt.xticks(np.arange(0.1,0.6,0.1))
+# # plt.xlim(left=0.02)
+# plt.ylabel(r'$\hat\alpha_{\mathrm{chain}}$')
+# plt.yticks(np.arange(-0.4,0.6,0.2))
+# plt.ylim(bottom=-0.45)
+# plt.clim(0,150)
+# cb=plt.colorbar()
+# cb.set_label('event rate')
+# plt.tight_layout()
+# mng = plt.get_current_fig_manager()
+# mng.window.showMaximized()
 
 # plt.figure(figsize=())
 

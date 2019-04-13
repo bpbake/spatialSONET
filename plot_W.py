@@ -32,9 +32,9 @@ print("data_dir: {0}".format(data_dir))
 N = 3000 ## minimum of 1000
 p = 50/N
 print("N={0}".format(N))
-L_left=500
-# L_left=float('inf')
+L_left=float('inf')
 # L_left=50
+print("L_left:{0}".format(L_left))
 
 
 ## what matrices do we want to plot:
@@ -55,23 +55,20 @@ for w_index in range(start_index, end_index+1):
             
     W = Wsparse.todense()
 
-    for k,v in sorted(stats.items()):
-        print(k+":{0}".format(v))
-        sys.stdout.flush()
-
-
     ## plot the W matrix
-    # plt.rc('text', usetex=True)
+    plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=100)
     plt.rc('xtick', labelsize=50)
     plt.rc('ytick', labelsize=50)
+    plt.figure(figsize=(12,10))
 
-    plt.figure()
-    plt.spy(W, markersize=1)
+    # plt.figure()
+    # plt.suptitle('Matrix: {0}'.format(w_index))
+    plt.spy(W, markersize=0.75)
     plt.xticks(np.arange(0,N+1,1000))
     plt.yticks(np.arange(0,N+1,1000))
-    mng = plt.get_current_fig_manager()
+    # mng = plt.get_current_fig_manager()
     # mng.window.state('zoomed')
-    mng.window.showMaximized()
+    # mng.window.showMaximized()
 
 plt.show()

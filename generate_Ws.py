@@ -78,19 +78,19 @@ for w_index in range(start_index, end_index+1):
             ## Define the L_left, L_right, and alpha values here:
             # L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
             # L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
-            L_left = 500 
-            # L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
-            L_right = 0 
-            # L_right = L_left ## for symmetric/recurrent networks
+            # L_left = 250 
+            L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
+            # L_right = 0 
+            L_right = L_left ## for symmetric/recurrent networks
 
             # alpha_recip = np.random.uniform(-0.5, 1)
             # alpha_conv = np.random.uniform(0, 0.5)
             # alpha_div = np.random.uniform(0, 0.5)
             # alpha_chain = np.random.uniform(-0.5, 0.5)
-            alpha_recip = 0
-            alpha_conv = 0.5
-            alpha_div = 0.5
-            alpha_chain = 0.5
+            alpha_recip = 0.5
+            alpha_conv = 0
+            alpha_div = 0
+            alpha_chain = 0
 
             # print('alpha_recip={0}'.format(alpha_recip))
             # print('alpha_conv={0}'.format(alpha_conv))
@@ -112,8 +112,8 @@ for w_index in range(start_index, end_index+1):
             Wsparse = sparse.csr_matrix(W)
 
             ## truncate W to make it a lower triangular matrix (used in the Feed Forward case)
-            W_lowerTri = np.tril(W) 
-            Wsparse = sparse.csr_matrix(W_lowerTri) 
+            # W_lowerTri = np.tril(W) 
+            # Wsparse = sparse.csr_matrix(W_lowerTri) 
             
 
             ## save the adjacency matrix W as a python pickle file

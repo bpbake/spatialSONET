@@ -8,11 +8,13 @@ Created on Sun Mar  5 14:06:45 2017
 # data_dir = 'matrices/N1000_LL50_LR50_recurr_alphas_all_rand/'
 # data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
 
-# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_rand/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_conv_div_rand/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_conv_div_rand/'
-data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
+data_dir = 'matrices/test/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
+
 
 res_dir = data_dir
 print("data_dir: "+data_dir)
@@ -21,9 +23,9 @@ Style = "Regular5s_"
 # Style = "Irregular50s_"
 print("Style: "+Style)
 
-L_left = 100 ## spatial parameter ff
+# L_left = 100 ## spatial parameter ff
 # L_left = 50 ## spatial parameter recurrent
-# L_left = float("inf") ## spatial parameter for homogeneous
+L_left = float("inf") ## spatial parameter for homogeneous
 N = 3000 ## Number of excitatory neurons
 p = 50/N ## average probability of connectivity between neurons
 neuron_bin_size = 100 ## number of neurons in each neuron bin (for analysis of network simulation)

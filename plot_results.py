@@ -43,9 +43,10 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
       
     mintime=500
     maxtime=results['simulation_time']+mintime
-    plt.subplot(211)
 
-    plt.suptitle('Matrix {0}, style {1}'.format(i, style))    
+    ## Raster plot
+    # plt.subplot(211)
+    plt.suptitle('Matrix: {0}, style: {1} \n data_dir: {2}'.format(i, style, data_dir))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=.5)
@@ -58,17 +59,19 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     # plt.tight_layout()
     # plt.grid(True)
     
-    sigma = 100
-    gaussian_kernel = np.exp(-((np.arange(-4*sigma, 4*sigma+1, 1))**2)/(2*sigma))
-    gaussian_kernel = gaussian_kernel/np.sum(gaussian_kernel)
-    # print(gaussian_kernel)
-    plt.subplot(212)
-    ind1=np.min(np.where(results['PRM time']>mintime))
-    ind2=np.max(np.where(results['PRM time']<maxtime))
-    plt.plot(results['PRM time'][ind1:ind2],np.convolve(results['PRM rate'][ind1:ind2],gaussian_kernel,mode="same"))
-    plt.xlabel('Time (ms)')
-    plt.ylabel('Population rate (Hz)')
-    # plt.xlim(10000,15000)
+
+    ## PRM Plot: 
+    # sigma = 100
+    # gaussian_kernel = np.exp(-((np.arange(-4*sigma, 4*sigma+1, 1))**2)/(2*sigma))
+    # gaussian_kernel = gaussian_kernel/np.sum(gaussian_kernel)
+    # # print(gaussian_kernel)
+    # plt.subplot(212)
+    # ind1=np.min(np.where(results['PRM time']>mintime))
+    # ind2=np.max(np.where(results['PRM time']<maxtime))
+    # plt.plot(results['PRM time'][ind1:ind2],np.convolve(results['PRM rate'][ind1:ind2],gaussian_kernel,mode="same"))
+    # plt.xlabel('Time (ms)')
+    # plt.ylabel('Population rate (Hz)')
+    # # plt.xlim(10000,15000)
 
     plt.show()
 
