@@ -18,6 +18,8 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     with open(result_filename, "rb") as rf:
        results = pickle.load(rf)
 
+    print(data_dir)
+
     print('Matrix {0}, style {1}'.format(i, style))
     for k,v in sorted(results.items()):
         if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
@@ -27,10 +29,10 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     print("\n")
 
 
-    # matplotlib.rcParams.update({'font.size': 60})
-    # plt.rc('font', family='serif', size=60)
-    # plt.rc('xtick', labelsize=50)
-    # plt.rc('ytick', labelsize=50)
+    matplotlib.rcParams.update({'font.size': 60})
+    plt.rc('font', family='serif', size=60)
+    plt.rc('xtick', labelsize=50)
+    plt.rc('ytick', labelsize=50)
 
     # #plot the results of the simulation
     # plt.figure(figsize=(20,7))
@@ -46,16 +48,19 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 
     ## Raster plot
     # plt.subplot(211)
-    plt.suptitle('Matrix: {0}, style: {1} \n data_dir: {2}'.format(i, style, data_dir))    
+    # plt.suptitle('Matrix: {0}, style: {1} \n data_dir: {2}'.format(i, style, data_dir))    
 
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
-    plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=.5)
+    plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
     
     #axis([mintime, maxtime, 1, N])
     plt.xlabel('Time (ms)')
-    #plt.xticks([])
+    plt.xticks(np.arange(600,1501,300))
+    plt.xlim(499,1550)
     plt.ylabel('Neuron index')
-    # plt.xlim(10000,15000)
+    plt.yticks(np.arange(0,3001,500))
+    plt.ylim(-1,3001)
+
     # plt.tight_layout()
     # plt.grid(True)
     
@@ -77,18 +82,32 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
 
 
 
+def plot_hist(N, p, i, style, data_dir):
+    import analyze_results as ar
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+
+    print(data_dir)
+
+    print('Matrix {0}, style {1}'.format(i, style))
+
+    ## Load in results
+    results = ar.load_results(N, p, i, style, data_dir)
+    print("mean IEI:{0}\nevent_rate:{1}".format(np.mean(results['IEIs']), results['event_rate']))
 
     ### Plot histograms of IEIs:
-# plt.figure()
-# plt.rc('font', family='serif', size=80)
-# plt.rc('xtick', labelsize=70)
-# plt.rc('ytick', labelsize=70)
-# plt.hist(results['IEIs'],50) #data , number of bins
-# plt.xlabel('Inter-event interval (ms)')
-# plt.ylabel('Count')
-# plt.tight_layout()
+    plt.figure()
+    # matplotlib.rcParams.update({'font.size': 60})
+    plt.rc('font', family='serif', size=60)
+    plt.rc('xtick', labelsize=50)
+    plt.rc('ytick', labelsize=50)
+    plt.hist(results['IEIs'],50) #data , number of bins
+    plt.xlabel('Inter-event interval (ms)')
+    plt.ylabel('Count')
+    # plt.tight_layout()
 
-    # plt.show()
+    plt.show()
 
 
 #### Plot histogram of start_neuron_bin:
