@@ -30,7 +30,7 @@ data_dir = 'matrices/test/'
 print("data_dir: {0}".format(data_dir))
 
 N = 3000 ## minimum of 1000
-p = 50/N
+p = 30/N
 print("N={0}".format(N))
 L_left=float('inf')
 # L_left=50
@@ -51,7 +51,7 @@ for w_index in range(start_index, end_index+1):
     sys.stdout.flush()
 
     ## load in pickled W matrix and stats
-    Wsparse, stats = loadW(N,p,w_index,L_left,data_dir)
+    Wsparse, stats = load_W(N,p,w_index,L_left,data_dir)
             
     W = Wsparse.todense()
 
@@ -60,11 +60,11 @@ for w_index in range(start_index, end_index+1):
     plt.rc('font', family='serif', size=100)
     plt.rc('xtick', labelsize=50)
     plt.rc('ytick', labelsize=50)
-    plt.figure(figsize=(12,10))
+    plt.figure(figsize=(11,10))
 
     # plt.figure()
     # plt.suptitle('Matrix: {0}'.format(w_index))
-    plt.spy(W, markersize=0.75)
+    plt.spy(W, markersize=0.5)
     plt.xticks(np.arange(0,N+1,1000))
     plt.yticks(np.arange(0,N+1,1000))
     # mng = plt.get_current_fig_manager()

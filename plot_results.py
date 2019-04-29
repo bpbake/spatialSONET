@@ -29,10 +29,10 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     print("\n")
 
 
-    matplotlib.rcParams.update({'font.size': 60})
-    plt.rc('font', family='serif', size=60)
-    plt.rc('xtick', labelsize=50)
-    plt.rc('ytick', labelsize=50)
+    matplotlib.rcParams.update({'font.size': 40})
+    plt.rc('font', family='serif', size=40)
+    plt.rc('xtick', labelsize=30)
+    plt.rc('ytick', labelsize=30)
 
     # #plot the results of the simulation
     # plt.figure(figsize=(20,7))
@@ -55,18 +55,21 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     
     #axis([mintime, maxtime, 1, N])
     plt.xlabel('Time (ms)')
-    plt.xticks(np.arange(600,1501,300))
-    plt.xlim(499,1550)
+    # plt.xticks([])
+    # plt.xticks(np.arange(505,600,15))
+    plt.xlim(490,590)
+    # plt.xticks(np.arange(1000,5550,500))
+    # plt.xlim(450,5550)
     plt.ylabel('Neuron index')
-    plt.yticks(np.arange(0,3001,500))
-    plt.ylim(-1,3001)
+    # plt.yticks(np.arange(0,3001,500))
+    plt.ylim(-10,3010)
 
     # plt.tight_layout()
-    # plt.grid(True)
+    plt.grid(True)
     
 
     ## PRM Plot: 
-    # sigma = 100
+    # sigma = 500
     # gaussian_kernel = np.exp(-((np.arange(-4*sigma, 4*sigma+1, 1))**2)/(2*sigma))
     # gaussian_kernel = gaussian_kernel/np.sum(gaussian_kernel)
     # # print(gaussian_kernel)
@@ -75,13 +78,16 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     # ind2=np.max(np.where(results['PRM time']<maxtime))
     # plt.plot(results['PRM time'][ind1:ind2],np.convolve(results['PRM rate'][ind1:ind2],gaussian_kernel,mode="same"))
     # plt.xlabel('Time (ms)')
+    # plt.xticks(np.arange(500,5501,100))
+    # plt.xlim(450,750)
     # plt.ylabel('Population rate (Hz)')
-    # # plt.xlim(10000,15000)
+    # plt.ylim(10000,15000)
 
     plt.show()
 
 
 
+## plot histogram of IEIs for a given simulation:
 def plot_hist(N, p, i, style, data_dir):
     import analyze_results as ar
     import matplotlib.pyplot as plt
@@ -102,7 +108,7 @@ def plot_hist(N, p, i, style, data_dir):
     plt.rc('font', family='serif', size=60)
     plt.rc('xtick', labelsize=50)
     plt.rc('ytick', labelsize=50)
-    plt.hist(results['IEIs'],50) #data , number of bins
+    plt.hist(results['IEIs'],50) ## data , number of bins
     plt.xlabel('Inter-event interval (ms)')
     plt.ylabel('Count')
     # plt.tight_layout()

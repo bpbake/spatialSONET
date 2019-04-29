@@ -316,16 +316,22 @@ def analyze_events(N, events, num_events, simulation_time, neuron_bin_size=100):
 
   IEIs = [] ## will be a list of inter-event intervals (times)
   stime = None ## we don't care about the time before the first event
+  sbin = None
 
   for event in events: 
     events_length += event['event_size']
     ## update num neurons covered by event
     
+    if (stime == event['start_time']) and (sbin == event['start_neuron_bin']):
+      print("skipped event")
+      continue 
+
     if stime is not None:
-      ## update IEIs list with time beteween previous event and current event
-      IEIs.append(event['start_time']-stime) 
+        ## update IEIs list with time beteween previous event and current event
+        IEIs.append(event['start_time']-stime) 
     
     stime = event['start_time'] ## update with start time of current event
+    sbin = event['start_neuron_bin'] ## update with start neuron bin of current event
 
   event_mag = events_length/(N*simulation_time) ## normalized magnitude of events 
   ## (number of neurons covered by events, proportional to num neurons in network and simulation time)

@@ -53,7 +53,7 @@ input_orig = input
 
 
 N = 3000 ## Number of excitatory neurons
-p = 50/N ## average probability of connectivity between neurons
+p = 30/N ## average probability of connectivity between neurons
 
 ## what indices do you want to use for these matrices:
 if len(sys.argv) >= 3:
@@ -76,21 +76,19 @@ for w_index in range(start_index, end_index+1):
             sys.stdout.flush()
             
             ## Define the L_left, L_right, and alpha values here:
-            # L_left = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
-            # L_right = math.exp(np.random.uniform(math.log(45), math.log(10000)))# L=[90,22000]ish
-            # L_left = 250 
+            # L_left = 50 
             L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
-            # L_right = 0 
-            L_right = L_left ## for symmetric/recurrent networks
+            # L_right = 0  ## for feedforward networks
+            L_right = L_left ## for recurrent networks
 
             # alpha_recip = np.random.uniform(-0.5, 1)
             # alpha_conv = np.random.uniform(0, 0.5)
             # alpha_div = np.random.uniform(0, 0.5)
             # alpha_chain = np.random.uniform(-0.5, 0.5)
-            alpha_recip = 0.5
-            alpha_conv = 0
-            alpha_div = 0
-            alpha_chain = 0
+            alpha_recip = 0
+            alpha_conv = 3
+            alpha_div = 3
+            alpha_chain = 3
 
             # print('alpha_recip={0}'.format(alpha_recip))
             # print('alpha_conv={0}'.format(alpha_conv))
@@ -111,6 +109,7 @@ for w_index in range(start_index, end_index+1):
             ## the matrix is sparse, so let's save it that way
             Wsparse = sparse.csr_matrix(W)
 
+            ## For feedforwad networks:
             ## truncate W to make it a lower triangular matrix (used in the Feed Forward case)
             # W_lowerTri = np.tril(W) 
             # Wsparse = sparse.csr_matrix(W_lowerTri) 

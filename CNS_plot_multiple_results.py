@@ -27,13 +27,13 @@ import analyze_results as ar
 N = 3000 ## Number of excitatory neurons
 p =50/N ## average probability of connectivity between neurons
 
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
-data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
-# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 print("data_dir: "+data_dir)
 
 # style = "Regular5s_Clean_"
-style = "Irregular50s_Clean_"
+style = "Irregular50sNew_Clean_"
 print("style: "+style)
 
 # reload=False
@@ -206,8 +206,10 @@ plt.xlabel(r'$\hat\alpha_{\mathrm{div}}$')
 plt.ylabel('event rate')
 plt.xticks(np.arange(0.1,0.6,0.1))
 plt.xlim(left=0.02)
-plt.yticks(np.arange(10,31,10))
-plt.ylim(5,35)
+# plt.yticks(np.arange(25,51,5))
+# plt.ylim(20,55)
+plt.yticks(np.arange(0,26,5))
+plt.ylim(0,27)
 plt.tight_layout()
 mng = plt.get_current_fig_manager()
 mng.window.showMaximized()
