@@ -29,10 +29,10 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     print("\n")
 
 
-    matplotlib.rcParams.update({'font.size': 40})
-    plt.rc('font', family='serif', size=40)
-    plt.rc('xtick', labelsize=30)
-    plt.rc('ytick', labelsize=30)
+    # matplotlib.rcParams.update({'font.size': 40})
+    # plt.rc('font', family='serif', size=40)
+    # plt.rc('xtick', labelsize=30)
+    # plt.rc('ytick', labelsize=30)
 
     # #plot the results of the simulation
     # plt.figure(figsize=(20,7))
@@ -53,19 +53,25 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
     
+
+    plt.rc('font', family='serif', size=60)
+    plt.rc('xtick', labelsize=50)
+    plt.rc('ytick', labelsize=50)
+
+
     #axis([mintime, maxtime, 1, N])
     plt.xlabel('Time (ms)')
     # plt.xticks([])
-    # plt.xticks(np.arange(505,600,15))
-    plt.xlim(490,590)
-    # plt.xticks(np.arange(1000,5550,500))
-    # plt.xlim(450,5550)
+    # plt.xticks(np.arange(1000,3600,500))
+    # plt.xlim(500,3500)
+    plt.xticks(np.arange(600,1510,300))
+    plt.xlim(500,1500)
     plt.ylabel('Neuron index')
-    # plt.yticks(np.arange(0,3001,500))
-    plt.ylim(-10,3010)
+    plt.yticks(np.arange(0,3001,500))
+    plt.ylim(0,3000)
 
     # plt.tight_layout()
-    plt.grid(True)
+    # plt.grid(True)
     
 
     ## PRM Plot: 
@@ -111,6 +117,8 @@ def plot_hist(N, p, i, style, data_dir):
     plt.hist(results['IEIs'],50) ## data , number of bins
     plt.xlabel('Inter-event interval (ms)')
     plt.ylabel('Count')
+    plt.yticks(np.arange(0,17,5))
+    plt.ylim(0,18)
     # plt.tight_layout()
 
     plt.show()
