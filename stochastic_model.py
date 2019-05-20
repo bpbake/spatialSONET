@@ -96,9 +96,21 @@ def stochastic_model(W, N, coupling_strength, nswitch=25000):
 #######################################################################################
 def stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax):
 	import matplotlib.pyplot as plt
+	import numpy as np
 
-	plt.xlim(0, tmax+5)
-	# plt.ylim(-5,N+5)
+	plt.figure()
+
+	plt.rc('font', family='serif', size=60)
+	plt.rc('xtick', labelsize=50)
+	plt.rc('ytick', labelsize=50)
+
+	plt.xlabel('time')
+	plt.ylabel('neuron index')
+
+	plt.xlim(0, tmax+1)
+	plt.yticks(np.arange(0,3100,500))
+	plt.ylim(-10,3010)
+
 	plt.hlines(fired_neurons, on_times, off_times)
 	# plt.show()
 
@@ -111,16 +123,25 @@ def stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax):
 def num_active_plot(sim_index, active_count, plateau, threshold, time_bin_size, tmax):
 	import math
 	import numpy as np
+	import matplotlib.pyplot as plt
 
 	num_time_bins = math.ceil(tmax/time_bin_size)
 	time_bins = time_bin_size*np.arange(num_time_bins)
 
 	## plot num active neurons vs time
 	plt.figure()
-	plt.suptitle("number active neurons in simulation index {0}".format(sim_index))
+
+	plt.rc('font', family='serif', size=60)
+	plt.rc('xtick', labelsize=50)
+	plt.rc('ytick', labelsize=50)
+
+	plt.xlabel('time')
+	plt.ylabel('number of active neurons')
+	# plt.suptitle("number active neurons in simulation index {0}".format(sim_index))
 	plt.plot(time_bins, active_count, "b-")
-	plt.plot(time_bins, plateau*np.ones(num_time_bins), "r-")
-	plt.plot(time_bins, threshold*np.ones(num_time_bins), "r-")
+	plt.plot(time_bins, plateau*np.ones(num_time_bins), "r--", label = "plateau")
+	plt.plot(time_bins, threshold*np.ones(num_time_bins), "gold--", label = "threshold")
+	plt.legend()
 	plt.show()
 
 

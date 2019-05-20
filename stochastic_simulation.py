@@ -50,7 +50,6 @@ import matplotlib.pyplot as plt
 
 N = 3000 ## Number of excitatory neurons
 p = 50/N ## average probability of connectivity between neurons
-# w_index = 4
 L_left = float("inf")
 
 coupling_strength = 0.03
@@ -73,15 +72,17 @@ for w_index in range(start_index, end_index+1):
 
 	print("\n\n\nNow running simulations on network {0}\n\n".format(w_index))
 
+	## Load the W matrix
 	W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p, L_left, w_index)
 	with open(W_filename+'.pickle', 'rb') as wf:
 	    try:
-	        Wsparse = pickle.load(wf) ## load in W matrix
+	        Wsparse = pickle.load(wf)
 	    except (EOFError):
 	        print("unpickling W error")
 	        sys.stdout.flush()
 	W = np.array(Wsparse.todense())
 
+	## Load the stats
 	stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, w_index, coupling_strength)
 	stats_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L_left, w_index)
 	try:
@@ -99,49 +100,46 @@ for w_index in range(start_index, end_index+1):
 				print("unpickling stats error")
 				sys.stdout.flush()
 
+	## Print the stats
+	print('Matrix {0}'.format(w_index))
+	for k,v in sorted(stats.items()):
+		if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):
+			print(k+":{0}".format(v))
+		if k=="events":
+			print(k+"{0}".format(v[0:20]))
+	print("\n")
 
 
+    ## Initialize simulation 
 	time_bin_size = 1/N
-	# event = False
 	event_times = []
-	num_sim = 500
+	num_sim = 200
 
+	## run simulations
 	for sim in range(num_sim):
 		sim_start = time.time()
 		print("\n\nSimulation {0} of {1} on network {2} of ({3} to {4})\n".format(sim+1, num_sim, w_index, start_index, end_index))
 		(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times) = sm.stochastic_model(W, N, coupling_strength, nswitch)
-		# print("number of switches: {0}".format(len(times)))
-		print("time of 80%% of switches: {0}".format(time80percent))
-		# print("last time: {0}".format(times[-1]))
+		print("time of 80% of switches: {0}".format(time80percent))
 		print("tmax: {0}".format(tmax))
 		sys.stdout.flush()
 
-		# now_time = time.time()
-		# print("\nfinished with stochastic simulation.  \nruntime: {0}\n".format(now_time-sim_start))
-
 
 		## Plot simulation
-		plt.figure()
-		plt.suptitle("rastor plot of simulation {0}".format(sim))
-		sm.stochastic_plot(N, fired_neurons, on_times, off_times, tmax)
+		# sm.stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax)
 
 
 		## Now make a list of active neurons at beginning of each time bin
 		num_time_bins = math.ceil(tmax/time_bin_size)
-		# print("num time bins: {0}".format(num_time_bins))
-		# sys.stdout.flush()
 
 		active_count = []
 		
+		## Fill the active_count arry
 		for time_bin_index in range(num_time_bins):
 			t = time_bin_size*time_bin_index
-			num_active = len(on_times[np.where(on_times <= t)]) - len(off_times[np.where(off_times <= t)]) ## the number switched on before time t - number that switched off before time t)
+			## define num_active = the number switched on before time t - number that switched off before time t)
+			num_active = len(on_times[np.where(on_times <= t)]) - len(off_times[np.where(off_times <= t)]) 
 			active_count.append(num_active)
-
-		# print("\nfinished calculating num active neurons per time bin")#. \nruntime: {0}".format(time.time()-sim_start))
-		# print("time spent calculating num active neurons: {0}\n".format(time.time()-now_time))
-		# now_time = time.time()
-		# sys.stdout.flush()
 
 
 		## find plateau and threshold values & add to plot
@@ -149,26 +147,19 @@ for w_index in range(start_index, end_index+1):
 		plateau = float(np.array(active_count[time_bin_80percent:]).mean())
 		threshold = 0.5*plateau
 		print("plateau = {0}".format(plateau))
-		# print("\nready to plot num active neurons vs. time.  \nruntime: {0}\n".format(time.time()-sim_start))
 		sys.stdout.flush()
 
 
 		## plot num active neurons vs time
-		sm.num_active_plot(sim, active_count, plateau, threshold, time_bin_size, tmax)
+		# sm.num_active_plot(sim, active_count, plateau, threshold, time_bin_size, tmax)
 
 
 		## Check that an event occurred
-		# if plateau > (.1*N):
-		# 	event=True
-		# else:
-		# 	break
 		if plateau < (.1*N):
 			print("\n\nsimulation {0} may not have an event\n\n".format(sim))
 
 
-		## event time = first time num active neurons > threshold
-		# print("now calculating event time")
-		# sys.stdout.flush()
+		## define event time = first time num active neurons > threshold
 		active_count = np.asarray(active_count)
 		event_time_bin = float(np.argwhere(active_count >= threshold)[0])
 		event_time = time_bin_size*event_time_bin
@@ -207,8 +198,9 @@ for w_index in range(start_index, end_index+1):
 	print("std event time: {0}".format(std_event_time))
 	sys.stdout.flush()
 
+	# plt.show()
 
 
-	# stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, w_index, coupling_strength)
+	## save stochastic stats
 	with open(stochastic_filename+".pickle", "wb") as stochf:
 			pickle.dump(stats, stochf)

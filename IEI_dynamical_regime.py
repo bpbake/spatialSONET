@@ -27,13 +27,13 @@ import analyze_results as ar
 N = 3000 ## Number of excitatory neurons
 p =50/N ## average probability of connectivity between neurons
 
-data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
-# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 print("data_dir: "+data_dir)
 
-style = "Regular5s_"
-# style = "Irregular50s_"
+# style = "Regular5s_"
+style = "Irregular50s_"
 print("style: "+style)
 
 reload=False
@@ -71,6 +71,7 @@ else:
     actual_index = -1
 
     skipped = 0
+    num_no_events = 0
     for w_index in range(start_index, end_index+1):
         if w_index%30 == 0:    
             print("w_index = {0}".format(w_index))
@@ -100,30 +101,41 @@ else:
           except:
             continue
 
-        # if not samp_results['IEIs']:
-        #   print('no events in index {0}. IEI stats not computed.'.format(w_index))
-        # else:
-        imean=np.mean(samp_results["IEIs"])
-        istd=np.std(samp_results["IEIs"])
+        if not samp_results['IEIs']:
+          num_no_events += 1
+          # imean = samp_results['simulation_time']
+          imean = float('nan')
+          istd = float('nan')
+          # istd = float('inf')
+          # print('no events in index {0}. IEI stats not computed.'.format(w_index))
+        else:
+          imean=np.mean(samp_results["IEIs"])
+          istd=np.std(samp_results["IEIs"])
         icoeffvar = np.true_divide(istd,imean)
         results["IEI mean"][actual_index]=imean
         results["IEI std"][actual_index]=istd
         results["IEI coeff of variation"][actual_index]=icoeffvar
-        print('IEI coeff of variation for index {0}: {1}'.format(w_index, icoeffvar))         
+        print('IEI coeff of variation for index {0}: {1}'.format(w_index, icoeffvar))   
+        # print('IEI excess kurtosis for index {0}: {1}'.format(w_index, samp_results['IEI excess_kurtosis']))  
+        # print('IEI mean: {0}'.format(imean))    
 
 
     for key in results:
         results[key].resize(actual_index+1, refcheck=False)
 
     results["skipped"] = skipped
+    results['num_no_events'] = num_no_events
     ## save results (pickle new stats summary dictionary for future plots)
     with open(iei_filename, "wb") as rf:
         pickle.dump(results, rf)
 
 print("\n{0} networks were skipped due to saturation or high average firing rate".format(results['skipped']))
+print("there were {0} simulations with no events".format(results['num_no_events']))
 
 print("\nStyle: {0}".format(style))
-print("min IEI coefficient of variation: {1}".format(style, np.nanmin(results["IEI coeff of variation"])))
+print("average IEI mean: {0}".format(np.nanmean(results['IEI mean'])))
+print("average IEI excess kurtosis: {0}".format(np.nanmean(results['IEI excess_kurtosis'])))
+# print("min IEI coefficient of variation: {1}".format(style, np.nanmin(results["IEI coeff of variation"])))
 print("mean IEI coefficient of variation: {1}".format(style, np.nanmean(results["IEI coeff of variation"])))
-print("max IEI coefficient of variation: {1}".format(style, np.nanmax(results["IEI coeff of variation"])))
-print("median IEI coefficient of variation: {1}".format(style, np.nanmedian(results["IEI coeff of variation"])))
+# print("max IEI coefficient of variation: {1}".format(style, np.nanmax(results["IEI coeff of variation"])))
+# print("median IEI coefficient of variation: {1}".format(style, np.nanmedian(results["IEI coeff of variation"])))
