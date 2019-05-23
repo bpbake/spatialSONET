@@ -96,8 +96,8 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEI excess_kurtosis'] = excess_kurtosis
   results['IEI skew'] = skew
 
-  save_results(N, p, i, results, style+"New_", data_dir)
-  clean_results(N, p, i, style+"New_", data_dir)
+  save_results(N, p, i, results, style, data_dir)
+  clean_results(N, p, i, style, data_dir)
 
   for k,v in sorted(results.items()):
     if (not isinstance(v,np.ndarray)) and (not isinstance(v, list)):

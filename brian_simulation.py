@@ -9,8 +9,12 @@ Created on Sun Mar  5 14:06:45 2017
 # data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
 
 # data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
-data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
+
+data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
 # data_dir = 'matrices/test/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
@@ -20,7 +24,7 @@ res_dir = data_dir
 print("data_dir: "+data_dir)
 # print("results_dir: "+res_dir)
 # Style = "Regular5s_"
-Style = "Irregular50s_"
+Style = "Irregular100s_"
 print("Style: "+Style)
 
 # L_left = 100 ## spatial parameter ff
@@ -79,7 +83,7 @@ refract = 1*ms ## "cool down" time between spikes (after a spike, it can't spike
 transienttime = 500*ms ## getting the network into place (the start bit of the simulation)
 ## the part of the simulation we care about
 # simulationtime = 5000*ms ## Regular
-simulationtime = 50000*ms ## Irregular
+simulationtime = 100000*ms ## Irregular
 
 ## Set up the Neuron Groups for simulation
 G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refract', method='euler') 
@@ -94,7 +98,10 @@ G.v='vreset+(vthreshold-vreset)*rand()' ## sets voltage dip below reset after sp
 ##--- For homogeneous networks ---
 # ext_rate = 110*Hz ## rate of external input (how often input happens)
 # ext_mag = 1.7*mV ## how much the voltage gets affected by the external input
-##--- For spatial networks ---
+##--- For feed-forward networks ---
+# ext_rate = 115*Hz ## rate of external input (how often input happens)
+# ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
+##--- For recurrent networks ---
 ext_rate = 113*Hz ## rate of external input (how often input happens)
 ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
 
@@ -223,6 +230,12 @@ for w_index in range(start_index, end_index+1):
     stats['IEIs'] = IEIs 
     stats['IEI excess_kurtosis'] = excess_kurtosis
     stats['IEI skew'] = skew
+    imean=np.mean(IEIs)
+    istd=np.std(IEIs)
+    icoeffvar = np.true_divide(istd,imean)
+    stats["IEI mean"]=imean
+    stats["IEI std"]=istd
+    stats["IEI coeff of variation"]=icoeffvar
     
     ## print the stats for W
     for key,value in sorted(stats.items()):

@@ -103,11 +103,12 @@ def stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax):
 	plt.rc('font', family='serif', size=60)
 	plt.rc('xtick', labelsize=50)
 	plt.rc('ytick', labelsize=50)
+	plt.rc('lines', markersize=2, linewidth=2)
 
-	plt.xlabel('time')
-	plt.ylabel('neuron index')
+	plt.xlabel('Time')
+	plt.ylabel('Neuron index')
 
-	plt.xlim(0, tmax+1)
+	plt.xlim(0, tmax)
 	plt.yticks(np.arange(0,3100,500))
 	plt.ylim(-10,3010)
 
@@ -134,13 +135,14 @@ def num_active_plot(sim_index, active_count, plateau, threshold, time_bin_size, 
 	plt.rc('font', family='serif', size=60)
 	plt.rc('xtick', labelsize=50)
 	plt.rc('ytick', labelsize=50)
+	plt.rc('lines', markersize=5, linewidth=5)
 
-	plt.xlabel('time')
-	plt.ylabel('number of active neurons')
+	plt.xlabel('Time')
+	plt.ylabel('Number of active neurons')
 	# plt.suptitle("number active neurons in simulation index {0}".format(sim_index))
 	plt.plot(time_bins, active_count, "b-")
 	plt.plot(time_bins, plateau*np.ones(num_time_bins), "r--", label = "plateau")
-	plt.plot(time_bins, threshold*np.ones(num_time_bins), "gold--", label = "threshold")
+	plt.plot(time_bins, threshold*np.ones(num_time_bins), "--", color = 'gold', label = "threshold")
 	plt.legend()
 	plt.show()
 

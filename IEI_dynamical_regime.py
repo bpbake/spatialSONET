@@ -28,16 +28,16 @@ N = 3000 ## Number of excitatory neurons
 p =50/N ## average probability of connectivity between neurons
 
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
-# data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 print("data_dir: "+data_dir)
 
-# style = "Regular5s_"
-style = "Irregular50s_"
+style = "Regular5s_"
+# style = "Irregular50s_"
 print("style: "+style)
 
-reload=False
-# reload=True
+# reload=False
+reload=True
 
 iei_filename = "{0}IEI_Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,style) 
 
@@ -74,7 +74,7 @@ else:
     num_no_events = 0
     for w_index in range(start_index, end_index+1):
         if w_index%30 == 0:    
-            print("w_index = {0}".format(w_index))
+            print("\nw_index = {0}".format(w_index))
 
         try:
             samp_results = ar.load_results(N, p, w_index, style, data_dir)
@@ -115,7 +115,7 @@ else:
         results["IEI mean"][actual_index]=imean
         results["IEI std"][actual_index]=istd
         results["IEI coeff of variation"][actual_index]=icoeffvar
-        print('IEI coeff of variation for index {0}: {1}'.format(w_index, icoeffvar))   
+        # print('IEI coeff of variation for index {0}: {1}'.format(w_index, icoeffvar))   
         # print('IEI excess kurtosis for index {0}: {1}'.format(w_index, samp_results['IEI excess_kurtosis']))  
         # print('IEI mean: {0}'.format(imean))    
 
@@ -132,10 +132,11 @@ else:
 print("\n{0} networks were skipped due to saturation or high average firing rate".format(results['skipped']))
 print("there were {0} simulations with no events".format(results['num_no_events']))
 
-print("\nStyle: {0}".format(style))
-print("average IEI mean: {0}".format(np.nanmean(results['IEI mean'])))
-print("average IEI excess kurtosis: {0}".format(np.nanmean(results['IEI excess_kurtosis'])))
-# print("min IEI coefficient of variation: {1}".format(style, np.nanmin(results["IEI coeff of variation"])))
-print("mean IEI coefficient of variation: {1}".format(style, np.nanmean(results["IEI coeff of variation"])))
-# print("max IEI coefficient of variation: {1}".format(style, np.nanmax(results["IEI coeff of variation"])))
-# print("median IEI coefficient of variation: {1}".format(style, np.nanmedian(results["IEI coeff of variation"])))
+print("\ndata_dir: {0}".format(data_dir))
+print("Style: {0}".format(style))
+# print("average IEI mean: {0}".format(np.nanmean(results['IEI mean'])))
+print("IEI excess kutosis: {0}".format(results['IEI excess_kurtosis']))
+# print("average IEI excess kurtosis: {0}".format(np.nanmean(results['IEI excess_kurtosis'])))
+print("IEI coefficients of variation: {0}".format(results['IEI coeff of variation']))
+# print("mean IEI coefficient of variation: {1}".format(style, np.nanmean(results["IEI coeff of variation"])))
+print("IEI skew: {0}".format(results['IEI skew']))

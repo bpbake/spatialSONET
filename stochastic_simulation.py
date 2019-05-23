@@ -19,10 +19,11 @@ start = time.time()
 
 
 # data_dir = 'matrices/N1000_Linf_recurr_alpha_div_rand/'
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = "matrices/"
-data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+data_dir = 'matrices/test/'
 print("data_dir: {0}".format(data_dir))
 sys.stdout.flush()
 
@@ -51,6 +52,7 @@ import matplotlib.pyplot as plt
 N = 3000 ## Number of excitatory neurons
 p = 50/N ## average probability of connectivity between neurons
 L_left = float("inf")
+# L_left = 100
 
 coupling_strength = 0.03
 nswitch = 25000
@@ -113,20 +115,24 @@ for w_index in range(start_index, end_index+1):
     ## Initialize simulation 
 	time_bin_size = 1/N
 	event_times = []
-	num_sim = 200
+	num_sim = 5
 
 	## run simulations
 	for sim in range(num_sim):
 		sim_start = time.time()
 		print("\n\nSimulation {0} of {1} on network {2} of ({3} to {4})\n".format(sim+1, num_sim, w_index, start_index, end_index))
 		(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times) = sm.stochastic_model(W, N, coupling_strength, nswitch)
+
+		print("data_dir: {0}".format(data_dir))
+		print("alpha_div_hat: {0}".format(stats['alpha_div_hat']))
+		
 		print("time of 80% of switches: {0}".format(time80percent))
 		print("tmax: {0}".format(tmax))
 		sys.stdout.flush()
 
 
 		## Plot simulation
-		# sm.stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax)
+		sm.stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax)
 
 
 		## Now make a list of active neurons at beginning of each time bin
@@ -151,7 +157,7 @@ for w_index in range(start_index, end_index+1):
 
 
 		## plot num active neurons vs time
-		# sm.num_active_plot(sim, active_count, plateau, threshold, time_bin_size, tmax)
+		sm.num_active_plot(sim, active_count, plateau, threshold, time_bin_size, tmax)
 
 
 		## Check that an event occurred
