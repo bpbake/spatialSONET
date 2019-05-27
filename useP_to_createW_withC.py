@@ -52,7 +52,7 @@ def create_W(N, P, alpha_recip, alpha_conv, alpha_div, alpha_chain):
     sys.stdout.flush()
     
     ## Make the matrices of sigma and sigma_tilde
-    Msigma = np.ones((N,N)) - np.identity(N) ## used in the covariance matrix of gaussian Z's
+    Msigma = np.ones((N,N)) - np.identity(N) ## this is the variance matrix of gaussian Z's
     M_tilde = np.multiply(Msigma, np.add(P,c1)) ## used in the approximation of the covariance matrix of Z's
     ## we multiply sigma_ij by (p_ij + c1) to get sigma_ij^tilde
 

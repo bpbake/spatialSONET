@@ -10,10 +10,10 @@ Created on Sun Mar  5 14:06:45 2017
 
 # data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
 
-data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
-# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
 # data_dir = 'matrices/test/'
@@ -28,8 +28,8 @@ Style = "Irregular100s_"
 print("Style: "+Style)
 
 # L_left = 100 ## spatial parameter ff
-L_left = 50 ## spatial parameter recurrent
-# L_left = float("inf") ## spatial parameter for homogeneous
+# L_left = 50 ## spatial parameter recurrent
+L_left = float("inf") ## spatial parameter for homogeneous
 N = 3000 ## Number of excitatory neurons
 p = 50/N ## average probability of connectivity between neurons
 neuron_bin_size = 100 ## number of neurons in each neuron bin (for analysis of network simulation)
@@ -91,19 +91,19 @@ G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refr
 G.v='vreset+(vthreshold-vreset)*rand()' ## sets voltage dip below reset after spike
 
 ## variables that control the PoissonGroup
-##-----Regular Regime-----
+##-----REGULAR Regime-----
 # ext_rate = 250*Hz ## rate of external input (how often input happens)
 # ext_mag = 1*mV ## how much the voltage gets affected by the external input
-##-----Irregular Regime-----
+##-------IRREGULAR Regime-----
 ##--- For homogeneous networks ---
-# ext_rate = 110*Hz ## rate of external input (how often input happens)
-# ext_mag = 1.7*mV ## how much the voltage gets affected by the external input
+ext_rate = 111*Hz ## rate of external input (how often input happens)
+ext_mag = 1.6*mV ## how much the voltage gets affected by the external input
 ##--- For feed-forward networks ---
-# ext_rate = 115*Hz ## rate of external input (how often input happens)
+# ext_rate = 116*Hz ## rate of external input (how often input happens)
 # ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
 ##--- For recurrent networks ---
-ext_rate = 113*Hz ## rate of external input (how often input happens)
-ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
+# ext_rate = 113*Hz ## rate of external input (how often input happens)
+# ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) ## adds noise to the simulation
 Sp = Synapses(P,G, on_pre="v+=ext_mag") ## synapes P onto G

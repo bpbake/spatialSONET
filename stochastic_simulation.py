@@ -22,8 +22,9 @@ start = time.time()
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = "matrices/"
-# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
-data_dir = 'matrices/test/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
+# data_dir = 'matrices/test/'
 print("data_dir: {0}".format(data_dir))
 sys.stdout.flush()
 
@@ -72,7 +73,7 @@ else:
 for w_index in range(start_index, end_index+1):
 	np.random.seed(w_index)
 
-	print("\n\n\nNow running simulations on network {0}\n\n".format(w_index))
+	print("\n\nNow running simulations on network {0}\n".format(w_index))
 
 	## Load the W matrix
 	W_filename = "{0}Wsparse_N{1}_p{2}_L{3}_{4}".format(data_dir, N, p, L_left, w_index)
@@ -85,22 +86,13 @@ for w_index in range(start_index, end_index+1):
 	W = np.array(Wsparse.todense())
 
 	## Load the stats
-	stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_{3}_{4}".format(data_dir, N, p, w_index, coupling_strength)
 	stats_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L_left, w_index)
-	try:
-		with open(stochastic_filename, 'rb') as stochf:
-			try:
-				stats = pickle.load(stochf)
-			except (EOFError):
-				print("unpickling stochastic stats error")
-				sys.stdout.flush()
-	except: 
-		with open(stats_filename, 'rb') as statf:
-			try:
-				stats = pickle.load(statf)
-			except (EOFError):
-				print("unpickling stats error")
-				sys.stdout.flush()
+	with open(stats_filename, 'rb') as statf:
+		try:
+			stats = pickle.load(statf)
+		except (EOFError):
+			print("unpickling stats error")
+			sys.stdout.flush()
 
 	## Print the stats
 	print('Matrix {0}'.format(w_index))
@@ -109,18 +101,18 @@ for w_index in range(start_index, end_index+1):
 			print(k+":{0}".format(v))
 		if k=="events":
 			print(k+"{0}".format(v[0:20]))
-	print("\n")
+	# print("\n")
 
 
     ## Initialize simulation 
 	time_bin_size = 1/N
 	event_times = []
-	num_sim = 5
+	num_sim = 200
 
 	## run simulations
 	for sim in range(num_sim):
 		sim_start = time.time()
-		print("\n\nSimulation {0} of {1} on network {2} of ({3} to {4})\n".format(sim+1, num_sim, w_index, start_index, end_index))
+		print("\n\nSimulation {0} of {1} on network {2} of ({3} to {4})".format(sim+1, num_sim, w_index, start_index, end_index))
 		(times, neurons, tmax, time80percent, fired_neurons, on_times, off_times) = sm.stochastic_model(W, N, coupling_strength, nswitch)
 
 		print("data_dir: {0}".format(data_dir))
@@ -132,7 +124,7 @@ for w_index in range(start_index, end_index+1):
 
 
 		## Plot simulation
-		sm.stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax)
+		# sm.stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax)
 
 
 		## Now make a list of active neurons at beginning of each time bin
@@ -157,12 +149,12 @@ for w_index in range(start_index, end_index+1):
 
 
 		## plot num active neurons vs time
-		sm.num_active_plot(sim, active_count, plateau, threshold, time_bin_size, tmax)
+		# sm.num_active_plot(sim, active_count, plateau, threshold, time_bin_size, tmax)
 
 
 		## Check that an event occurred
 		if plateau < (.1*N):
-			print("\n\nsimulation {0} may not have an event\n\n".format(sim))
+			print("\nsimulation {0} may not have an event\n".format(sim))
 
 
 		## define event time = first time num active neurons > threshold
@@ -173,6 +165,44 @@ for w_index in range(start_index, end_index+1):
 		event_times.append(event_time)
 		print("event time: {0}".format(event_time))
 
+		## record short details
+		stats['coupling_strength'] = coupling_strength
+		stats['num_switches'] = nswitch
+		stats['simulation_index'] = sim
+		stats['time_bin_size'] = time_bin_size
+		stats['num_time_bins'] = num_time_bins
+
+		stats['tmax'] = tmax
+		stats['time80percent'] = time80percent
+
+		stats['plateau'] = plateau
+		stats['threshold'] = threshold
+		stats['active_count'] = active_count
+		stats['event_time_bin'] = event_time_bin
+		stats['event_time'] = event_time
+
+		stats['runtime'] = time.time()-sim_start
+
+		## save stochastic stats
+		stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_coupling{3}_index{4}_simulation{5}_Clean".format(
+			data_dir, N, p, coupling_strength, w_index, sim)
+		with open(stochastic_filename+".pickle", "wb") as stochf:
+				pickle.dump(stats, stochf)
+
+
+		## Add in more details
+		stats['times'] = times
+		stats['neurons'] = neurons
+		stats['fired_neurons'] = fired_neurons
+		stats['on_times'] = on_times
+		stats['off_times'] = off_times
+
+		## save stochastic stats
+		stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_coupling{3}_index{4}_simulation{5}".format(
+			data_dir, N, p, coupling_strength, w_index, sim)
+		with open(stochastic_filename+".pickle", "wb") as stochf:
+				pickle.dump(stats, stochf)
+
 
 	print("\ntotal runtime for {0} simulations: {1} seconds\n".format(num_sim, time.time()-start))
 	sys.stdout.flush()
@@ -181,32 +211,32 @@ for w_index in range(start_index, end_index+1):
 
 
 	## now update the event_times and num_sim lists
-	try:
-		stats['event_times'] += event_times ## this is a list (not numpy array)
-		stats['num_sim'] += num_sim ## this is a number (integer)
-	except:
-		stats['event_times'] = event_times
-		stats['num_sim'] = num_sim
+	# try:
+	# 	stats['event_times'] += event_times ## this is a list (not numpy array)
+	# 	stats['num_sim'] += num_sim ## this is a number (integer)
+	# except:
+	# 	stats['event_times'] = event_times
+	# 	stats['num_sim'] = num_sim
 
 
 
-	## calculate (and update) event time stats
-	mean_event_time = np.mean(stats['event_times'])
-	median_event_time = np.median(stats['event_times'])
-	std_event_time = np.std(stats['event_times'])
-	stats['mean_event_time'] = mean_event_time
-	stats['median_event_time'] = median_event_time
-	stats['std_event_time'] = std_event_time
+	# ## calculate (and update) event time stats
+	# mean_event_time = np.mean(stats['event_times'])
+	# median_event_time = np.median(stats['event_times'])
+	# std_event_time = np.std(stats['event_times'])
+	# stats['mean_event_time'] = mean_event_time
+	# stats['median_event_time'] = median_event_time
+	# stats['std_event_time'] = std_event_time
 
-	print("\ntotal number of simulations: {0}".format(stats['num_sim']))
-	print("mean event time: {0}".format(mean_event_time))
-	print("median event time: {0}".format(median_event_time))
-	print("std event time: {0}".format(std_event_time))
-	sys.stdout.flush()
+	# print("\ntotal number of simulations: {0}".format(stats['num_sim']))
+	# print("mean event time: {0}".format(mean_event_time))
+	# print("median event time: {0}".format(median_event_time))
+	# print("std event time: {0}".format(std_event_time))
+	# sys.stdout.flush()
 
 	# plt.show()
 
 
 	## save stochastic stats
-	with open(stochastic_filename+".pickle", "wb") as stochf:
-			pickle.dump(stats, stochf)
+	# with open(stochastic_filename+".pickle", "wb") as stochf:
+	# 		pickle.dump(stats, stochf)
