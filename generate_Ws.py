@@ -14,8 +14,8 @@ Created on Mon Apr  3 16:41:12 2017
 
 ## Define a directory for adjacency matrices (saved as python pickle files)
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
+data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = "matrices/"
 # data_dir = 'matrices/test/'
@@ -75,10 +75,10 @@ for w_index in range(start_index, end_index+1):
             sys.stdout.flush()
             
             ## Define the L_left, L_right, and alpha values here:
-            # L_left = 50 ## 100 for feedforward, 50 for recurrent
-            L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
-            # L_right = 0  ## for feedforward networks
-            L_right = L_left ## for recurrent networks
+            L_left = 100 ## 100 for feedforward, 50 for recurrent
+            # L_left = float("inf") ## for homogeneous networks (as in Zhao et al.)
+            L_right = 0  ## for feedforward networks
+            # L_right = L_left ## for recurrent networks
 
             # alpha_recip = np.random.uniform(-0.5, 1)
             # alpha_conv = np.random.uniform(0, 0.5)
@@ -86,7 +86,7 @@ for w_index in range(start_index, end_index+1):
             # alpha_chain = np.random.uniform(-0.5, 0.5)
             alpha_recip = 0
             alpha_conv = 0
-            alpha_div = 0.5
+            alpha_div = 0
             alpha_chain = 0
 
             # print('alpha_recip={0}'.format(alpha_recip))
@@ -110,8 +110,8 @@ for w_index in range(start_index, end_index+1):
 
             ## For feedforwad networks:
             ## truncate W to make it a lower triangular matrix (used in the Feed Forward case)
-            # W_lowerTri = np.tril(W) 
-            # Wsparse = sparse.csr_matrix(W_lowerTri) 
+            W_lowerTri = np.tril(W) 
+            Wsparse = sparse.csr_matrix(W_lowerTri) 
             
 
             ## save the adjacency matrix W as a python pickle file

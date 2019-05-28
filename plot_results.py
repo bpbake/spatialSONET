@@ -53,7 +53,7 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     inds = np.logical_and(results['spikemon times']>mintime, results['spikemon times'] < maxtime)
     plt.plot(results['spikemon times'][inds],results['spikemon indices'][inds], '.k', markersize=1)
     
-
+    plt.rc('text', usetex=False)
     plt.rc('font', family='serif', size=60)
     plt.rc('xtick', labelsize=50)
     plt.rc('ytick', labelsize=50)
@@ -62,10 +62,12 @@ def plot_results(N,p,i, style, data_dir='matrices/'):
     #axis([mintime, maxtime, 1, N])
     plt.xlabel('Time (ms)')
     # plt.xticks([])
-    plt.xticks(np.arange(1000,3500,500))
-    plt.xlim(450,3500)
-    # plt.xticks(np.arange(600,1510,300))
-    # plt.xlim(500,1500)
+    # plt.xticks(np.arange(1000,3500,500))
+    # plt.xlim(450,3500)
+    plt.xticks(np.arange(500,2010,250))
+    plt.xlim(450,2000)
+    # plt.xticks(np.arange(16000,20000,1000))
+    # plt.xlim(15000, 20000)
     plt.ylabel('Neuron index')
     plt.yticks(np.arange(0,3001,500))
     plt.ylim(0,3000)
@@ -117,8 +119,8 @@ def plot_hist(N, p, i, style, data_dir):
     plt.hist(results['IEIs'],50) ## data , number of bins
     plt.xlabel('Inter-event interval (ms)')
     plt.ylabel('Count')
-    plt.yticks(np.arange(0,17,5))
-    plt.ylim(0,18)
+    # plt.yticks(np.arange(0,17,5))
+    # plt.ylim(0,18)
     # plt.tight_layout()
 
     plt.show()

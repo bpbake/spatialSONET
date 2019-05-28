@@ -42,6 +42,7 @@ def plot_degree_hist(N,p,i,L,data_dir='matrices/test/'):
   import numpy as np
   import scipy as sp
   from scipy import sparse
+  import matplotlib.colors as colors
 
   ## Load W
   Wsparse, stats = load_W(N,p,i,L, data_dir)
@@ -88,9 +89,10 @@ def plot_degree_hist(N,p,i,L,data_dir='matrices/test/'):
   plt.rc('font', family='serif', size=80)
   plt.rc('xtick', labelsize=50)
   plt.rc('ytick', labelsize=50)
-  plt.hist2d(outdeg, indeg, bins=80)
+  plt.hist2d(outdeg, indeg, bins=80, norm=colors.SymLogNorm(linthresh=1))
   plt.xlabel('out-degree')
   plt.ylabel('in-degree')
+  # plt.clim(0,10)
   cb=plt.colorbar()
   cb.set_label('Count')
   mng = plt.get_current_fig_manager()

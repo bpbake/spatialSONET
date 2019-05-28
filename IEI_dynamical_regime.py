@@ -27,9 +27,9 @@ import analyze_results as ar
 N = 3000 ## Number of excitatory neurons
 p =50/N ## average probability of connectivity between neurons
 
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
+data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
 print("data_dir: "+data_dir)
 
 style = "Regular5s_Clean_"
