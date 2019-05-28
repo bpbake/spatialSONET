@@ -19,6 +19,7 @@ input_orig = input ## rename the python default for input (brian will overwrite 
 
 import numpy as np
 np.set_printoptions(threshold=np.nan)
+from scipy import stats
 
 import matplotlib.pyplot as plt
 
@@ -155,6 +156,7 @@ print("\nmean kurtosis: {0}".format(kurtosis_mean))
 # plt.ylabel('event rate')
 # # plt.tight_layout()
 
+print("stats are: slope, intercept, r_value, p_value, std_err")
 
 ## Plot event rate vs alpha_chain
 plt.rc('text', usetex=True)
@@ -175,6 +177,7 @@ plt.ylim(-10,140)
 plt.tight_layout()
 mng = plt.get_current_fig_manager()
 mng.window.showMaximized()
+print("event rate vs. alpha_chain stats: {0}".format(stats.linregress(results['alpha_chain_hat'],results['event_rate'])))
 
 
 ## Plot event rate vs. alpha_conv
@@ -198,6 +201,7 @@ plt.ylim(-10,140)
 plt.tight_layout()
 mng = plt.get_current_fig_manager()
 mng.window.showMaximized()
+print("event rate vs. alpha_conv stats: {0}".format(stats.linregress(results['alpha_conv_hat'],results['event_rate'])))
 
 
 
@@ -220,6 +224,7 @@ plt.ylim(-10,140)
 plt.tight_layout()
 mng = plt.get_current_fig_manager()
 mng.window.showMaximized()
+print("event rate vs. alpha_div stats: {0}".format(stats.linregress(results['alpha_div_hat'],results['event_rate'])))
 
 
 ## Plot alpha_chain vs. alpha_conv with event rate color

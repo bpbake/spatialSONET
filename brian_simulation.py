@@ -96,8 +96,8 @@ G.v='vreset+(vthreshold-vreset)*rand()' ## sets voltage dip below reset after sp
 # ext_mag = 1*mV ## how much the voltage gets affected by the external input
 ##-------IRREGULAR Regime-----
 ##--- For homogeneous networks ---
-ext_rate = 111*Hz ## rate of external input (how often input happens)
-ext_mag = 1.6*mV ## how much the voltage gets affected by the external input
+ext_rate = 110*Hz ## rate of external input (how often input happens)
+ext_mag = 1.65*mV ## how much the voltage gets affected by the external input
 ##--- For feed-forward networks ---
 # ext_rate = 116*Hz ## rate of external input (how often input happens)
 # ext_mag = 1.5*mV ## how much the voltage gets affected by the external input

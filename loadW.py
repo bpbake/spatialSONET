@@ -37,7 +37,7 @@ def load_W(N,p,i,L, data_dir='matrices/') :
    return(Wsparse, stats)  
 
 
-def plot_degree_hist(N,p,i,L,data_dir='matrices/'):
+def plot_degree_hist(N,p,i,L,data_dir='matrices/test/'):
   import matplotlib.pyplot as plt
   import numpy as np
   import scipy as sp
@@ -55,31 +55,50 @@ def plot_degree_hist(N,p,i,L,data_dir='matrices/'):
   print("mean in-degree:{0}\nmean out-degree:{1}".format(np.mean(indeg), np.mean(outdeg)))
 
   ## Plot histograms:
-  plt.figure()
-  # matplotlib.rcParams.update({'font.size': 60})
-  plt.rc('font', family='serif', size=60)
-  plt.rc('xtick', labelsize=50)
-  plt.rc('ytick', labelsize=50)
-  plt.hist(indeg,40) ## data , number of bins
-  plt.xlabel('in-degree')
-  plt.ylabel('Count')
-  mng = plt.get_current_fig_manager()
-  # mng.window.state('zoomed')
-  mng.window.showMaximized()
+  # plt.figure()
+  # # matplotlib.rcParams.update({'font.size': 60})
+  # plt.rc('font', family='serif', size=60)
+  # plt.rc('xtick', labelsize=50)
+  # plt.rc('ytick', labelsize=50)
+  # plt.hist(indeg,40) ## data , number of bins
+  # plt.xlabel('in-degree')
+  # plt.ylabel('Count')
+  # mng = plt.get_current_fig_manager()
+  # # mng.window.state('zoomed')
+  # mng.window.showMaximized()
+  # # plt.tight_layout()
+
+
+  # plt.figure()
+  # # matplotlib.rcParams.update({'font.size': 60})
+  # plt.rc('font', family='serif', size=60)
+  # plt.rc('xtick', labelsize=50)
+  # plt.rc('ytick', labelsize=50)
+  # plt.hist(outdeg,40) ## data , number of bins
+  # plt.xlabel('out-degree')
+  # plt.ylabel('Count')
+  # mng = plt.get_current_fig_manager()
+  # # mng.window.state('zoomed')
+  # mng.window.showMaximized()
   # plt.tight_layout()
 
-
+  ## 2-d historam
   plt.figure()
-  # matplotlib.rcParams.update({'font.size': 60})
-  plt.rc('font', family='serif', size=60)
+  plt.rc('text', usetex=True)
+  plt.rc('font', family='serif', size=80)
   plt.rc('xtick', labelsize=50)
   plt.rc('ytick', labelsize=50)
-  plt.hist(outdeg,40) ## data , number of bins
+  plt.hist2d(outdeg, indeg, bins=80)
   plt.xlabel('out-degree')
-  plt.ylabel('Count')
+  plt.ylabel('in-degree')
+  cb=plt.colorbar()
+  cb.set_label('Count')
   mng = plt.get_current_fig_manager()
   # mng.window.state('zoomed')
   mng.window.showMaximized()
   # plt.tight_layout()
+
+
+
 
   plt.show()

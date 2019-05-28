@@ -27,17 +27,17 @@ import analyze_results as ar
 N = 3000 ## Number of excitatory neurons
 p =50/N ## average probability of connectivity between neurons
 
-# data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
-data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
-# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
+# data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
 print("data_dir: "+data_dir)
 
-style = "Regular5s_"
-# style = "Irregular50s_"
+style = "Regular5s_Clean_"
+# style = "Irregular100s_Clean_"
 print("style: "+style)
 
-# reload=False
-reload=True
+reload=False
+# reload=True
 
 iei_filename = "{0}IEI_Summary_W_N{1}_p{2}_{3}.pickle".format(data_dir,N,p,style) 
 
@@ -101,23 +101,24 @@ else:
           except:
             continue
 
-        if not samp_results['IEIs']:
-          num_no_events += 1
-          # imean = samp_results['simulation_time']
-          imean = float('nan')
-          istd = float('nan')
-          # istd = float('inf')
-          # print('no events in index {0}. IEI stats not computed.'.format(w_index))
-        else:
-          imean=np.mean(samp_results["IEIs"])
-          istd=np.std(samp_results["IEIs"])
-        icoeffvar = np.true_divide(istd,imean)
-        results["IEI mean"][actual_index]=imean
-        results["IEI std"][actual_index]=istd
-        results["IEI coeff of variation"][actual_index]=icoeffvar
-        # print('IEI coeff of variation for index {0}: {1}'.format(w_index, icoeffvar))   
+        # if not samp_results['IEIs']:
+        #   num_no_events += 1
+        #   # imean = samp_results['simulation_time']
+        #   imean = float('nan')
+        #   istd = float('nan')
+        #   # istd = float('inf')
+        #   # print('no events in index {0}. IEI stats not computed.'.format(w_index))
+        # else:
+        #   imean=np.mean(samp_results["IEIs"])
+        #   istd=np.std(samp_results["IEIs"])
+        # icoeffvar = np.true_divide(istd,imean)
+        # results["IEI mean"][actual_index]=imean
+        # results["IEI std"][actual_index]=istd
+        # results["IEI coeff of variation"][actual_index]=icoeffvar
+        # # print('IEI coeff of variation for index {0}: {1}'.format(w_index, icoeffvar))   
         # print('IEI excess kurtosis for index {0}: {1}'.format(w_index, samp_results['IEI excess_kurtosis']))  
         # print('IEI mean: {0}'.format(imean))    
+        print("IEI skew: {0}".format(samp_results['IEI skew']))
 
 
     for key in results:
@@ -139,4 +140,8 @@ print("IEI excess kutosis: {0}".format(results['IEI excess_kurtosis']))
 # print("average IEI excess kurtosis: {0}".format(np.nanmean(results['IEI excess_kurtosis'])))
 print("IEI coefficients of variation: {0}".format(results['IEI coeff of variation']))
 # print("mean IEI coefficient of variation: {1}".format(style, np.nanmean(results["IEI coeff of variation"])))
-print("IEI skew: {0}".format(results['IEI skew']))
+print("\nIEI skew: {0}".format(results['IEI skew']))
+print("mean IEI skew: {0}".format(np.nanmean(results['IEI skew'])))
+
+print("\nevent rates: {0}".format(results['event_rate']))
+print("mean event rate: {0}".format(np.nanmean(results['event_rate'])))
