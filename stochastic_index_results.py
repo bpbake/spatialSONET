@@ -80,6 +80,7 @@ for w_index in range(start_index, end_index+1):
 		('tmax', np.zeros(num_sim)),
 		('time80percent', np.zeros(num_sim)),
 		('plateau', np.zeros(num_sim)),
+		# ('plateau_time', np.zeros(num_sim)),
 		('threshold', np.zeros(num_sim)),
 		('event_time_bin', np.zeros(num_sim)),
 		('event_time', np.zeros(num_sim)),
@@ -151,8 +152,13 @@ for w_index in range(start_index, end_index+1):
 	results['event_time excess_kurtosis'] = excess_kurtosis
 
 	## Calculate num events per unit 'time'
+	# total_time = np.sum(results['time80percent'])
+	# plateau_time_bin = float(np.argwhere(samp_results['active_count']>=samp_results['plateau'])[0])
+	# plateau_time = samp_results['time_bin_size']*plateau_time_bin
+	# total_time = np.sum(plateau_time)
 	total_time = np.sum(results['event_time'])
 	event_rate = np.true_divide(num_sim,total_time)
+
 
 	results['total_time'] = total_time
 	results['event_rate'] = event_rate

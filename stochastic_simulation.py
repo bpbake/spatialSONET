@@ -184,10 +184,10 @@ for w_index in range(start_index, end_index+1):
 		stats['runtime'] = time.time()-sim_start
 
 		## save stochastic stats
-		stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_coupling{3}_index{4}_simulation{5}_Clean".format(
-			data_dir, N, p, coupling_strength, w_index, sim)
-		with open(stochastic_filename+".pickle", "wb") as stochf:
-				pickle.dump(stats, stochf)
+		# stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_coupling{3}_index{4}_simulation{5}_Clean".format(
+		# 	data_dir, N, p, coupling_strength, w_index, sim)
+		# with open(stochastic_filename+".pickle", "wb") as stochf:
+		# 		pickle.dump(stats, stochf)
 
 
 		## Add in more details

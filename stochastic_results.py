@@ -19,8 +19,8 @@ import time
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = "matrices/"
-data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
-# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
 # data_dir = 'matrices/test/'
 print("data_dir: {0}".format(data_dir))
 sys.stdout.flush()

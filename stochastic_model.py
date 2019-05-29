@@ -94,6 +94,83 @@ def stochastic_model(W, N, coupling_strength, nswitch=25000):
 ##
 ##
 #######################################################################################
+def load_sim_results(N, p, w_index, coupling_strength=0.03, data_dir='matrices/'):
+	import pickle
+	import numpy as np
+
+	result_filename = "{0}StochasticResult_W_N{1}_p{2}_coupling{3}_index{4}.pickle".format(data_dir,N,p,coupling_strength,w_index)
+	try:
+		with open(result_filename, "rb") as rf:
+			results = pickle.load(rf)
+	except:
+		print("couldn't load {0}".format(result_filename))
+
+	return(results)
+
+
+
+#######################################################################################
+##
+##
+#######################################################################################
+def load_single_sim_results(N, p, w_index, sim_index, coupling_strength=0.03, data_dir='matrices/'):
+	import pickle
+	import numpy as np
+
+	stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_coupling{3}_index{4}_simulation{5}".format(
+			data_dir, N, p, coupling_strength, w_index, sim_index)
+	try:
+		with open(stochastic_filename+".pickle", "rb") as stochf:
+			results = pickle.load(stochf)
+	except:
+		print("couldn't load {0}.pickle".format(stochastic_filename))
+
+	return(results)
+
+
+#######################################################################################
+##
+##
+#######################################################################################
+def stochastic_plot_multiple_results(N, p, coupling_strength=0.03, data_dir1='matrices/', data_dir2='matrices/'):
+	import pickle
+	import numpy as np
+	import matplotlib.pyplot as plt
+
+	summary_filename1 = "{0}StochasticSummary_W_N{1}_p{2}_coupling{3}.pickle".format(data_dir1,N,p,coupling_strength)
+	with open(summary_filename1, "rb") as rf:
+		results1 = pickle.load(rf)
+
+	summary_filename2 = "{0}StochasticSummary_W_N{1}_p{2}_coupling{3}.pickle".format(data_dir2,N,p,coupling_strength)
+	with open(summary_filename2, "rb") as rf:
+		results2 = pickle.load(rf)
+
+	# alpha_div_hats = np.concatenate(results1['alpha_div_hat'], results2['alpha_div_hat'])
+	# event_rates = np.concatenate(results1['event_rate'], results2['event_rate'])
+	# results = load_sim_results(N, p, w_index, coupling_strength=0.03, data_dir='matrices/')
+
+	plt.rc('text', usetex=True)
+	plt.rc('font', family='serif', size=80)
+	plt.rc('xtick', labelsize=50)
+	plt.rc('ytick', labelsize=50)
+	plt.figure(figsize=(12,10))
+	# plt.plot(alpha_div_hats, event_rates, 'o', color='b', markersize=30)
+	plt.plot(results1['alpha_div_hat'], results1['event_rate'], 'o', color='b', markersize=30)
+	plt.plot(results2['alpha_div_hat'], results2['event_rate'], 'o', color='b', markersize=30)
+	plt.xlabel(r'$\hat\alpha_{\mathrm{div}}$')
+	plt.ylabel('event rate')
+	plt.xticks(np.arange(0.1,1,0.1))
+	plt.xlim(0.02, 0.82)
+	plt.tight_layout()
+	mng = plt.get_current_fig_manager()
+	mng.window.showMaximized()
+
+
+
+#######################################################################################
+##
+##
+#######################################################################################
 def stochastic_raster_plot(N, fired_neurons, on_times, off_times, tmax):
 	import matplotlib.pyplot as plt
 	import numpy as np
