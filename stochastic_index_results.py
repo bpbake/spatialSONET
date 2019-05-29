@@ -61,13 +61,16 @@ if len(sys.argv) >= 3:
 	start_index = int(sys.argv[1])
 	end_index = int(sys.argv[2])
 else:
-	start_index = int(input_orig("enter starting index: "))
-	end_index = int(input_orig("enter end index: "))
+	start_index = int(input_orig("enter network starting index: "))
+	end_index = int(input_orig("enter network end index: "))
 	
 w_indices = end_index-start_index+1
 
 ## now, let's access the results for the chosen indices
-for w_index in range(start_index, end_index+1):	
+for w_index in range(start_index, end_index+1):
+	print("\n\ndata_dir: {0}".format(data_dir))
+	print("\nBeginning network {0}".format(w_index))	
+	sys.stdout.flush()
 
 	results = dict([
 		('num_switches', np.zeros(num_sim)),
@@ -79,13 +82,16 @@ for w_index in range(start_index, end_index+1):
 		('plateau', np.zeros(num_sim)),
 		('threshold', np.zeros(num_sim)),
 		('event_time_bin', np.zeros(num_sim)),
-		('event_times', np.zeros(num_sim)),
+		('event_time', np.zeros(num_sim)),
 		('runtime', np.zeros(num_sim))])
 
 	actual_index = -1
 	skipped = 0
 
 	for sim in range(num_sim):
+		if sim%30 == 0:
+			print("index {0} simulation {1}".format(w_index, sim))
+			sys.stdout.flush()
 
 		## load simulation data
 		stochastic_filename = "{0}Stochastic_Results_N{1}_p{2}_coupling{3}_index{4}_simulation{5}".format(
@@ -95,6 +101,7 @@ for w_index in range(start_index, end_index+1):
 				samp_results = pickle.load(stochf)
 		except:
 			print("couldn't load {0}.pickle".format(stochastic_filename))
+			sys.stdout.flush()
 			continue
 		
 		actual_index += 1
@@ -111,25 +118,25 @@ for w_index in range(start_index, end_index+1):
 	stats_filename = "{0}Stats_W_N{1}_p{2}_L{3}_{4}.pickle".format(data_dir, N, p, L_left, w_index)
 	with open(stats_filename, 'rb') as statf:
 		try:
-			stats = pickle.load(statf)
+			Wstats = pickle.load(statf)
 		except (EOFError):
 			print("unpickling stats error")
 			sys.stdout.flush()
 
 	## Add network (index) specific results
-	results['N'] = stats['N']
-	results['L_left'] = stats['L_left']  
-	results['L_right'] = stats['L_right']
-	results['p_AVG'] = stats['p_AVG'] 
-	results['alpha_recip'] = stats['alpha_recip']
-	results['alpha_conv'] = stats['alpha_conv']
-	results['alpha_div'] = stats['alpha_div']
-	results['alpha_chain'] = stats['alpha_chain']
-	results['p_hat'] = stats['p_hat']
-	results['alpha_recip_hat'] = stats['alpha_recip_hat']
-	results['alpha_conv_hat'] = stats['alpha_conv-hat']
-	results['alpha_div_hat'] = stats['alpha_div_hat']
-	results['alpha_chain_hat'] = stats['alpha_chain_hat']
+	results['N'] = Wstats['N']
+	results['L_left'] = Wstats['L_left']  
+	results['L_right'] = Wstats['L_right']
+	results['p_AVG'] = p
+	results['alpha_recip'] = Wstats['alpha_recip']
+	results['alpha_conv'] = Wstats['alpha_conv']
+	results['alpha_div'] = Wstats['alpha_div']
+	results['alpha_chain'] = Wstats['alpha_chain']
+	results['p_hat'] = Wstats['p_hat']
+	results['alpha_recip_hat'] = Wstats['alpha_recip_hat']
+	results['alpha_conv_hat'] = Wstats['alpha_conv_hat']
+	results['alpha_div_hat'] = Wstats['alpha_div_hat']
+	results['alpha_chain_hat'] = Wstats['alpha_chain_hat']
 
 	results['skipped'] = skipped
 	results['num_sim'] = num_sim
@@ -137,18 +144,14 @@ for w_index in range(start_index, end_index+1):
 
 
 	## calculate skew and excess kurtosis of event times (IEIs)
-	try:
-		excess_kurtosis = stats.kurtosis(results['event_times'], bias=False)
-		skew = stats.skew(results['event_times'], bias=False)
-	except:
-		excess_kurtosis = np.float64('nan')
-		skew = np.float64('nan')
+	excess_kurtosis = stats.kurtosis(results['event_time'], bias=False)
+	skew = stats.skew(results['event_time'], bias=False)
 
 	results['event_time skew'] = skew
 	results['event_time excess_kurtosis'] = excess_kurtosis
 
 	## Calculate num events per unit 'time'
-	total_time = np.sum(results['event_times'])
+	total_time = np.sum(results['event_time'])
 	event_rate = np.true_divide(num_sim,total_time)
 
 	results['total_time'] = total_time
@@ -160,3 +163,4 @@ for w_index in range(start_index, end_index+1):
 		pickle.dump(results, rf)
 
 	print("results for network {0} pickled".format(w_index))
+	sys.stdout.flush()

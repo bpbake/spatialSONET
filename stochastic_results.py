@@ -19,8 +19,8 @@ import time
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_div_rand/'
 # data_dir = 'matrices/N1000_erdos_renyi/'
 # data_dir = "matrices/"
-# data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
-data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
+data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_half/'
 # data_dir = 'matrices/test/'
 print("data_dir: {0}".format(data_dir))
 sys.stdout.flush()
@@ -89,8 +89,7 @@ else:
 		('alpha_div_hat', np.zeros(n_indices)), 
 		('alpha_chain_hat', np.zeros(n_indices)),
 		('num_sim', np.zeros(n_indices)),
-		('coupling_strength', np.zeros(n_indices)),
-		('event_rate', np.zeros(n_indices)), 
+		('coupling_strength', np.zeros(n_indices)), 
 		('event_time excess_kurtosis', np.zeros(n_indices)), 
 		('event_time skew', np.zeros(n_indices)),
 		('event_rate', np.zeros(n_indices)),
@@ -108,7 +107,7 @@ else:
 		result_filename = "{0}StochasticResult_W_N{1}_p{2}_coupling{3}_index{4}.pickle".format(data_dir,N,p,coupling_strength,w_index)
 		try:
 			with open(result_filename, "rb") as rf:
-				results = pickle.load(results, rf)
+				results = pickle.load(rf)
 		except:
 			print("couldn't load {0}".format(result_filename))
 			continue
@@ -129,6 +128,8 @@ else:
 	print("result summary pickled")
 
 
-print("data_dir: {0}".format(data_dir))
-print("event_rates: {0}".format(results_summary['event_rate']))
-print("event_times skew: {0}".format(results_summary["event_times skew"]))
+# print("data_dir: {0}".format(data_dir))
+print("\nevent_rates: {0}".format(results_summary['event_rate']))
+print("mean event rate: {0}".format(np.mean(results_summary['event_rate'])))
+print("\nevent_times skew: {0}".format(results_summary["event_time skew"]))
+print("mean skew: {0}".format(np.mean(results_summary['event_time skew'])))
