@@ -9,12 +9,12 @@ Created on Sun Mar  5 14:06:45 2017
 # data_dir = 'matrices/N1000_LL100_LR0_ff_alpha_div_rand/'
 
 # data_dir = 'matrices/N3000_Linf_homogeneous_alpha_div_rand/'
-# data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
+data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_rand/'
 # data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
 
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alphas_all_zero/'
 # data_dir = 'matrices/N3000_Linf_homogeneous_alphas_all_zero/'
-data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
+# data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
 # data_dir = 'matrices/test/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
@@ -23,12 +23,12 @@ data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_zero/'
 res_dir = data_dir
 print("data_dir: "+data_dir)
 # print("results_dir: "+res_dir)
-Style = "Regular5s_"
-# Style = "Irregular100s_"
+# Style = "Regular5s_"
+Style = "Irregular100s_"
 print("Style: "+Style)
 
-L_left = 100 ## spatial parameter ff
-# L_left = 50 ## spatial parameter recurrent
+# L_left = 100 ## spatial parameter ff
+L_left = 50 ## spatial parameter recurrent
 # L_left = float("inf") ## spatial parameter for homogeneous
 N = 3000 ## Number of excitatory neurons
 p = 50/N ## average probability of connectivity between neurons
@@ -82,8 +82,8 @@ refract = 1*ms ## "cool down" time between spikes (after a spike, it can't spike
 
 transienttime = 500*ms ## getting the network into place (the start bit of the simulation)
 ## the part of the simulation we care about
-simulationtime = 5000*ms ## Regular
-# simulationtime = 100000*ms ## Irregular
+# simulationtime = 5000*ms ## Regular
+simulationtime = 100000*ms ## Irregular
 
 ## Set up the Neuron Groups for simulation
 G = NeuronGroup(N, eqs, threshold='v>-55*mV', reset='v=-65*mV', refractory='refract', method='euler') 
@@ -92,17 +92,17 @@ G.v='vreset+(vthreshold-vreset)*rand()' ## sets voltage dip below reset after sp
 
 ## variables that control the PoissonGroup
 ##-----REGULAR Regime-----
-ext_rate = 250*Hz ## rate of external input (how often input happens)
-ext_mag = 1*mV ## how much the voltage gets affected by the external input
+# ext_rate = 250*Hz ## rate of external input (how often input happens)
+# ext_mag = 1*mV ## how much the voltage gets affected by the external input
 ##-------IRREGULAR Regime-----
 ##--- For homogeneous networks ---
 # ext_rate = 110*Hz ## rate of external input (how often input happens)
 # ext_mag = 1.65*mV ## how much the voltage gets affected by the external input
+##--- For recurrent networks ---
+ext_rate = 113*Hz ## rate of external input (how often input happens)
+ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
 ##--- For feed-forward networks ---
 # ext_rate = 116*Hz ## rate of external input (how often input happens)
-# ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
-##--- For recurrent networks ---
-# ext_rate = 113*Hz ## rate of external input (how often input happens)
 # ext_mag = 1.5*mV ## how much the voltage gets affected by the external input
 
 P = PoissonGroup(N, ext_rate) ## adds noise to the simulation

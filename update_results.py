@@ -4,9 +4,9 @@ Created on Tues Feb  26 14:25 2019
 
 @author: Brittany
 """
-# data_dir = 'matrices/N1000_Linf_recurr_alpha_div_rand/'
+# data_dir = 'matrices/N3000_Linf_homogeneous_alpha_conv_div_rand/'
 # data_dir = 'matrices/N3000_LL50_LR50_recurr_alpha_div_rand/'
-data_dir = 'matrices/N3000_LL100_LR0_ff_alpha_conv_div_rand/'
+data_dir = 'matrices/N3000_LL100_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/N3000_erdos_renyi/'
 # res_dir = '/var/tmp/N3000_LL70_LR0_ff_alphas_all_rand/'
 # data_dir = 'matrices/N1000_LL50_LR50_recurr_alpha_div_rand/'
@@ -15,8 +15,8 @@ res_dir = data_dir
 print("data_dir: "+data_dir)
 # print("results_dir: "+res_dir)
 style1 = "Regular5s_"
-# style2 = "Irregular50s_"
-print("styles: "+style1)#+", "+style2)
+style2 = ""#"Irregular50s_"
+print("styles: "+style1+" "+style2)
 
 import sys
 
@@ -50,11 +50,11 @@ else:
 
 ## now, let's update the chosen simulations
 for w_index in range(start_index, end_index+1):
-	print("\n\nupdating network {0}".format(w_index))
-	print("data_dir {0}\n".format(data_dir))
+  print("\n\nupdating network {0} of ({1} to {2})".format(w_index,start_index,end_index))
+  print("data_dir {0}\nstyles {1} {2}".format(data_dir,style1,style2))
 
-	try:
-		ar.update_results(N, p, w_index, style1, data_dir)
-		# ar.update_results(N, p, w_index, style2, data_dir)
-	except Exception as e:
-		print("Error: %s" % e)
+  try:
+    ar.update_results(N, p, w_index, style1, data_dir)
+    # ar.update_results(N, p, w_index, style2, data_dir)
+  except Exception as e:
+    print("Error: %s" % e)

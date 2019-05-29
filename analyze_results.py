@@ -95,6 +95,12 @@ def update_results(N, p, i, style, data_dir='matrices/', neuron_bin_size=100):
   results['IEIs'] = IEIs 
   results['IEI excess_kurtosis'] = excess_kurtosis
   results['IEI skew'] = skew
+  imean=np.mean(IEIs)
+  istd=np.std(IEIs)
+  icoeffvar = np.true_divide(istd,imean)
+  results["IEI mean"]=imean
+  results["IEI std"]=istd
+  results["IEI coeff of variation"]=icoeffvar
 
   save_results(N, p, i, results, style, data_dir)
   clean_results(N, p, i, style, data_dir)
@@ -323,7 +329,7 @@ def analyze_events(N, events, num_events, simulation_time, neuron_bin_size=100):
     ## update num neurons covered by event
     
     if (stime == event['start_time']) and (sbin == event['start_neuron_bin']):
-      print("skipped event")
+      # print("skipped event")
       continue 
 
     if stime is not None:

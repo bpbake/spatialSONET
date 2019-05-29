@@ -64,10 +64,9 @@ else:
         ('p_AVG', np.zeros(n_indices)), ('alpha_recip', np.zeros(n_indices)), ('alpha_conv', np.zeros(n_indices)), 
         ('alpha_div', np.zeros(n_indices)), ('alpha_chain', np.zeros(n_indices)), ('p_hat', np.zeros(n_indices)), 
         ('alpha_recip_hat', np.zeros(n_indices)), ('alpha_conv_hat', np.zeros(n_indices)), ('alpha_div_hat', np.zeros(n_indices)), 
-        ('alpha_chain_hat', np.zeros(n_indices)), #('largest eigenvalue', np.zeros(n_indices)), 
+        ('alpha_chain_hat', np.zeros(n_indices)), 
         ('average firing rate', np.zeros(n_indices)), ('event_rate', np.zeros(n_indices)), 
-        ('IEI excess_kurtosis', np.zeros(n_indices)), ('IEI skew', np.zeros(n_indices)),]) 
-        #('j', np.zeros(n_indices)),('ext_rate', np.zeros(n_indices)),('ext_mag', np.zeros(n_indices))])
+        ('IEI excess_kurtosis', np.zeros(n_indices)), ('IEI skew', np.zeros(n_indices))]) 
     actual_index = -1
 
     skipped = 0
