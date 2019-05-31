@@ -102,6 +102,7 @@ for w_index in range(start_index, end_index+1):
 				samp_results = pickle.load(stochf)
 		except:
 			print("couldn't load {0}.pickle".format(stochastic_filename))
+			print("Error: %s" % e)
 			sys.stdout.flush()
 			continue
 		

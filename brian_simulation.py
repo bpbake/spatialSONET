@@ -135,7 +135,8 @@ else:
 for w_index in range(start_index, end_index+1):
     
     print("\n\nw_index = {0}".format(w_index))
-    print("data_dir: "+data_dir+'\n')
+    print("data_dir: "+data_dir)
+    print("style: "+Style+"\n")
     
     restore() ## set the state back to what it was when the store() command was called
 

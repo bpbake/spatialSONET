@@ -110,6 +110,7 @@ else:
 				results = pickle.load(rf)
 		except:
 			print("couldn't load {0}".format(result_filename))
+			print("Error: %s" % e)
 			continue
 		
 		actual_index += 1
